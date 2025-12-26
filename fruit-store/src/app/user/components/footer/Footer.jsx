@@ -1,5 +1,5 @@
 import "./Footer.css";
-import bctImg from "../../../assets/bct.png";
+import bctImg from "../../../../assets/bct.png";
 
 function Footer() {
   return (
