@@ -1,15 +1,11 @@
-import Header from "../components/header/Header";
-import Footer from "../components/footer/Footer";
+import BannerSlider from "../components/banner/BannerSlider";
 
 function Home() {
   return (
     <>
-      <Header />
-      <main>
-        <h1>Fruit Store</h1>
-        <p>Trái cây tươi mỗi ngày</p>
-      </main>
-      <Footer />
+      {/* <h1>Fruit Store</h1>
+      <p>Trái cây tươi mỗi ngày</p> */}
+      <BannerSlider />
     </>
   );
 }

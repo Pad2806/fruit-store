@@ -1,0 +1,91 @@
+.banner-slider {
+  background: #fff;
+}
+
+.slider-wrapper {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+.slide.active {
+  position: relative;
+  opacity: 1;
+  z-index: 1;
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 28px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.nav.prev {
+  left: 12px;
+}
+
+.nav.next {
+  right: 12px;
+}
+
+.nav:hover {
+  background: #f47c4b;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .slider-wrapper {
+    border-radius: 0;
+  }
+
+  .slide img {
+    border-radius: 0;
+  }
+}
+
+.banner-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  background: rgba(160, 160, 160, 0.884);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: #f87743;
+  transform: scale(1.3);
+}
