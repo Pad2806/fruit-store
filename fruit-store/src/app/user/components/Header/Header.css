@@ -1,0 +1,175 @@
+.header {
+  background: #f47c4b;
+  color: #fff;
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+}
+
+.header-inner {
+  max-width: 1150px;     
+  margin: 0 auto;        
+  padding: 30px 20px 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+/* LEFT */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-shrink: 0;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.menu::before {
+  content: "☰";
+  font-size: 30px;       
+  line-height: 1;
+}
+
+.logo {
+  font-size: clamp(24px, 2.5vw, 36px);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* SEARCH */
+.header-search {
+  flex: 1 1 auto;
+  max-width: 480px;
+  min-width: 0px;
+  margin: 0 16px;  
+  position: relative;    
+}
+
+.header-search input {
+  width: 100%;
+  height: 28px;
+  padding: 8px 0px 8px 16px;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* RIGHT */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 200;
+  cursor: pointer;
+}
+
+.action .icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.cart {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: red;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+@media (max-width: 1024px) {
+
+  .header-inner {
+    padding: 18px 16px 16px;
+  }
+
+  /* Search nhỏ lại */
+  .header-search {
+    max-width: 300px;
+    min-width: 0px;
+    margin: 0 10px;
+  }
+
+  /* Giảm khoảng cách bên phải */
+  .header-actions {
+    gap: 18px;
+  }
+
+  /* Ẩn chữ, giữ icon */
+  .action span:not(.icon) {
+    display: none;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .header-inner {
+    padding: 14px 12px;
+  }
+
+  /* Logo nhỏ lại */
+  .logo {
+    font-size: 22px;
+  }
+
+  /* Menu + logo sát hơn */
+  .header-left {
+    gap: 12px;
+  }
+
+  /* Search co tối đa */
+  .header-search {
+    max-width: 250px;
+    min-width: 0;
+    margin: 0 10px;
+  }
+
+  /* Chỉ giữ icon */
+  .action span:not(.icon) {
+    display: none;
+  }
+
+  /* Icon nhỏ lại chút */
+  .action .icon {
+    font-size: 18px;
+  }
+
+}
