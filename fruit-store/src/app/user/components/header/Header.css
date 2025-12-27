@@ -1,10 +1,21 @@
-.header {
+/* .header {
   background: #f47c4b;
   color: #fff;
   position: relative;
   font-family: 'Montserrat', sans-serif;
   overflow-x: hidden;
+} */
+ .header {
+  background: #f47c4b;
+  color: #fff;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  font-family: 'Montserrat', sans-serif;
 }
+
 
 .header-inner {
   max-width: 1150px;     
@@ -120,19 +131,16 @@
     padding: 18px 16px 16px;
   }
 
-  /* Search nhỏ lại */
   .header-search {
     max-width: 300px;
     min-width: 0px;
     margin: 0 10px;
   }
 
-  /* Giảm khoảng cách bên phải */
   .header-actions {
     gap: 18px;
   }
 
-  /* Ẩn chữ, giữ icon */
   .action span:not(.icon) {
     display: none;
   }
@@ -145,29 +153,24 @@
     padding: 14px 12px;
   }
 
-  /* Logo nhỏ lại */
   .logo {
     font-size: 22px;
   }
 
-  /* Menu + logo sát hơn */
   .header-left {
     gap: 12px;
   }
 
-  /* Search co tối đa */
   .header-search {
     max-width: 250px;
     min-width: 0;
     margin: 0 10px;
   }
 
-  /* Chỉ giữ icon */
   .action span:not(.icon) {
     display: none;
   }
 
-  /* Icon nhỏ lại chút */
   .action .icon {
     font-size: 18px;
   }
