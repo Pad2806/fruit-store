@@ -1,16 +1,23 @@
-import { useCart } from "../../context/CartContext";
+import { Link } from "react-router-dom";
 import "./ProductCard.css";
+import { useCart } from "../../context/CartContext";
 
 function ProductCard({ product }) {
-  const { addToCart } = useCart();
+  const { addToCart } = useCart(); 
+
   return (
     <div className="product-card">
-      <img src={product.image} alt={product.name} />
+      <Link to={`/products/${product.id}`} className="product-link">
+        <img src={product.image} alt={product.name} />
+        <h3 className="product-name">{product.name}</h3>
+      </Link>
 
-      <h3 className="product-name">{product.name}</h3>
       <p className="product-price">{product.price}</p>
 
-      <button className="buy-btn" onClick={addToCart}> CHỌN MUA</button>
+      <button className="buy-btn" 
+      onClick={addToCart} 
+      >
+        CHỌN MUA</button>
     </div>
   );
 }

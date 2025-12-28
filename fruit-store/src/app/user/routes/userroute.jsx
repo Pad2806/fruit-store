@@ -1,9 +1,9 @@
 import UserLayout from "../UserLayout";
-import Home from "../pages/home";
+import Home from "../pages/home/home";
 import About from "../pages/about";
 import Contact from "../pages/contact";
-import Products from "../pages/products";
-import ProductDetail from "../pages/product_detail";
+import Products from "../pages/products/products";
+import ProductDetail from "../pages/product_detail/product_detail";
 
 const userRoutes = [
   {
