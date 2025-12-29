@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Landmark, Banknote } from "lucide-react";
 import styles from "./checkout.module.scss";
 import appleImg from "../../assets/images/apple.png";
 import grapesImg from "../../assets/images/peonygrapes.png";
@@ -110,7 +111,7 @@ export default function Checkout() {
                 />
                 <span className={styles.customRadio}></span>
                 <span className={styles.methodName}>Thanh toán khi giao hàng (COD)</span>
-                <span className={styles.methodIcon}>💵</span>
+                <span className={styles.methodIcon}><Banknote /></span>
               </label>
 
               <label className={styles.paymentOption}>
@@ -123,7 +124,7 @@ export default function Checkout() {
                 />
                 <span className={styles.customRadio}></span>
                 <span className={styles.methodName}>Chuyển khoản qua ngân hàng</span>
-                <span className={styles.methodIcon}>🏦</span>
+                <span className={styles.methodIcon}><Landmark /></span>
               </label>
             </div>
           </section>
