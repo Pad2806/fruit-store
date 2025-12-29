@@ -12,7 +12,26 @@ export const products = [
     name: "Dưa xiêm gọt trọc",
     price: "19.000đ",
     image: img1,
-    description: "Dưa xiêm tươi, đã gọt sẵn, tiện lợi cho gia đình."
+    description: (
+      <>
+        <strong>Dưa xiêm gọt trọc tươi ngon</strong>, được tuyển chọn từ những
+        trái dưa chín tự nhiên, vị ngọt thanh, mọng nước.  
+        <br /><br />
+
+        Sản phẩm đã được <strong>gọt sẵn – làm sạch – đóng gói kỹ lưỡng</strong>,
+        giúp tiết kiệm thời gian sơ chế, phù hợp cho gia đình bận rộn, văn phòng
+        hoặc dùng ngay sau khi mua.  
+        <br /><br />
+
+        <strong>Cam kết:</strong>  
+        <br />
+        • Dưa tươi trong ngày  
+        <br />
+        • Không chất bảo quản  
+        <br />
+        • Đảm bảo an toàn vệ sinh thực phẩm
+      </>
+    )
   },
   {
     id: "2",

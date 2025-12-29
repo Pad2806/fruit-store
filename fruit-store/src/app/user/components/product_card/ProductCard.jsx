@@ -15,7 +15,7 @@ function ProductCard({ product }) {
       <p className="product-price">{product.price}</p>
 
       <button className="buy-btn" 
-      onClick={addToCart} 
+      onClick={() => addToCart(product)}
       >
         CHỌN MUA</button>
     </div>

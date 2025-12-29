@@ -1,5 +1,7 @@
 import { useState, useRef, useLayoutEffect } from "react";
+import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import SearchBar from "../search/SearchBar";
 import "./Header.css";
 
 function Header() {
@@ -36,8 +38,7 @@ function Header() {
           </div>
 
           <div className="header-search">
-            <input placeholder="Tìm kiếm sản phẩm..." />
-            <span className="search-icon">🔍</span>
+            <SearchBar />
           </div>
 
           <div className="header-actions">
@@ -71,10 +72,29 @@ function Header() {
           >
             <div className="menu-dropdown-inner">
               <ul className="menu-list">
-                <li className="home">🏠</li>
-                <li>TRANG CHỦ</li>
-                <li>TRÁI CÂY NGON HÔM NAY</li>
-                <li>LIÊN HỆ</li>
+                <li className="home">
+                  <Link to="/" onClick={() => setOpenMenu(false)}>🏠</Link>
+                </li>
+                <li>
+                  <Link to="/" onClick={() => setOpenMenu(false)}>
+                    TRANG CHỦ
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/products" onClick={() => setOpenMenu(false)}>
+                    TRÁI CÂY NGON HÔM NAY
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" onClick={() => setOpenMenu(false)}>
+                    VỀ CHÚNG TÔI
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" onClick={() => setOpenMenu(false)}>
+                    LIÊN HỆ
+                  </Link>
+                </li>
               </ul>
 
               <div className="menu-support">
