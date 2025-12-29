@@ -1,7 +1,5 @@
 import { useRoutes } from "react-router-dom";
-import userRoutes from "./app/user/routes/userroute";
-import { useRoutes } from "react-router-dom";
-import userRoutes from "./app/user/routes/userroute";
+import { userRoutes } from "./app/user/routes/userroute";
 
 function App() {
   const routes = useRoutes([
@@ -10,12 +8,7 @@ function App() {
   ]);
 
   return routes;
-  const routes = useRoutes([
-    ...userRoutes
-    
-  ]);
 
-  return routes;
 }
 
 export default App;
