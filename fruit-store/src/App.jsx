@@ -1,5 +1,5 @@
 import { useRoutes } from "react-router-dom";
-import userRoutes from "./app/user/routes/useroutes";
+import {userRoutes} from "./app/user/routes/userroute";
 import adminRoutes from "./app/admin/routes/adminroutes";
 import sellerRoutes from "./app/seller/routes/sellerroutes";
 
