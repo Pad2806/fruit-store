@@ -1,6 +1,7 @@
 import { useState, useRef, useLayoutEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { Phone, User, ShoppingCart } from "lucide-react";
 import SearchBar from "../search/SearchBar";
 import "./Header.css";
 
@@ -9,6 +10,7 @@ function Header() {
   const [menuTop, setMenuTop] = useState(0);
   const headerRef = useRef(null);
   const { cartCount } = useCart();
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     if (openMenu && headerRef.current) {
@@ -32,7 +34,7 @@ function Header() {
               <span>MENU</span>
             </div>
 
-            <div className="logo">
+            <div className="logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
               <span>FRUIT</span>store
             </div>
           </div>
@@ -42,16 +44,16 @@ function Header() {
           </div>
 
           <div className="header-actions">
-            <div className="action">
-              <span className="icon">📞</span>
+            <div className="action" onClick={() => navigate("/contact")} style={{ cursor: "pointer" }}>
+              <span className="icon"><Phone size={18} /></span>
               <span>Hotline 0865660775</span>
             </div>
-            <div className="action">
-              <span className="icon">👤</span>
+            <div className="action" onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
+              <span className="icon"><User size={20} /></span>
               <span>Tài khoản</span>
             </div>
-            <div className="action cart">
-              <span className="icon">🛒</span>
+            <div className="action cart" onClick={() => navigate("/cart")} style={{ cursor: "pointer" }}>
+              <span className="icon"><ShoppingCart size={20} /></span>
               <span>Giỏ hàng</span>
               <span className="badge">{cartCount}</span>
             </div>
