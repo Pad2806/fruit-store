@@ -1,0 +1,106 @@
+.footer {
+  background: #fff;
+  border-top: 1px solid #eee;
+  font-family: 'Montserrat', sans-serif;
+  color: #333;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: grid;
+  grid-template-columns: 2fr 2fr 1.5fr 1.5fr;
+  gap: 32px;
+}
+
+.footer-col h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.footer-col p,
+.footer-col li {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.footer-col {
+  padding-left: 16px;
+}
+
+.footer-col {
+  list-style: disc;
+}
+
+.footer-links {
+  padding-left: 16px;
+}
+
+.footer-links li {
+  list-style: disc;
+  margin-bottom: 8px;
+}
+
+.footer-links a {
+  color: #333;
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #f47c4b;   
+  text-decoration: underline;
+}
+
+.bct {
+  width: 100px;        
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+}
+
+.small {
+  font-size: 12px;
+  color: #666;
+}
+
+.footer-hotline .hotline {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.footer-hotline .email {
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.social span {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ccc;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: 14px 0;
+  font-size: 13px;
+  color: #666;
+  border-top: 1px solid #eee;
+}
+
+@media (max-width: 768px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+  }
+}
