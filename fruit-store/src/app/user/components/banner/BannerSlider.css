@@ -1,6 +1,6 @@
 .banner-slider {
   background: #fff;
-  padding: 0px 0;
+  padding: 20px 0;
 }
 
 .slider-wrapper {
@@ -12,7 +12,7 @@
 
 .slide img {
   width: 100%;
-  max-height: 500px;        
+  max-height: 500px;
   object-fit: cover;
   display: block;
   border-radius: 12px;

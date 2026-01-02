@@ -47,13 +47,20 @@
   font-size: 13px;
   font-weight: 600;
 }
-
+/* 
 .price {
   font-size: 28px;
   font-weight: 700;
   color: red;
   margin-bottom: 20px;
+} */
+ .product-detail-info .price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f47c4b;
+  margin-bottom: 20px;
 }
+
 
 .quantity {
   display: inline-flex;

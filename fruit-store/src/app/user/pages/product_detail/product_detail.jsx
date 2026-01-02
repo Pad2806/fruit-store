@@ -4,7 +4,7 @@ import { products } from "../../data/products";
 import "./product_detail.css";
 import ProductCard from "../../components/product_card/ProductCard";
 import { useCart } from "../../context/CartContext";
-
+import { FaCheckCircle, FaTruck, FaPhoneAlt } from "react-icons/fa";
 function ProductDetail() {
   const { id } = useParams();
   const product = products.find(p => p.id === id);
@@ -41,11 +41,6 @@ function ProductDetail() {
             <span className="status">Còn hàng</span>
           </div>
 
-          <div className="voucher">
-            <span>FREESHIP40K</span>
-            <span>FREESHIPMF</span>
-          </div>
-
           <div className="price">{product.price}</div>
 
           <div className="quantity">
@@ -59,7 +54,7 @@ function ProductDetail() {
             onClick={() => {
               for (let i = 0; i < qty; i++) addToCart();
             }}
-          >THÊM VÀO GIỎ</button>
+          >THÊM VÀO GIỎ HÀNG</button>
         </div>
       </section>
 
@@ -76,12 +71,18 @@ function ProductDetail() {
           <h3>Dịch vụ giao hàng</h3>
 
           <ul>
-            <li>✔ Cam kết 100% chính hãng</li>
-            <li>🚚 Giao hàng dự kiến: Thứ 2 - Chủ nhật (8h00 - 21h00)</li>
-            <li>📞 Hỗ trợ 24/7 qua Facebook, Zalo & Hotline</li>
+            <li>
+              <FaCheckCircle style={{color: "#f47c4b", marginRight: "10px"}} /> Cam kết 100% chính hãng
+            </li>
+            <li>
+              <FaTruck style={{color: "#f47c4b", marginRight: "10px"}} /> Giao hàng dự kiến: Thứ 2 - Chủ nhật (8h00 - 21h00)
+            </li>
+            <li>
+              <FaPhoneAlt style={{color: "#f47c4b", marginRight: "10px"}} /> Hỗ trợ 24/7 qua Facebook, Zalo & Hotline
+            </li>
           </ul>
         </div>
-      </section>,
+      </section>
 
       <section className="related-products">
         <h2>Sản phẩm liên quan</h2>
