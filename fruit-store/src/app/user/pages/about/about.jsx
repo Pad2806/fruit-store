@@ -128,16 +128,16 @@ function About() {
             <h3>Giá trị cốt lõi</h3>
             <ul className="about-values">
               <li>
-                <FaCheckCircle /> Chất lượng đặt lên hàng đầu
+                <FaCheckCircle style={{color: "#00c403ff"}} /> Chất lượng đặt lên hàng đầu
               </li>
               <li>
-                <FaCheckCircle /> Minh bạch nguồn gốc
+                <FaCheckCircle style={{color: "#00c403ff"}} /> Minh bạch nguồn gốc
               </li>
               <li>
-                <FaCheckCircle /> Phục vụ tận tâm
+                <FaCheckCircle style={{color: "#00c403ff"}} /> Phục vụ tận tâm
               </li>
               <li>
-                <FaCheckCircle /> Lấy khách hàng làm trung tâm
+                <FaCheckCircle style={{color: "#00c403ff"}} /> Lấy khách hàng làm trung tâm
               </li>
             </ul>
           </div>
