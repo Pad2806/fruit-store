@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BannerSlider from "../../components/banner/BannerSlider";
 import ProductList from "../../components/product_list/ProductList";
-import "./products.css";
+import styles from "./products.module.scss";
 
 import banner1 from "../../assets/banner3.png";
 import banner2 from "../../assets/banner2.png";
@@ -45,11 +45,11 @@ function Products() {
     <>
       <BannerSlider banners={productBanners} />
 
-      <section className="products-page">
-        <div className="products-header">
+      <section className={styles.productsPage}>
+        <div className={styles.productsHeader}>
           <h2>Trái cây ngon mỗi ngày</h2>
 
-          <select className="sort-select">
+          <select className={styles.sortSelect}>
             <option>Sắp xếp</option>
             <option>Giá tăng dần</option>
             <option>Giá giảm dần</option>
@@ -61,7 +61,7 @@ function Products() {
         <ProductList products={visibleProducts} />
 
         {visibleCount < products.length && (
-          <div className="load-more">
+          <div className={styles.loadMore}>
             <button onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
               Xem thêm <strong>trái cây ngon mỗi ngày</strong>
             </button>

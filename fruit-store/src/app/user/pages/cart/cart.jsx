@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./cart.module.scss";
 import appleImg from "../../assets/images/apple.png";
 import grapesImg from "../../assets/images/peonygrapes.png";
-
+import { FaClock } from "react-icons/fa";
 export default function Cart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([
@@ -151,7 +151,7 @@ export default function Cart() {
 
               {isConfirmed && deliveryOption === "select" && (
                 <div className={styles.confirmedDisplay}>
-                   <span className={styles.clockIcon}>🕒</span>
+                   <span className={styles.clockIcon}><FaClock /></span>
                    <strong>{confirmedTime}</strong>
                 </div>
               )}

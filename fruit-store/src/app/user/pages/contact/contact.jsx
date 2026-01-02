@@ -1,5 +1,4 @@
-
-import "./contact.css";
+import styles from "./contact.module.scss";
 import {
   FaMapMarkerAlt,
   FaEnvelope,
@@ -9,14 +8,13 @@ import {
 
 function Contact() {
   return (
-    <div className="contact-page">
-      <div className="contact-content">
-        {/* LEFT */}
-        <div className="contact-info">
+    <div className={styles.contactPage}>
+      <div className={styles.contactContent}>
+        <div className={styles.contactInfo}>
           <h2>Thông tin liên hệ</h2>
 
-          <div className="info-item">
-            <span className="icon">
+          <div className={styles.infoItem}>
+            <span className={styles.icon}>
               <FaMapMarkerAlt />
             </span>
             <p>
@@ -24,8 +22,8 @@ function Contact() {
             </p>
           </div>
 
-          <div className="info-item">
-            <span className="icon">
+          <div className={styles.infoItem}>
+            <span className={styles.icon}>
               <FaMapMarkerAlt />
             </span>
             <p>
@@ -33,39 +31,38 @@ function Contact() {
             </p>
           </div>
 
-          <div className="info-item">
-            <span className="icon">
+          <div className={styles.infoItem}>
+            <span className={styles.icon}>
               <FaEnvelope />
             </span>
-            <p>hello@morningfruit.com.vn</p>
+            <p>hello@fruitstore.com.vn</p>
           </div>
 
-          <div className="info-item">
-            <span className="icon">
+          <div className={styles.infoItem}>
+            <span className={styles.icon}>
               <FaPhoneAlt />
             </span>
             <p>Hotline: 0865666666</p>
           </div>
 
-          <div className="info-item">
-            <span className="icon">
+          <div className={styles.infoItem}>
+            <span className={styles.icon}>
               <FaClock />
             </span>
             <p>Thứ 2 – Chủ nhật (8h00 – 20h00)</p>
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="contact-form">
+        <div className={styles.contactForm}>
           <h2>Tư vấn Quà Tặng Doanh Nghiệp</h2>
-          <p className="desc">
+          <p className={styles.desc}>
             Nếu bạn có thắc mắc gì, hãy gửi yêu cầu cho chúng tôi.
           </p>
 
           <form>
             <input type="text" placeholder="Tên của bạn" />
 
-            <div className="row">
+            <div className={styles.row}>
               <input type="email" placeholder="Email của bạn" />
               <input type="tel" placeholder="Số điện thoại của bạn" />
             </div>

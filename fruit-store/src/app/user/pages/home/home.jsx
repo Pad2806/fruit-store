@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import BannerSlider from "../../components/banner/BannerSlider";
 import ProductList from "../../components/product_list/ProductList";
-import "./Home.css";
+import styles from "./home.module.scss";
 
 import banner1 from "../../assets/banner1.png";
 import banner2 from "../../assets/banner2.png";
@@ -37,14 +37,15 @@ function Home() {
   return (
     <>
       <BannerSlider banners={homeBanners} />
-      <section className="home-products">
-        <Link to="/products" className="home-products-title">
+
+      <section className={styles.homeProducts}>
+        <Link to="/products" className={styles.homeProductsTitle}>
           Trái ngon hôm nay
         </Link>
 
         <ProductList products={products.slice(0, 6)} />
 
-        <div className="home-products-more">
+        <div className={styles.homeProductsMore}>
           <Link to="/products">Xem thêm sản phẩm trái ngon hôm nay</Link>
         </div>
       </section>

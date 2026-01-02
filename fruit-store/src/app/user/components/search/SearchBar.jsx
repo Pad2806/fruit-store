@@ -8,7 +8,6 @@ function SearchBar() {
   const [results, setResults] = useState([]);
   const boxRef = useRef(null);
 
-  // Filter realtime
   useEffect(() => {
     if (keyword.trim() === "") {
       setResults([]);
@@ -22,7 +21,6 @@ function SearchBar() {
     setResults(filtered);
   }, [keyword]);
 
-  // Click ngoài → đóng
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (boxRef.current && !boxRef.current.contains(e.target)) {
