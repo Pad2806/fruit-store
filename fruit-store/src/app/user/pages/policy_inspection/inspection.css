@@ -9,7 +9,6 @@
   margin: 0 auto;
 }
 
-/* Header */
 .inspection-header {
   text-align: center;
   margin-bottom: 50px;
@@ -37,7 +36,6 @@
   line-height: 1.7;
 }
 
-/* Timeline */
 .inspection-timeline {
   position: relative;
   padding-left: 40px;
@@ -53,7 +51,6 @@
   background: #dbe3f0;
 }
 
-/* Item */
 .timeline-item {
   position: relative;
   display: flex;
@@ -100,7 +97,6 @@
   padding-left: 18px;
 }
 
-/* Variants */
 .timeline-item.warning .timeline-icon {
   background: #f2994a;
 }
@@ -109,7 +105,6 @@
   background: #27ae60;
 }
 
-/* Mobile */
 @media (max-width: 600px) {
   .inspection-header h1 {
     font-size: 24px;
