@@ -36,15 +36,14 @@ function Footer() {
 
         <div className="footer-col">
           <h4>Hỗ trợ khách hàng</h4>
-
           <ul className="footer-links">
             <li><a href="/#">Tìm kiếm</a></li>
             <li><a href="/about">Câu chuyện thương hiệu</a></li>
             <li><a href="/#">Chính sách thành viên</a></li>
             <li><a href="/#">Chính sách giao hàng</a></li>
             <li><a href="/#">Chính sách thanh toán</a></li>
-            <li><a href="/#">Chính sách bảo hành</a></li>
-            <li><a href="/#">Chính sách kiểm hàng</a></li>
+            <li><a href="/policy-warranty">Chính sách bảo hành</a></li>
+            <li><a href="/policy-inspection">Chính sách kiểm hàng</a></li>
             <li><a href="/#">Chính sách bảo mật</a></li>
             <li><a href="/#">Kiến thức trái cây</a></li>
             <li><a href="/#">Hướng dẫn mua hàng Online</a></li>

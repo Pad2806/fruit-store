@@ -8,6 +8,8 @@ import Login from '../pages/auths/login';
 import Cart from '../pages/cart/cart';
 import Checkout from '../pages/checkout/checkout';
 import User from '../pages/user/user';
+import WarrantyPolicy from "../pages/policy_warranty/warranty";
+import InspectionPolicy from "../pages/policy_inspection/inspection";
 
 const userRoutes = [
   {
@@ -21,7 +23,9 @@ const userRoutes = [
       {path: "/login", element: <Login />},
       {path: "/cart", element: <Cart />},
       {path: "/checkouts", element: <Checkout />},
-      {path: "/user", element: <User />}
+      {path: "/user", element: <User />},
+      { path: "/policy-warranty", element: <WarrantyPolicy /> },
+      { path: "/policy-inspection", element: <InspectionPolicy /> },
     ],
   },
 ];
