@@ -1,0 +1,157 @@
+$primary: #f36f40;
+$text-main: #333;
+$text-gray: #666;
+$border-color: #eee;
+
+.container {
+  min-height: 80vh;
+  padding: 40px 0;
+  background-color: #fff;
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 50px;
+  padding: 0 20px;
+}
+
+.mainContent {
+  flex: 3;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: $primary;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid $primary;
+  display: inline-block;
+}
+
+.contentBody {
+  section {
+    margin-bottom: 30px;
+    
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.8;
+      color: $text-main;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 20px;
+
+      li {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 10px;
+        color: $text-main;
+
+        &::before {
+          content: "•";
+          color: $primary;
+          position: absolute;
+          left: 0;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
+
+.subList {
+  margin-top: 8px;
+  padding-left: 25px !important;
+
+  li {
+    font-size: 14px;
+    color: $text-gray !important;
+
+    &::before {
+      content: "-" !important;
+      color: $primary !important;
+    }
+  }
+}
+
+.sidebar {
+  flex: 1;
+  background-color: #fbfbfb;
+  padding: 25px;
+  border-radius: 8px;
+  height: fit-content;
+  border: 1px solid $border-color;
+}
+
+.sidebarTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid $border-color;
+  color: $text-main;
+}
+
+.sideNav {
+  display: flex;
+  flex-direction: column;
+}
+
+.navItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  color: $text-gray;
+  text-decoration: none;
+  font-size: 14px;
+  border-bottom: 1px dashed #ddd;
+  transition: all 0.2s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    color: $primary;
+    padding-left: 5px;
+  }
+
+  &.active {
+    background: transparent;
+    color: $primary;
+    font-weight: 700;
+
+    svg {
+      color: $primary;
+    }
+  }
+
+  svg {
+    color: #999;
+  }
+}
+
+@media (max-width: 992px) {
+  .wrapper {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .sidebar {
+    order: -1;
+    width: 100%;
+  }
+}

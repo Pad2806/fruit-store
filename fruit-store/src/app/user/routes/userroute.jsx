@@ -8,7 +8,9 @@ import Login from '../pages/auths/login';
 import Cart from '../pages/cart/cart';
 import Checkout from '../pages/checkout/checkout';
 import User from '../pages/user/user';
-
+import PrivacyPolicy from "../pages/privacypolicy/privacypolicy";
+import OnlineShoppingGuide from "../pages/onlineshoppingguide/onlineshoppingguide";
+import OrderSuccess from "../pages/ordersuccess/ordersuccess";
 const userRoutes = [
   {
     element: <UserLayout />,
@@ -21,7 +23,10 @@ const userRoutes = [
       {path: "/login", element: <Login />},
       {path: "/cart", element: <Cart />},
       {path: "/checkouts", element: <Checkout />},
-      {path: "/user", element: <User />}
+      {path: "/user", element: <User />},
+      { path: "/chinh-sach-bao-mat", element: <PrivacyPolicy /> },
+      {path: "/huong-dan-mua-hang", element: <OnlineShoppingGuide />},
+      {path: "/order-success", element: <OrderSuccess />},
     ],
   },
 ];

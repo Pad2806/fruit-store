@@ -4,8 +4,31 @@ import styles from "./cart.module.scss";
 import appleImg from "../../assets/images/apple.png";
 import grapesImg from "../../assets/images/peonygrapes.png";
 import { FaClock } from "react-icons/fa";
+
 export default function Cart() {
   const navigate = useNavigate();
+  
+  const formatDate = (date) => {
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+  };
+
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  const dayAfter = new Date();
+  dayAfter.setDate(today.getDate() + 2);
+
+  const dateOptions = [
+    { label: "Hôm nay", value: formatDate(today) },
+    { label: `Ngày mai (${formatDate(tomorrow)})`, value: formatDate(tomorrow) },
+    { label: `Ngày kia (${formatDate(dayAfter)})`, value: formatDate(dayAfter) }
+  ];
+
+  const timeOptions = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
+
   const [cartItems, setCartItems] = useState([
     {
       id: 1,
@@ -30,6 +53,8 @@ export default function Cart() {
   const [deliveryOption, setDeliveryOption] = useState("available");
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [confirmedTime, setConfirmedTime] = useState("");
+  const [tempDate, setTempDate] = useState(dateOptions[0].label);
+  const [tempTime, setTempTime] = useState(timeOptions[0]);
 
   const updateQuantity = (id, delta) => {
     setCartItems(cartItems.map(item => 
@@ -58,7 +83,7 @@ export default function Cart() {
 
   const handleConfirmTime = () => {
     if (deliveryOption === "select") {
-      setConfirmedTime("27/12/2025 10:00 - 12:00");
+      setConfirmedTime(`${tempDate} | ${tempTime}`);
       setIsConfirmed(true);
     } else {
       setIsConfirmed(false);
@@ -159,8 +184,22 @@ export default function Cart() {
               {!isConfirmed && deliveryOption === "select" && (
                 <div className={styles.selectWrapper}>
                   <div className={styles.selectGroup}>
-                    <select><option>Hôm nay</option></select>
-                    <select><option>08:00 - 10:00</option></select>
+                    <select 
+                      value={tempDate} 
+                      onChange={(e) => setTempDate(e.target.value)}
+                    >
+                      {dateOptions.map(opt => (
+                        <option key={opt.value} value={opt.label}>{opt.label}</option>
+                      ))}
+                    </select>
+                    <select 
+                      value={tempTime} 
+                      onChange={(e) => setTempTime(e.target.value)}
+                    >
+                      {timeOptions.map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))}
+                    </select>
                   </div>
                   <button className={styles.confirmTimeBtn} onClick={handleConfirmTime}>
                     XÁC NHẬN THỜI GIAN

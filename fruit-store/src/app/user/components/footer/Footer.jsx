@@ -45,9 +45,9 @@ function Footer() {
             <li><a href="/#">Chính sách thanh toán</a></li>
             <li><a href="/#">Chính sách bảo hành</a></li>
             <li><a href="/#">Chính sách kiểm hàng</a></li>
-            <li><a href="/#">Chính sách bảo mật</a></li>
+            <li><a href="/chinh-sach-bao-mat">Chính sách bảo mật</a></li>
             <li><a href="/#">Kiến thức trái cây</a></li>
-            <li><a href="/#">Hướng dẫn mua hàng Online</a></li>
+            <li><a href="/huong-dan-mua-hang">Hướng dẫn mua hàng Online</a></li>
             <li><a href="/contact">Liên hệ</a></li>
           </ul>
         </div>
