@@ -8,6 +8,8 @@ import Login from '../pages/auths/login';
 import Cart from '../pages/cart/cart';
 import Checkout from '../pages/checkout/checkout';
 import User from '../pages/user/user';
+import PurchasePolicy from "../pages/policies/purchasepolicy"; 
+import PaymentPolicy from "../pages/policies/paymentpolicy";
 
 const userRoutes = [
   {
@@ -21,7 +23,9 @@ const userRoutes = [
       {path: "/login", element: <Login />},
       {path: "/cart", element: <Cart />},
       {path: "/checkouts", element: <Checkout />},
-      {path: "/user", element: <User />}
+      {path: "/user", element: <User />},
+      { path: "/purchasepolicy", element: <PurchasePolicy /> },
+      { path: "/paymentpolicy", element: <PaymentPolicy /> },
     ],
   },
 ];

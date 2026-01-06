@@ -66,6 +66,14 @@ const AdminPanel = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const isView = modalMode === 'view';
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setFormError('');
+    setShowPassword(false);
+  };
+
   const handleCreate = () => {
     setModalMode('create');
     setCurrentUser({
@@ -89,7 +97,19 @@ const AdminPanel = () => {
     setCurrentUser({
       ...user,
       role: normalizeRole(user.role),
-      password: '', 
+      password: '',
+    });
+    setFormError('');
+    setShowPassword(false);
+    setShowModal(true);
+  };
+
+  const handleView = (user) => {
+    setModalMode('view');
+    setCurrentUser({
+      ...user,
+      role: normalizeRole(user.role),
+      password: '',
     });
     setFormError('');
     setShowPassword(false);
@@ -115,7 +135,7 @@ const AdminPanel = () => {
 
   const validatePhone = (s) => {
     const t = String(s || '').trim();
-    if (!t) return true; 
+    if (!t) return true;
     return /^[0-9]{9,11}$/.test(t);
   };
 
@@ -143,7 +163,6 @@ const AdminPanel = () => {
     const payload = {
       ...currentUser,
       role: normalizeRole(currentUser.role),
-
     };
 
     if (modalMode === 'create') {
@@ -153,11 +172,11 @@ const AdminPanel = () => {
       };
       setUsers([...users, newUser]);
     } else {
-
+      // giữ nguyên email khi edit (như yêu cầu)
       setUsers(users.map((u) => (u.id === payload.id ? { ...u, ...payload, email: u.email } : u)));
     }
 
-    setShowModal(false);
+    handleCloseModal();
   };
 
   const handleLogout = () => {
@@ -166,17 +185,18 @@ const AdminPanel = () => {
   };
 
   const filteredUsers = useMemo(() => {
-    const t = searchTerm.toLowerCase();
+    const t = searchTerm.toLowerCase().trim();
     return users.filter(
       (u) =>
         u.name.toLowerCase().includes(t) ||
         u.email.toLowerCase().includes(t) ||
-        String(u.id).includes(searchTerm) ||
-        String(u.phone_number || '').includes(searchTerm)
+        String(u.id).includes(t) ||
+        String(u.phone_number || '').includes(t)
     );
   }, [users, searchTerm]);
 
   const getRoleColor = (role) => roles.find((r) => r.value === role)?.color || '#95a5a6';
+  const getRoleLabel = (role) => roles.find((r) => r.value === role)?.label || role;
 
   return (
     <div className="admin-container">
@@ -187,7 +207,7 @@ const AdminPanel = () => {
         </div>
 
         <div className="header-actions">
-          <button className="btn-logout" onClick={handleLogout}>
+          <button className="btn-logout" onClick={handleLogout} aria-label="Logout" title="Đăng xuất">
             <LogOut size={18} />
           </button>
         </div>
@@ -209,6 +229,7 @@ const AdminPanel = () => {
               name="admin-user-search"
             />
           </div>
+
           <button className="btn-create" onClick={handleCreate}>
             <UserPlus size={20} />
             Thêm người dùng
@@ -230,13 +251,18 @@ const AdminPanel = () => {
 
             <tbody>
               {filteredUsers.map((user) => (
-                <tr key={user.id}>
+                <tr
+                  key={user.id}
+                  onClick={() => handleView(user)}
+                  style={{ cursor: 'pointer' }}
+                  title="Bấm để xem chi tiết"
+                >
                   <td>{user.id}</td>
                   <td>{user.name}</td>
                   <td title={user.email}>{user.email}</td>
                   <td>
                     <span className="role-badge" style={{ backgroundColor: getRoleColor(user.role) }}>
-                      {roles.find((r) => r.value === user.role)?.label}
+                      {getRoleLabel(user.role)}
                     </span>
                   </td>
                   <td>
@@ -246,10 +272,26 @@ const AdminPanel = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      <button className="btn-edit" onClick={() => handleEdit(user)}>
+                      <button
+                        className="btn-edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(user);
+                        }}
+                        aria-label="Edit"
+                        title="Sửa"
+                      >
                         <Edit2 size={16} />
                       </button>
-                      <button className="btn-delete" onClick={() => handleDeleteClick(user)}>
+                      <button
+                        className="btn-delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(user);
+                        }}
+                        aria-label="Delete"
+                        title="Xoá"
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -257,17 +299,22 @@ const AdminPanel = () => {
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
       </div>
 
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+        <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{modalMode === 'create' ? 'Thêm người dùng mới' : 'Chỉnh sửa người dùng'}</h2>
-              <button className="btn-close" onClick={() => setShowModal(false)}>
+              <h2>
+                {modalMode === 'create'
+                  ? 'Thêm người dùng mới'
+                  : modalMode === 'edit'
+                  ? 'Chỉnh sửa người dùng'
+                  : 'Chi tiết người dùng'}
+              </h2>
+              <button className="btn-close" onClick={handleCloseModal} aria-label="Close" title="Đóng">
                 <X size={24} />
               </button>
             </div>
@@ -280,6 +327,7 @@ const AdminPanel = () => {
                 <input
                   type="text"
                   value={currentUser.name}
+                  disabled={isView}
                   onChange={(e) => setCurrentUser({ ...currentUser, name: e.target.value })}
                   placeholder="Nhập họ tên"
                 />
@@ -290,9 +338,9 @@ const AdminPanel = () => {
                 <input
                   type="email"
                   value={currentUser.email}
+                  disabled={modalMode === 'edit' || isView}
                   onChange={(e) => setCurrentUser({ ...currentUser, email: e.target.value })}
                   placeholder="Nhập email"
-                  disabled={modalMode === 'edit'}
                   title={modalMode === 'edit' ? 'Email không thể chỉnh sửa' : undefined}
                   autoComplete="off"
                 />
@@ -303,6 +351,7 @@ const AdminPanel = () => {
                 <input
                   type="tel"
                   value={currentUser.phone_number}
+                  disabled={isView}
                   onChange={(e) => setCurrentUser({ ...currentUser, phone_number: e.target.value })}
                   placeholder="VD: 0901234567"
                   autoComplete="off"
@@ -314,6 +363,7 @@ const AdminPanel = () => {
                 <input
                   type="text"
                   value={currentUser.address}
+                  disabled={isView}
                   onChange={(e) => setCurrentUser({ ...currentUser, address: e.target.value })}
                   placeholder="Nhập địa chỉ"
                   autoComplete="off"
@@ -325,6 +375,7 @@ const AdminPanel = () => {
                 <input
                   type="date"
                   value={currentUser.dob}
+                  disabled={isView}
                   onChange={(e) => setCurrentUser({ ...currentUser, dob: e.target.value })}
                   autoComplete="off"
                 />
@@ -337,20 +388,29 @@ const AdminPanel = () => {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={currentUser.password}
+                    disabled={isView}
                     onChange={(e) => setCurrentUser({ ...currentUser, password: e.target.value })}
-                    placeholder={modalMode === 'create' ? 'Tối thiểu 6 ký tự' : 'Để trống nếu không đổi'}
+                    placeholder={
+                      isView
+                        ? '********'
+                        : modalMode === 'create'
+                        ? 'Tối thiểu 6 ký tự'
+                        : 'Để trống nếu không đổi'
+                    }
                     autoComplete="new-password"
                   />
 
-                  <button
-                    type="button"
-                    className="btn-toggle-password"
-                    onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                    title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  {!isView && (
+                    <button
+                      type="button"
+                      className="btn-toggle-password"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                      title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -358,6 +418,7 @@ const AdminPanel = () => {
                 <label>Vai trò</label>
                 <select
                   value={normalizeRole(currentUser.role)}
+                  disabled={isView}
                   onChange={(e) => setCurrentUser({ ...currentUser, role: e.target.value })}
                 >
                   {roles.map((role) => (
@@ -372,6 +433,7 @@ const AdminPanel = () => {
                 <label>Trạng thái</label>
                 <select
                   value={currentUser.status}
+                  disabled={isView}
                   onChange={(e) => setCurrentUser({ ...currentUser, status: e.target.value })}
                 >
                   <option value="active">Hoạt động</option>
@@ -381,13 +443,16 @@ const AdminPanel = () => {
             </div>
 
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={() => setShowModal(false)}>
-                Hủy
+              <button className="btn-cancel" onClick={handleCloseModal}>
+                {isView ? 'Đóng' : 'Hủy'}
               </button>
-              <button className="btn-save" onClick={handleSave}>
-                <Save size={20} />
-                Lưu
-              </button>
+
+              {!isView && (
+                <button className="btn-save" onClick={handleSave}>
+                  <Save size={20} />
+                  Lưu
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -398,7 +463,7 @@ const AdminPanel = () => {
           <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header delete">
               <h2>Xác nhận xoá</h2>
-              <button className="btn-close" onClick={cancelDelete}>
+              <button className="btn-close" onClick={cancelDelete} aria-label="Close" title="Đóng">
                 <X size={24} />
               </button>
             </div>
@@ -423,39 +488,6 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
-
-      {/* Footer policies */}
-      <footer className="footer-content">
-        <div className="footer-inner">
-          <div className="footer-col">
-            <h3>Chính sách mua hàng</h3>
-            <ul>
-              <li>Đổi/Trả trong 24–48h nếu sản phẩm lỗi, dập nát do vận chuyển.</li>
-              <li>Kiểm tra hàng khi nhận; vui lòng quay video mở kiện để được hỗ trợ nhanh.</li>
-              <li>Hoàn tiền/đổi hàng theo hình thức bạn chọn sau khi xác minh.</li>
-              <li>Hỗ trợ CSKH: 08xx xxx xxx (8:00–20:00).</li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h3>Chính sách thanh toán</h3>
-            <ul>
-              <li>Thanh toán khi nhận hàng (COD) hoặc chuyển khoản ngân hàng.</li>
-              <li>Đơn hàng được xác nhận sau khi hệ thống ghi nhận thanh toán (nếu chuyển khoản).</li>
-              <li>Hoá đơn/biên nhận được gửi kèm đơn hàng hoặc qua email (nếu có).</li>
-              <li>Bảo mật thông tin thanh toán theo tiêu chuẩn an toàn.</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} FRUITstore</span>
-          <span className="dot">•</span>
-          <span>All rights reserved</span>
-        </div>
-      </footer>
-
-
     </div>
   );
 };

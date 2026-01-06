@@ -41,8 +41,8 @@ function Footer() {
             <li><a href="/#">Tìm kiếm</a></li>
             <li><a href="/about">Câu chuyện thương hiệu</a></li>
             <li><a href="/#">Chính sách thành viên</a></li>
-            <li><a href="/#">Chính sách giao hàng</a></li>
-            <li><a href="/#">Chính sách thanh toán</a></li>
+            <li><a href="/purchasepolicy">Chính sách mua hàng</a></li>
+            <li><a href="/paymentpolicy">Chính sách thanh toán</a></li>
             <li><a href="/#">Chính sách bảo hành</a></li>
             <li><a href="/#">Chính sách kiểm hàng</a></li>
             <li><a href="/#">Chính sách bảo mật</a></li>

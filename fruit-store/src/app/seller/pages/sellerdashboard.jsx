@@ -8,7 +8,6 @@ import {
   Search,
   X,
   Save,
-  Eye,
   LogOut,
 } from 'lucide-react';
 import './sellerdashboard.css';
@@ -18,7 +17,6 @@ const MAX_IMAGES = 5;
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('products');
 
-  
   const [products, setProducts] = useState([
     {
       id: 1,
@@ -79,10 +77,42 @@ const SellerDashboard = () => {
   ]);
 
   const [orders, setOrders] = useState([
-    { id: 1001, customer: 'Nguyễn Văn A', phone: '0901234567', products: 'Cam Sành x2kg, Táo Envy x1kg', total: 175000, status: 'pending', date: '2024-12-27' },
-    { id: 1002, customer: 'Trần Thị B', phone: '0912345678', products: 'Nho Mỹ x1kg', total: 120000, status: 'confirmed', date: '2024-12-27' },
-    { id: 1003, customer: 'Lê Văn C', phone: '0923456789', products: 'Dâu Tây x2hộp', total: 300000, status: 'shipping', date: '2024-12-26' },
-    { id: 1004, customer: 'Phạm Thị D', phone: '0934567890', products: 'Cam Sành x5kg', total: 225000, status: 'completed', date: '2024-12-25' },
+    {
+      id: 1001,
+      customer: 'Nguyễn Văn A',
+      phone: '0901234567',
+      products: 'Cam Sành x2kg, Táo Envy x1kg',
+      total: 175000,
+      status: 'pending',
+      date: '2024-12-27',
+    },
+    {
+      id: 1002,
+      customer: 'Trần Thị B',
+      phone: '0912345678',
+      products: 'Nho Mỹ x1kg',
+      total: 120000,
+      status: 'confirmed',
+      date: '2024-12-27',
+    },
+    {
+      id: 1003,
+      customer: 'Lê Văn C',
+      phone: '0923456789',
+      products: 'Dâu Tây x2hộp',
+      total: 300000,
+      status: 'shipping',
+      date: '2024-12-26',
+    },
+    {
+      id: 1004,
+      customer: 'Phạm Thị D',
+      phone: '0934567890',
+      products: 'Cam Sành x5kg',
+      total: 225000,
+      status: 'completed',
+      date: '2024-12-25',
+    },
   ]);
 
   const [showProductModal, setShowProductModal] = useState(false);
@@ -129,9 +159,11 @@ const SellerDashboard = () => {
     { id: 'cate_3', name: 'Trái cây theo mùa' },
   ];
 
+  // FIX: thêm ori_3 để khớp dữ liệu product #4
   const origins = [
     { id: 'ori_1', name: 'Việt Nam' },
     { id: 'ori_2', name: 'New Zealand / Mỹ' },
+    { id: 'ori_3', name: 'Đà Lạt (Việt Nam)' },
   ];
 
   const productStatuses = [
@@ -176,8 +208,10 @@ const SellerDashboard = () => {
         sold_quantity: 0,
       });
     } else if (product) {
-
-      setCurrentProduct({ ...product, images: Array.isArray(product.images) ? product.images : [] });
+      setCurrentProduct({
+        ...product,
+        images: Array.isArray(product.images) ? product.images : [],
+      });
     }
 
     setShowProductModal(true);
@@ -190,6 +224,7 @@ const SellerDashboard = () => {
 
   const handleCreateProduct = () => openProductModal('create');
   const handleEditProduct = (product) => openProductModal('edit', product);
+  const handleViewProduct = (product) => openProductModal('view', product);
 
   const openDeleteProductModal = (product) => {
     setDeleteTarget({
@@ -229,7 +264,8 @@ const SellerDashboard = () => {
       (file) =>
         new Promise((resolve) => {
           const reader = new FileReader();
-          reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+          reader.onload = () =>
+            resolve(typeof reader.result === 'string' ? reader.result : '');
           reader.readAsDataURL(file);
         })
     );
@@ -301,7 +337,8 @@ const SellerDashboard = () => {
   const openOrderModal = (mode, order) => {
     setModalMode(mode);
     setOrderFormError('');
-    setCurrentOrder(order);
+    // FIX: clone để tránh sửa trực tiếp object trong list
+    setCurrentOrder({ ...order });
     setShowOrderModal(true);
   };
 
@@ -358,21 +395,28 @@ const SellerDashboard = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    const t = searchTerm.toLowerCase();
+    const t = searchTerm.toLowerCase().trim();
     return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(t) ||
-        p.id.toString().includes(t)
+      (p) => p.name.toLowerCase().includes(t) || p.id.toString().includes(t)
     );
   }, [products, searchTerm]);
 
   const filteredOrders = useMemo(() => {
-    const t = searchTerm.toLowerCase();
-    return orders.filter((order) => order.customer.toLowerCase().includes(t) || order.id.toString().includes(searchTerm));
+    const t = searchTerm.toLowerCase().trim();
+    return orders.filter(
+      (order) =>
+        order.customer.toLowerCase().includes(t) ||
+        order.id.toString().includes(t)
+    );
   }, [orders, searchTerm]);
 
-  const getOrderStatusColor = (status) => orderStatuses.find((s) => s.value === status)?.color || '#95a5a6';
-  const getOrderStatusLabel = (status) => orderStatuses.find((s) => s.value === status)?.label || status;
+  const getOrderStatusColor = (status) =>
+    orderStatuses.find((s) => s.value === status)?.color || '#95a5a6';
+  const getOrderStatusLabel = (status) =>
+    orderStatuses.find((s) => s.value === status)?.label || status;
+
+  // FIX: khai báo isView đúng vị trí
+  const isView = modalMode === 'view';
 
   return (
     <div className="seller-container">
@@ -402,7 +446,12 @@ const SellerDashboard = () => {
           </div>
 
           <div className="header-actions">
-            <button className="btn-logout" onClick={handleLogout} aria-label="Logout" title="Đăng xuất">
+            <button
+              className="btn-logout"
+              onClick={handleLogout}
+              aria-label="Logout"
+              title="Đăng xuất"
+            >
               <LogOut size={18} />
             </button>
           </div>
@@ -411,12 +460,18 @@ const SellerDashboard = () => {
 
       <div className="seller-body">
         <div className="tabs">
-          <button className={`tab ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
+          <button
+            className={`tab ${activeTab === 'products' ? 'active' : ''}`}
+            onClick={() => setActiveTab('products')}
+          >
             <Package size={20} />
             Quản lý sản phẩm
           </button>
 
-          <button className={`tab ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+          <button
+            className={`tab ${activeTab === 'orders' ? 'active' : ''}`}
+            onClick={() => setActiveTab('orders')}
+          >
             <ShoppingCart size={20} />
             Quản lý đơn hàng
           </button>
@@ -438,7 +493,6 @@ const SellerDashboard = () => {
                   spellCheck={false}
                   name="seller-search"
                 />
-
               </div>
 
               <button className="btn-create" onClick={handleCreateProduct}>
@@ -462,14 +516,29 @@ const SellerDashboard = () => {
 
                 <tbody>
                   {filteredProducts.map((product) => {
-                    const firstImage = Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '';
+                    const firstImage =
+                      Array.isArray(product.images) && product.images.length > 0
+                        ? product.images[0]
+                        : '';
                     return (
-                      <tr key={product.id}>
+                      <tr
+                        key={product.id}
+                        onClick={() => handleViewProduct(product)}
+                        style={{ cursor: 'pointer' }}
+                        title="Bấm để xem chi tiết"
+                      >
                         <td>
                           {firstImage ? (
-                            <img className="product-thumb" src={firstImage} alt={product.name} />
+                            <img
+                              className="product-thumb"
+                              src={firstImage}
+                              alt={product.name}
+                            />
                           ) : (
-                            <div className="product-thumb placeholder" title="Chưa có hình">
+                            <div
+                              className="product-thumb placeholder"
+                              title="Chưa có hình"
+                            >
                               <span>🍊</span>
                             </div>
                           )}
@@ -478,11 +547,16 @@ const SellerDashboard = () => {
                         <td className="product-name">{product.name}</td>
 
                         <td className="price">
-                          {Number(product.price).toLocaleString('vi-VN')}₫/{product.unit}
+                          {Number(product.price).toLocaleString('vi-VN')}₫/
+                          {product.unit}
                         </td>
 
                         <td>
-                          <span className={`stock ${Number(product.stock) <= 10 ? 'low' : ''}`}>
+                          <span
+                            className={`stock ${
+                              Number(product.stock) <= 10 ? 'low' : ''
+                            }`}
+                          >
                             {product.stock} {product.unit}
                           </span>
                         </td>
@@ -495,10 +569,26 @@ const SellerDashboard = () => {
 
                         <td>
                           <div className="action-buttons">
-                            <button className="btn-edit" onClick={() => handleEditProduct(product)} aria-label="Edit product" title="Sửa">
+                            <button
+                              className="btn-edit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditProduct(product);
+                              }}
+                              aria-label="Edit product"
+                              title="Sửa"
+                            >
                               <Edit2 size={16} />
                             </button>
-                            <button className="btn-delete" onClick={() => openDeleteProductModal(product)} aria-label="Delete product" title="Xoá">
+                            <button
+                              className="btn-delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteProductModal(product);
+                              }}
+                              aria-label="Delete product"
+                              title="Xoá"
+                            >
                               <Trash2 size={16} />
                             </button>
                           </div>
@@ -507,7 +597,6 @@ const SellerDashboard = () => {
                     );
                   })}
                 </tbody>
-
               </table>
             </div>
           </div>
@@ -544,15 +633,27 @@ const SellerDashboard = () => {
 
                 <tbody>
                   {filteredOrders.map((order) => (
-                    <tr key={order.id}>
+                    <tr
+                      key={order.id}
+                      onClick={() => handleViewOrder(order)}
+                      style={{ cursor: 'pointer' }}
+                      title="Bấm để xem chi tiết"
+                    >
                       <td className="order-id">#{order.id}</td>
                       <td>{order.customer}</td>
                       <td>{order.phone}</td>
                       <td className="order-products">{order.products}</td>
-                      <td className="price">{Number(order.total).toLocaleString('vi-VN')}₫</td>
+                      <td className="price">
+                        {Number(order.total).toLocaleString('vi-VN')}₫
+                      </td>
 
                       <td>
-                        <span className="order-status" style={{ backgroundColor: getOrderStatusColor(order.status) }}>
+                        <span
+                          className="order-status"
+                          style={{
+                            backgroundColor: getOrderStatusColor(order.status),
+                          }}
+                        >
                           {getOrderStatusLabel(order.status)}
                         </span>
                       </td>
@@ -561,13 +662,26 @@ const SellerDashboard = () => {
 
                       <td>
                         <div className="action-buttons">
-                          <button className="btn-view" onClick={() => handleViewOrder(order)} aria-label="View order" title="Xem">
-                            <Eye size={16} />
-                          </button>
-                          <button className="btn-edit" onClick={() => handleEditOrder(order)} aria-label="Edit order" title="Sửa">
+                          <button
+                            className="btn-edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditOrder(order);
+                            }}
+                            aria-label="Edit order"
+                            title="Sửa"
+                          >
                             <Edit2 size={16} />
                           </button>
-                          <button className="btn-delete" onClick={() => openDeleteOrderModal(order)} aria-label="Delete order" title="Xoá">
+                          <button
+                            className="btn-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDeleteOrderModal(order);
+                            }}
+                            aria-label="Delete order"
+                            title="Xoá"
+                          >
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -575,7 +689,6 @@ const SellerDashboard = () => {
                     </tr>
                   ))}
                 </tbody>
-
               </table>
             </div>
           </div>
@@ -586,14 +699,22 @@ const SellerDashboard = () => {
         <div className="modal-overlay" onClick={closeProductModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{modalMode === 'create' ? 'Thêm sản phẩm mới' : 'Chỉnh sửa sản phẩm'}</h2>
+              <h2>
+                {modalMode === 'create'
+                  ? 'Thêm sản phẩm mới'
+                  : modalMode === 'edit'
+                  ? 'Chỉnh sửa sản phẩm'
+                  : 'Chi tiết sản phẩm'}
+              </h2>
               <button className="btn-close" onClick={closeProductModal}>
                 <X size={24} />
               </button>
             </div>
 
             <div className="modal-body">
-              {productFormError && <div className="form-error">{productFormError}</div>}
+              {productFormError && (
+                <div className="form-error">{productFormError}</div>
+              )}
 
               <div className="form-row">
                 <div className="form-group">
@@ -601,8 +722,12 @@ const SellerDashboard = () => {
                   <input
                     type="text"
                     value={currentProduct.name}
+                    disabled={isView}
                     onChange={(e) => {
-                      setCurrentProduct({ ...currentProduct, name: e.target.value });
+                      setCurrentProduct({
+                        ...currentProduct,
+                        name: e.target.value,
+                      });
                       if (productFormError) setProductFormError('');
                     }}
                     placeholder="VD: Cam Sành Cao Cấp"
@@ -613,8 +738,12 @@ const SellerDashboard = () => {
                   <label>Trạng thái *</label>
                   <select
                     value={currentProduct.status}
+                    disabled={isView}
                     onChange={(e) => {
-                      setCurrentProduct({ ...currentProduct, status: e.target.value });
+                      setCurrentProduct({
+                        ...currentProduct,
+                        status: e.target.value,
+                      });
                       if (productFormError) setProductFormError('');
                     }}
                   >
@@ -632,7 +761,13 @@ const SellerDashboard = () => {
                   <label>Danh mục *</label>
                   <select
                     value={currentProduct.category_id}
-                    onChange={(e) => setCurrentProduct({ ...currentProduct, category_id: e.target.value })}
+                    disabled={isView}
+                    onChange={(e) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        category_id: e.target.value,
+                      })
+                    }
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -646,7 +781,13 @@ const SellerDashboard = () => {
                   <label>Xuất xứ *</label>
                   <select
                     value={currentProduct.origin_id}
-                    onChange={(e) => setCurrentProduct({ ...currentProduct, origin_id: e.target.value })}
+                    disabled={isView}
+                    onChange={(e) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        origin_id: e.target.value,
+                      })
+                    }
                   >
                     {origins.map((o) => (
                       <option key={o.id} value={o.id}>
@@ -663,8 +804,12 @@ const SellerDashboard = () => {
                   <input
                     type="number"
                     value={currentProduct.price}
+                    disabled={isView}
                     onChange={(e) => {
-                      setCurrentProduct({ ...currentProduct, price: e.target.value });
+                      setCurrentProduct({
+                        ...currentProduct,
+                        price: e.target.value,
+                      });
                       if (productFormError) setProductFormError('');
                     }}
                     placeholder="45000"
@@ -675,7 +820,13 @@ const SellerDashboard = () => {
                   <label>Đơn vị</label>
                   <select
                     value={currentProduct.unit}
-                    onChange={(e) => setCurrentProduct({ ...currentProduct, unit: e.target.value })}
+                    disabled={isView}
+                    onChange={(e) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        unit: e.target.value,
+                      })
+                    }
                   >
                     {units.map((unit) => (
                       <option key={unit} value={unit}>
@@ -692,8 +843,12 @@ const SellerDashboard = () => {
                   <input
                     type="number"
                     value={currentProduct.stock}
+                    disabled={isView}
                     onChange={(e) => {
-                      setCurrentProduct({ ...currentProduct, stock: e.target.value });
+                      setCurrentProduct({
+                        ...currentProduct,
+                        stock: e.target.value,
+                      });
                       if (productFormError) setProductFormError('');
                     }}
                     placeholder="150"
@@ -705,7 +860,13 @@ const SellerDashboard = () => {
                   <input
                     type="number"
                     value={currentProduct.sold_quantity}
-                    onChange={(e) => setCurrentProduct({ ...currentProduct, sold_quantity: e.target.value })}
+                    disabled={isView}
+                    onChange={(e) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        sold_quantity: e.target.value,
+                      })
+                    }
                     placeholder="0"
                   />
                 </div>
@@ -717,7 +878,13 @@ const SellerDashboard = () => {
                   <input
                     type="text"
                     value={currentProduct.short_desc}
-                    onChange={(e) => setCurrentProduct({ ...currentProduct, short_desc: e.target.value })}
+                    disabled={isView}
+                    onChange={(e) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        short_desc: e.target.value,
+                      })
+                    }
                     placeholder="VD: Cam sành ngọt, nhiều nước"
                   />
                 </div>
@@ -727,7 +894,13 @@ const SellerDashboard = () => {
                   <input
                     type="text"
                     value={currentProduct.detail_desc}
-                    onChange={(e) => setCurrentProduct({ ...currentProduct, detail_desc: e.target.value })}
+                    disabled={isView}
+                    onChange={(e) =>
+                      setCurrentProduct({
+                        ...currentProduct,
+                        detail_desc: e.target.value,
+                      })
+                    }
                     placeholder="VD: Cam tuyển chọn, phù hợp ép nước..."
                   />
                 </div>
@@ -737,29 +910,47 @@ const SellerDashboard = () => {
                 <div className="form-group">
                   <label>Hình ảnh (tối đa {MAX_IMAGES})</label>
 
-                  <div className="image-upload">
-                    <input
-                      id="product-images-input"
-                      className="file-input"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImagesChange}
-                    />
-                    <label className="btn-file" htmlFor="product-images-input">
-                      Chọn hình ảnh
-                    </label>
+                  {!isView && (
+                    <div className="image-upload">
+                      <input
+                        id="product-images-input"
+                        className="file-input"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImagesChange}
+                      />
+                      <label className="btn-file" htmlFor="product-images-input">
+                        Chọn hình ảnh
+                      </label>
 
-                    {(currentProduct.images || []).length > 0 && (
-                      <button type="button" className="btn-clear-image" onClick={clearAllImages} title="Xoá tất cả">
-                        <X size={16} />
-                      </button>
-                    )}
+                      {(currentProduct.images || []).length > 0 && (
+                        <button
+                          type="button"
+                          className="btn-clear-image"
+                          onClick={clearAllImages}
+                          title="Xoá tất cả"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
 
-                    <div className="image-count">
-                      {(currentProduct.images || []).length}/{MAX_IMAGES}
+                      <div className="image-count">
+                        {(currentProduct.images || []).length}/{MAX_IMAGES}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {isView && (
+                    <div
+                      className="image-upload"
+                      style={{ justifyContent: 'space-between' }}
+                    >
+                      <div className="image-count">
+                        {(currentProduct.images || []).length}/{MAX_IMAGES}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="image-preview">
                     {(currentProduct.images || []).length > 0 ? (
@@ -767,14 +958,16 @@ const SellerDashboard = () => {
                         {(currentProduct.images || []).map((src, idx) => (
                           <div key={idx} className="image-tile">
                             <img src={src} alt={`preview-${idx}`} />
-                            <button
-                              type="button"
-                              className="btn-remove-image"
-                              onClick={() => removeImageAt(idx)}
-                              title="Xoá ảnh"
-                            >
-                              <X size={14} />
-                            </button>
+                            {!isView && (
+                              <button
+                                type="button"
+                                className="btn-remove-image"
+                                onClick={() => removeImageAt(idx)}
+                                title="Xoá ảnh"
+                              >
+                                <X size={14} />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -790,12 +983,15 @@ const SellerDashboard = () => {
 
             <div className="modal-footer">
               <button className="btn-cancel" onClick={closeProductModal}>
-                Hủy
+                Đóng
               </button>
-              <button className="btn-save" onClick={handleSaveProduct}>
-                <Save size={20} />
-                Lưu
-              </button>
+
+              {!isView && (
+                <button className="btn-save" onClick={handleSaveProduct}>
+                  <Save size={20} />
+                  Lưu
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -805,7 +1001,9 @@ const SellerDashboard = () => {
         <div className="modal-overlay" onClick={closeOrderModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{modalMode === 'view' ? 'Chi tiết đơn hàng' : 'Cập nhật đơn hàng'}</h2>
+              <h2>
+                {modalMode === 'view' ? 'Chi tiết đơn hàng' : 'Cập nhật đơn hàng'}
+              </h2>
               <button className="btn-close" onClick={closeOrderModal}>
                 <X size={24} />
               </button>
@@ -837,7 +1035,9 @@ const SellerDashboard = () => {
 
                 <div className="detail-row">
                   <span className="label">Tổng tiền:</span>
-                  <span className="value price">{Number(currentOrder.total).toLocaleString('vi-VN')}₫</span>
+                  <span className="value price">
+                    {Number(currentOrder.total).toLocaleString('vi-VN')}₫
+                  </span>
                 </div>
 
                 <div className="detail-row">
@@ -867,7 +1067,10 @@ const SellerDashboard = () => {
 
               {modalMode === 'view' && (
                 <div className="status-display">
-                  <span className="order-status large" style={{ backgroundColor: getOrderStatusColor(currentOrder.status) }}>
+                  <span
+                    className="order-status large"
+                    style={{ backgroundColor: getOrderStatusColor(currentOrder.status) }}
+                  >
                     {getOrderStatusLabel(currentOrder.status)}
                   </span>
                 </div>
@@ -892,7 +1095,10 @@ const SellerDashboard = () => {
 
       {showDeleteModal && (
         <div className="modal-overlay" onClick={cancelDelete}>
-          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content delete-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header delete">
               <h2>Xác nhận xoá</h2>
               <button className="btn-close" onClick={cancelDelete}>
@@ -903,10 +1109,15 @@ const SellerDashboard = () => {
             <div className="modal-body">
               <p>
                 Bạn có chắc chắn muốn xoá{' '}
-                <strong>{deleteTarget?.type === 'product' ? 'sản phẩm' : 'đơn hàng'}</strong>: <strong>{deleteTarget?.title}</strong>?
+                <strong>
+                  {deleteTarget?.type === 'product' ? 'sản phẩm' : 'đơn hàng'}
+                </strong>
+                : <strong>{deleteTarget?.title}</strong>?
               </p>
 
-              {deleteTarget?.subtitle && <p className="delete-subtitle">{deleteTarget.subtitle}</p>}
+              {deleteTarget?.subtitle && (
+                <p className="delete-subtitle">{deleteTarget.subtitle}</p>
+              )}
 
               <p className="delete-warning">
                 Hành động này <strong>không thể hoàn tác</strong>.
@@ -924,39 +1135,6 @@ const SellerDashboard = () => {
           </div>
         </div>
       )}
-
-      {/* Footer policies */}
-      <footer className="footer-content">
-        <div className="footer-inner">
-          <div className="footer-col">
-            <h3>Chính sách mua hàng</h3>
-            <ul>
-              <li>Đổi/Trả trong 24–48h nếu sản phẩm lỗi, dập nát do vận chuyển.</li>
-              <li>Kiểm tra hàng khi nhận; vui lòng quay video mở kiện để được hỗ trợ nhanh.</li>
-              <li>Hoàn tiền/đổi hàng theo hình thức bạn chọn sau khi xác minh.</li>
-              <li>Hỗ trợ CSKH: 08xx xxx xxx (8:00–20:00).</li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h3>Chính sách thanh toán</h3>
-            <ul>
-              <li>Thanh toán khi nhận hàng (COD) hoặc chuyển khoản ngân hàng.</li>
-              <li>Đơn hàng được xác nhận sau khi hệ thống ghi nhận thanh toán (nếu chuyển khoản).</li>
-              <li>Hoá đơn/biên nhận được gửi kèm đơn hàng hoặc qua email (nếu có).</li>
-              <li>Bảo mật thông tin thanh toán theo tiêu chuẩn an toàn.</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} FRUITstore</span>
-          <span className="dot">•</span>
-          <span>All rights reserved</span>
-        </div>
-      </footer>
-
-
     </div>
   );
 };
