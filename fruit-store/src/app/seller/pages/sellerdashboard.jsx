@@ -13,14 +13,69 @@ import {
 } from 'lucide-react';
 import './sellerdashboard.css';
 
+const MAX_IMAGES = 5;
+
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('products');
 
+  
   const [products, setProducts] = useState([
-    { id: 1, name: 'Cam Sành Cao Cấp', price: 45000, stock: 150, unit: 'kg', image: '', status: 'available' },
-    { id: 2, name: 'Táo Envy New Zealand', price: 85000, stock: 80, unit: 'kg', image: '', status: 'available' },
-    { id: 3, name: 'Nho Mỹ Không Hạt', price: 120000, stock: 45, unit: 'kg', image: '', status: 'available' },
-    { id: 4, name: 'Dâu Tây Đà Lạt', price: 150000, stock: 0, unit: 'hộp', image: '', status: 'out_of_stock' },
+    {
+      id: 1,
+      name: 'Cam Sành Cao Cấp',
+      price: 45000,
+      stock: 150,
+      unit: 'kg',
+      images: [],
+      status: 'available',
+      short_desc: 'Cam sành ngọt, nhiều nước.',
+      detail_desc: 'Cam sành tuyển chọn, phù hợp ép nước hoặc ăn trực tiếp.',
+      category_id: 'cate_1',
+      origin_id: 'ori_1',
+      sold_quantity: 20,
+    },
+    {
+      id: 2,
+      name: 'Táo Envy New Zealand',
+      price: 85000,
+      stock: 80,
+      unit: 'kg',
+      images: [],
+      status: 'available',
+      short_desc: 'Táo giòn ngọt.',
+      detail_desc: 'Táo Envy nhập khẩu, giòn, thơm, độ ngọt cao.',
+      category_id: 'cate_2',
+      origin_id: 'ori_2',
+      sold_quantity: 10,
+    },
+    {
+      id: 3,
+      name: 'Nho Mỹ Không Hạt',
+      price: 120000,
+      stock: 45,
+      unit: 'kg',
+      images: [],
+      status: 'available',
+      short_desc: 'Nho không hạt, dễ ăn.',
+      detail_desc: 'Nho Mỹ không hạt, vị ngọt nhẹ, vỏ mỏng.',
+      category_id: 'cate_2',
+      origin_id: 'ori_2',
+      sold_quantity: 5,
+    },
+    {
+      id: 4,
+      name: 'Dâu Tây Đà Lạt',
+      price: 150000,
+      stock: 0,
+      unit: 'hộp',
+      images: [],
+      status: 'out_of_stock',
+      short_desc: 'Dâu tươi mỗi ngày.',
+      detail_desc: 'Dâu Đà Lạt loại 1, giao nhanh trong ngày.',
+      category_id: 'cate_3',
+      origin_id: 'ori_3',
+      sold_quantity: 30,
+    },
   ]);
 
   const [orders, setOrders] = useState([
@@ -32,7 +87,7 @@ const SellerDashboard = () => {
 
   const [showProductModal, setShowProductModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [modalMode, setModalMode] = useState('create'); 
+  const [modalMode, setModalMode] = useState('create');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [productFormError, setProductFormError] = useState('');
@@ -47,8 +102,13 @@ const SellerDashboard = () => {
     price: '',
     stock: '',
     unit: 'kg',
-    image: '', 
-    status: 'available', 
+    images: [],
+    status: 'available',
+    short_desc: '',
+    detail_desc: '',
+    category_id: '',
+    origin_id: '',
+    sold_quantity: 0,
   });
 
   const [currentOrder, setCurrentOrder] = useState({
@@ -62,6 +122,17 @@ const SellerDashboard = () => {
   });
 
   const units = ['kg', 'hộp', 'trái', 'bó'];
+
+  const categories = [
+    { id: 'cate_1', name: 'Trái cây nội địa' },
+    { id: 'cate_2', name: 'Trái cây nhập khẩu' },
+    { id: 'cate_3', name: 'Trái cây theo mùa' },
+  ];
+
+  const origins = [
+    { id: 'ori_1', name: 'Việt Nam' },
+    { id: 'ori_2', name: 'New Zealand / Mỹ' },
+  ];
 
   const productStatuses = [
     { value: 'available', label: 'Còn hàng' },
@@ -96,11 +167,17 @@ const SellerDashboard = () => {
         price: '',
         stock: '',
         unit: 'kg',
-        image: '',
+        images: [],
         status: 'available',
+        short_desc: '',
+        detail_desc: '',
+        category_id: categories[0]?.id || '',
+        origin_id: origins[0]?.id || '',
+        sold_quantity: 0,
       });
     } else if (product) {
-      setCurrentProduct(product);
+
+      setCurrentProduct({ ...product, images: Array.isArray(product.images) ? product.images : [] });
     }
 
     setShowProductModal(true);
@@ -124,27 +201,59 @@ const SellerDashboard = () => {
     setShowDeleteModal(true);
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    if (!file.type.startsWith('image/')) {
+    const currentCount = currentProduct.images?.length || 0;
+    const remaining = MAX_IMAGES - currentCount;
+
+    if (remaining <= 0) {
+      setProductFormError(`Bạn chỉ được tối đa ${MAX_IMAGES} ảnh.`);
+      e.target.value = '';
+      return;
+    }
+
+    const picked = files.slice(0, remaining);
+
+    const invalid = picked.find((f) => !f.type.startsWith('image/'));
+    if (invalid) {
       setProductFormError('Vui lòng chọn file hình ảnh hợp lệ.');
+      e.target.value = '';
       return;
     }
 
     setProductFormError('');
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = typeof reader.result === 'string' ? reader.result : '';
-      setCurrentProduct((prev) => ({ ...prev, image: dataUrl }));
-    };
-    reader.readAsDataURL(file);
+    const readers = picked.map(
+      (file) =>
+        new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+          reader.readAsDataURL(file);
+        })
+    );
+
+    Promise.all(readers).then((dataUrls) => {
+      const cleaned = dataUrls.filter(Boolean);
+      setCurrentProduct((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), ...cleaned].slice(0, MAX_IMAGES),
+      }));
+      e.target.value = '';
+    });
   };
 
-  const clearImage = () => {
-    setCurrentProduct((prev) => ({ ...prev, image: '' }));
+  const removeImageAt = (idx) => {
+    setCurrentProduct((prev) => ({
+      ...prev,
+      images: (prev.images || []).filter((_, i) => i !== idx),
+    }));
+    setProductFormError('');
+  };
+
+  const clearAllImages = () => {
+    setCurrentProduct((prev) => ({ ...prev, images: [] }));
     setProductFormError('');
   };
 
@@ -153,9 +262,16 @@ const SellerDashboard = () => {
     const priceOk = String(currentProduct.price).trim().length > 0;
     const stockOk = String(currentProduct.stock).trim().length > 0;
     const statusOk = !!currentProduct.status;
+    const categoryOk = String(currentProduct.category_id).trim().length > 0;
+    const originOk = String(currentProduct.origin_id).trim().length > 0;
 
-    if (!nameOk || !priceOk || !stockOk || !statusOk) {
-      setProductFormError('Vui lòng điền đầy đủ thông tin.');
+    if (!nameOk || !priceOk || !stockOk || !statusOk || !categoryOk || !originOk) {
+      setProductFormError('Vui lòng điền đầy đủ thông tin bắt buộc.');
+      return;
+    }
+
+    if ((currentProduct.images || []).length > MAX_IMAGES) {
+      setProductFormError(`Bạn chỉ được tối đa ${MAX_IMAGES} ảnh.`);
       return;
     }
 
@@ -165,6 +281,8 @@ const SellerDashboard = () => {
       ...currentProduct,
       price: Number(currentProduct.price),
       stock: Number(currentProduct.stock),
+      sold_quantity: Number(currentProduct.sold_quantity || 0),
+      images: Array.isArray(currentProduct.images) ? currentProduct.images : [],
     };
 
     if (modalMode === 'create') {
@@ -206,7 +324,6 @@ const SellerDashboard = () => {
   };
 
   const handleSaveOrder = () => {
-
     const customerOk = String(currentOrder.customer).trim().length > 0;
     const phoneOk = String(currentOrder.phone).trim().length > 0;
     const productsOk = String(currentOrder.products).trim().length > 0;
@@ -242,7 +359,11 @@ const SellerDashboard = () => {
 
   const filteredProducts = useMemo(() => {
     const t = searchTerm.toLowerCase();
-    return products.filter((p) => p.name.toLowerCase().includes(t) || p.id.toString().includes(t));
+    return products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(t) ||
+        p.id.toString().includes(t)
+    );
   }, [products, searchTerm]);
 
   const filteredOrders = useMemo(() => {
@@ -311,7 +432,13 @@ const SellerDashboard = () => {
                   placeholder="Tìm kiếm sản phẩm..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  name="seller-search"
                 />
+
               </div>
 
               <button className="btn-create" onClick={handleCreateProduct}>
@@ -334,49 +461,53 @@ const SellerDashboard = () => {
                 </thead>
 
                 <tbody>
-                  {filteredProducts.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        {product.image ? (
-                          <img className="product-thumb" src={product.image} alt={product.name} />
-                        ) : (
-                          <div className="product-thumb placeholder" title="Chưa có hình">
-                            <span>🍊</span>
+                  {filteredProducts.map((product) => {
+                    const firstImage = Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '';
+                    return (
+                      <tr key={product.id}>
+                        <td>
+                          {firstImage ? (
+                            <img className="product-thumb" src={firstImage} alt={product.name} />
+                          ) : (
+                            <div className="product-thumb placeholder" title="Chưa có hình">
+                              <span>🍊</span>
+                            </div>
+                          )}
+                        </td>
+
+                        <td className="product-name">{product.name}</td>
+
+                        <td className="price">
+                          {Number(product.price).toLocaleString('vi-VN')}₫/{product.unit}
+                        </td>
+
+                        <td>
+                          <span className={`stock ${Number(product.stock) <= 10 ? 'low' : ''}`}>
+                            {product.stock} {product.unit}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span className={`status-badge ${product.status}`}>
+                            {statusLabelOfProduct(product.status)}
+                          </span>
+                        </td>
+
+                        <td>
+                          <div className="action-buttons">
+                            <button className="btn-edit" onClick={() => handleEditProduct(product)} aria-label="Edit product" title="Sửa">
+                              <Edit2 size={16} />
+                            </button>
+                            <button className="btn-delete" onClick={() => openDeleteProductModal(product)} aria-label="Delete product" title="Xoá">
+                              <Trash2 size={16} />
+                            </button>
                           </div>
-                        )}
-                      </td>
-
-                      <td className="product-name">{product.name}</td>
-
-                      <td className="price">
-                        {Number(product.price).toLocaleString('vi-VN')}₫/{product.unit}
-                      </td>
-
-                      <td>
-                        <span className={`stock ${Number(product.stock) <= 10 ? 'low' : ''}`}>
-                          {product.stock} {product.unit}
-                        </span>
-                      </td>
-
-                      <td>
-                        <span className={`status-badge ${product.status}`}>
-                          {statusLabelOfProduct(product.status)}
-                        </span>
-                      </td>
-
-                      <td>
-                        <div className="action-buttons">
-                          <button className="btn-edit" onClick={() => handleEditProduct(product)} aria-label="Edit product" title="Sửa">
-                            <Edit2 size={16} />
-                          </button>
-                          <button className="btn-delete" onClick={() => openDeleteProductModal(product)} aria-label="Delete product" title="Xoá">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
+
               </table>
             </div>
           </div>
@@ -444,6 +575,7 @@ const SellerDashboard = () => {
                     </tr>
                   ))}
                 </tbody>
+
               </table>
             </div>
           </div>
@@ -497,6 +629,36 @@ const SellerDashboard = () => {
 
               <div className="form-row">
                 <div className="form-group">
+                  <label>Danh mục *</label>
+                  <select
+                    value={currentProduct.category_id}
+                    onChange={(e) => setCurrentProduct({ ...currentProduct, category_id: e.target.value })}
+                  >
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Xuất xứ *</label>
+                  <select
+                    value={currentProduct.origin_id}
+                    onChange={(e) => setCurrentProduct({ ...currentProduct, origin_id: e.target.value })}
+                  >
+                    {origins.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
                   <label>Giá bán *</label>
                   <input
                     type="number"
@@ -539,35 +701,90 @@ const SellerDashboard = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Hình ảnh</label>
+                  <label>Đã bán</label>
+                  <input
+                    type="number"
+                    value={currentProduct.sold_quantity}
+                    onChange={(e) => setCurrentProduct({ ...currentProduct, sold_quantity: e.target.value })}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Mô tả ngắn</label>
+                  <input
+                    type="text"
+                    value={currentProduct.short_desc}
+                    onChange={(e) => setCurrentProduct({ ...currentProduct, short_desc: e.target.value })}
+                    placeholder="VD: Cam sành ngọt, nhiều nước"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Mô tả chi tiết</label>
+                  <input
+                    type="text"
+                    value={currentProduct.detail_desc}
+                    onChange={(e) => setCurrentProduct({ ...currentProduct, detail_desc: e.target.value })}
+                    placeholder="VD: Cam tuyển chọn, phù hợp ép nước..."
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Hình ảnh (tối đa {MAX_IMAGES})</label>
 
                   <div className="image-upload">
                     <input
-                      id="product-image-input"
+                      id="product-images-input"
                       className="file-input"
                       type="file"
                       accept="image/*"
-                      onChange={handleImageChange}
+                      multiple
+                      onChange={handleImagesChange}
                     />
-                    <label className="btn-file" htmlFor="product-image-input">
+                    <label className="btn-file" htmlFor="product-images-input">
                       Chọn hình ảnh
                     </label>
 
-                    {currentProduct.image && (
-                      <button type="button" className="btn-clear-image" onClick={clearImage} title="Xoá hình">
+                    {(currentProduct.images || []).length > 0 && (
+                      <button type="button" className="btn-clear-image" onClick={clearAllImages} title="Xoá tất cả">
                         <X size={16} />
                       </button>
                     )}
+
+                    <div className="image-count">
+                      {(currentProduct.images || []).length}/{MAX_IMAGES}
+                    </div>
                   </div>
 
                   <div className="image-preview">
-                    {currentProduct.image ? (
-                      <img src={currentProduct.image} alt="Preview" />
+                    {(currentProduct.images || []).length > 0 ? (
+                      <div className="image-grid">
+                        {(currentProduct.images || []).map((src, idx) => (
+                          <div key={idx} className="image-tile">
+                            <img src={src} alt={`preview-${idx}`} />
+                            <button
+                              type="button"
+                              className="btn-remove-image"
+                              onClick={() => removeImageAt(idx)}
+                              title="Xoá ảnh"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     ) : (
                       <div className="image-empty">Chưa có hình</div>
                     )}
                   </div>
                 </div>
+
+                <div className="form-group" />
               </div>
             </div>
 
@@ -707,6 +924,39 @@ const SellerDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Footer policies */}
+      <footer className="footer-content">
+        <div className="footer-inner">
+          <div className="footer-col">
+            <h3>Chính sách mua hàng</h3>
+            <ul>
+              <li>Đổi/Trả trong 24–48h nếu sản phẩm lỗi, dập nát do vận chuyển.</li>
+              <li>Kiểm tra hàng khi nhận; vui lòng quay video mở kiện để được hỗ trợ nhanh.</li>
+              <li>Hoàn tiền/đổi hàng theo hình thức bạn chọn sau khi xác minh.</li>
+              <li>Hỗ trợ CSKH: 08xx xxx xxx (8:00–20:00).</li>
+            </ul>
+          </div>
+
+          <div className="footer-col">
+            <h3>Chính sách thanh toán</h3>
+            <ul>
+              <li>Thanh toán khi nhận hàng (COD) hoặc chuyển khoản ngân hàng.</li>
+              <li>Đơn hàng được xác nhận sau khi hệ thống ghi nhận thanh toán (nếu chuyển khoản).</li>
+              <li>Hoá đơn/biên nhận được gửi kèm đơn hàng hoặc qua email (nếu có).</li>
+              <li>Bảo mật thông tin thanh toán theo tiêu chuẩn an toàn.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span>© {new Date().getFullYear()} FRUITstore</span>
+          <span className="dot">•</span>
+          <span>All rights reserved</span>
+        </div>
+      </footer>
+
+
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { UserPlus, Edit2, Trash2, Search, X, Save, LogOut } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { UserPlus, Edit2, Trash2, Search, X, Save, LogOut, Eye, EyeOff } from 'lucide-react';
 import './adminpanel.css';
 
 const AdminPanel = () => {
@@ -12,18 +12,50 @@ const AdminPanel = () => {
   const normalizeRole = (role) => (validRoleValues.has(role) ? role : 'user');
 
   const [users, setUsers] = useState([
-    { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@example.com', role: 'user', status: 'active' },
-    { id: 2, name: 'Trần Thị B', email: 'tranthib@example.com', role: 'manager', status: 'active' },
-    { id: 3, name: 'Lê Văn C', email: 'levanc@example.com', role: 'user', status: 'inactive' },
+    {
+      id: 1,
+      name: 'Nguyễn Văn A',
+      email: 'nguyenvana@example.com',
+      phone_number: '0901234567',
+      address: 'TP.HCM',
+      dob: '2000-01-01',
+      role: 'user',
+      status: 'active',
+    },
+    {
+      id: 2,
+      name: 'Trần Thị B',
+      email: 'tranthib@example.com',
+      phone_number: '0912345678',
+      address: 'Hà Nội',
+      dob: '1998-05-12',
+      role: 'manager',
+      status: 'active',
+    },
+    {
+      id: 3,
+      name: 'Lê Văn C',
+      email: 'levanc@example.com',
+      phone_number: '0923456789',
+      address: 'Đà Nẵng',
+      dob: '2001-09-20',
+      role: 'user',
+      status: 'inactive',
+    },
   ]);
 
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [searchTerm, setSearchTerm] = useState('');
+
   const [currentUser, setCurrentUser] = useState({
     id: null,
     name: '',
     email: '',
+    phone_number: '',
+    address: '',
+    dob: '',
+    password: '',
     role: 'user',
     status: 'active',
   });
@@ -32,17 +64,35 @@ const AdminPanel = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [formError, setFormError] = useState('');
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleCreate = () => {
     setModalMode('create');
-    setCurrentUser({ id: null, name: '', email: '', role: 'user', status: 'active' });
+    setCurrentUser({
+      id: null,
+      name: '',
+      email: '',
+      phone_number: '',
+      address: '',
+      dob: '',
+      password: '',
+      role: 'user',
+      status: 'active',
+    });
     setFormError('');
+    setShowPassword(false);
     setShowModal(true);
   };
 
   const handleEdit = (user) => {
     setModalMode('edit');
-    setCurrentUser({ ...user, role: normalizeRole(user.role) });
+    setCurrentUser({
+      ...user,
+      role: normalizeRole(user.role),
+      password: '', 
+    });
     setFormError('');
+    setShowPassword(false);
     setShowModal(true);
   };
 
@@ -63,6 +113,12 @@ const AdminPanel = () => {
     setUserToDelete(null);
   };
 
+  const validatePhone = (s) => {
+    const t = String(s || '').trim();
+    if (!t) return true; 
+    return /^[0-9]{9,11}$/.test(t);
+  };
+
   const handleSave = () => {
     const nameOk = currentUser.name.trim().length > 0;
     const emailOk = currentUser.email.trim().length > 0;
@@ -72,11 +128,22 @@ const AdminPanel = () => {
       return;
     }
 
+    if (!validatePhone(currentUser.phone_number)) {
+      setFormError('Số điện thoại không hợp lệ (nên là 9-11 chữ số).');
+      return;
+    }
+
+    if (modalMode === 'create' && String(currentUser.password).trim().length < 6) {
+      setFormError('Mật khẩu tối thiểu 6 ký tự.');
+      return;
+    }
+
     setFormError('');
 
     const payload = {
       ...currentUser,
       role: normalizeRole(currentUser.role),
+
     };
 
     if (modalMode === 'create') {
@@ -86,7 +153,8 @@ const AdminPanel = () => {
       };
       setUsers([...users, newUser]);
     } else {
-      setUsers(users.map((u) => (u.id === payload.id ? payload : u)));
+
+      setUsers(users.map((u) => (u.id === payload.id ? { ...u, ...payload, email: u.email } : u)));
     }
 
     setShowModal(false);
@@ -97,11 +165,16 @@ const AdminPanel = () => {
     window.location.href = '/login';
   };
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = useMemo(() => {
+    const t = searchTerm.toLowerCase();
+    return users.filter(
+      (u) =>
+        u.name.toLowerCase().includes(t) ||
+        u.email.toLowerCase().includes(t) ||
+        String(u.id).includes(searchTerm) ||
+        String(u.phone_number || '').includes(searchTerm)
+    );
+  }, [users, searchTerm]);
 
   const getRoleColor = (role) => roles.find((r) => r.value === role)?.color || '#95a5a6';
 
@@ -129,6 +202,11 @@ const AdminPanel = () => {
               placeholder="Tìm kiếm người dùng..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              name="admin-user-search"
             />
           </div>
           <button className="btn-create" onClick={handleCreate}>
@@ -155,21 +233,17 @@ const AdminPanel = () => {
                 <tr key={user.id}>
                   <td>{user.id}</td>
                   <td>{user.name}</td>
-
                   <td title={user.email}>{user.email}</td>
-
                   <td>
                     <span className="role-badge" style={{ backgroundColor: getRoleColor(user.role) }}>
                       {roles.find((r) => r.value === user.role)?.label}
                     </span>
                   </td>
-
                   <td>
                     <span className={`status-badge ${user.status}`}>
                       {user.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
                     </span>
                   </td>
-
                   <td>
                     <div className="action-buttons">
                       <button className="btn-edit" onClick={() => handleEdit(user)}>
@@ -183,6 +257,7 @@ const AdminPanel = () => {
                 </tr>
               ))}
             </tbody>
+
           </table>
         </div>
       </div>
@@ -217,7 +292,66 @@ const AdminPanel = () => {
                   value={currentUser.email}
                   onChange={(e) => setCurrentUser({ ...currentUser, email: e.target.value })}
                   placeholder="Nhập email"
+                  disabled={modalMode === 'edit'}
+                  title={modalMode === 'edit' ? 'Email không thể chỉnh sửa' : undefined}
+                  autoComplete="off"
                 />
+              </div>
+
+              <div className="form-group">
+                <label>Số điện thoại</label>
+                <input
+                  type="tel"
+                  value={currentUser.phone_number}
+                  onChange={(e) => setCurrentUser({ ...currentUser, phone_number: e.target.value })}
+                  placeholder="VD: 0901234567"
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Địa chỉ</label>
+                <input
+                  type="text"
+                  value={currentUser.address}
+                  onChange={(e) => setCurrentUser({ ...currentUser, address: e.target.value })}
+                  placeholder="Nhập địa chỉ"
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Ngày sinh</label>
+                <input
+                  type="date"
+                  value={currentUser.dob}
+                  onChange={(e) => setCurrentUser({ ...currentUser, dob: e.target.value })}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Mật khẩu {modalMode === 'create' ? '*' : '(tùy chọn)'}</label>
+
+                <div className="password-field">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={currentUser.password}
+                    onChange={(e) => setCurrentUser({ ...currentUser, password: e.target.value })}
+                    placeholder={modalMode === 'create' ? 'Tối thiểu 6 ký tự' : 'Để trống nếu không đổi'}
+                    autoComplete="new-password"
+                  />
+
+                  <button
+                    type="button"
+                    className="btn-toggle-password"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
@@ -289,6 +423,39 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+
+      {/* Footer policies */}
+      <footer className="footer-content">
+        <div className="footer-inner">
+          <div className="footer-col">
+            <h3>Chính sách mua hàng</h3>
+            <ul>
+              <li>Đổi/Trả trong 24–48h nếu sản phẩm lỗi, dập nát do vận chuyển.</li>
+              <li>Kiểm tra hàng khi nhận; vui lòng quay video mở kiện để được hỗ trợ nhanh.</li>
+              <li>Hoàn tiền/đổi hàng theo hình thức bạn chọn sau khi xác minh.</li>
+              <li>Hỗ trợ CSKH: 08xx xxx xxx (8:00–20:00).</li>
+            </ul>
+          </div>
+
+          <div className="footer-col">
+            <h3>Chính sách thanh toán</h3>
+            <ul>
+              <li>Thanh toán khi nhận hàng (COD) hoặc chuyển khoản ngân hàng.</li>
+              <li>Đơn hàng được xác nhận sau khi hệ thống ghi nhận thanh toán (nếu chuyển khoản).</li>
+              <li>Hoá đơn/biên nhận được gửi kèm đơn hàng hoặc qua email (nếu có).</li>
+              <li>Bảo mật thông tin thanh toán theo tiêu chuẩn an toàn.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span>© {new Date().getFullYear()} FRUITstore</span>
+          <span className="dot">•</span>
+          <span>All rights reserved</span>
+        </div>
+      </footer>
+
+
     </div>
   );
 };
