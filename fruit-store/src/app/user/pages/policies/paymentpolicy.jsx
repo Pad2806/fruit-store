@@ -19,10 +19,10 @@ const PaymentPolicy = () => {
                 <h3 className={styles.h3Accent}>Thanh toán khi nhận hàng (COD)</h3>
                 <p>Thanh toán bằng tiền mặt trực tiếp cho nhân viên giao hàng</p>
               </div>
-              <div className={styles.methodCard}>
-                <div className={styles.methodIcon}>📱</div>
-                <h3 className={styles.h3Accent}>Ví điện tử</h3>
-                <p>VNPay</p>
+                <div className={styles.methodCard}>
+                <div className={styles.methodIcon}>🏦</div>
+                <h3 className={styles.h3Accent}>Chuyển khoản ngân hàng</h3>
+                <p>Chuyển khoản qua tài khoản ngân hàng của FruitStore</p>
               </div>
             </div>
           </article>

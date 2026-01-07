@@ -44,8 +44,8 @@ export default function Checkout() {
   };
 
   const handleFinalConfirm = () => {
-    if (customer.paymentMethod === "VNPAY") {
-      navigate("/payment-vnpay", { 
+    if (customer.paymentMethod === "VISA") {
+      navigate("/payment-visa", { 
         state: { 
           orderId, 
           totalAmount,
@@ -137,12 +137,12 @@ export default function Checkout() {
                 <input 
                   type="radio" 
                   name="paymentMethod" 
-                  value="VNPAY" 
-                  checked={customer.paymentMethod === "VNPAY"} 
+                  value="VISA" 
+                  checked={customer.paymentMethod === "VISA"} 
                   onChange={handleInput} 
                 />
                 <span className={styles.customRadio}></span>
-                <span className={styles.methodName}>Thanh toán qua VNPAY</span>
+                <span className={styles.methodName}>Thanh toán bằng thẻ quốc tế</span>
                 <span className={styles.methodIcon}><Landmark /></span>
               </label>
             </div>
@@ -243,7 +243,7 @@ export default function Checkout() {
 
               <div className={styles.modalSummary}>
                 <p>Phí ship: <span>{shippingFee.toLocaleString()}đ</span></p>
-                <p>Thanh toán: <span>{customer.paymentMethod === 'cod' ? 'Tiền mặt (COD)' : 'VNPAY'}</span></p>
+                <p>Thanh toán: <span>{customer.paymentMethod === 'cod' ? 'Tiền mặt (COD)' : 'VISA'}</span></p>
                 <h4 className={styles.modalTotal}>Tổng tiền: {totalAmount.toLocaleString()}đ</h4>
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function Checkout() {
             <div className={styles.modalFooter}>
               <button className={styles.cancelBtn} onClick={() => setShowModal(false)}>Hủy</button>
               <button className={styles.confirmBtn} onClick={handleFinalConfirm}>
-                {customer.paymentMethod === "VNPAY" ? "THANH TOÁN NGAY" : "XÁC NHẬN ĐẶT HÀNG"}
+                {customer.paymentMethod === "VISA" ? "THANH TOÁN NGAY" : "XÁC NHẬN ĐẶT HÀNG"}
               </button>
             </div>
           </div>
