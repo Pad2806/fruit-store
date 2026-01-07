@@ -28,8 +28,8 @@ function Footer() {
 
         <div className="footer-col">
           <h4>Thông tin liên hệ</h4>
-          <p><strong>Chi nhánh 1:</strong> 183 Nguyễn Thái Học, P. Bến Thành</p>
-          <p><strong>Chi nhánh 2:</strong> 42B Trần Huy Liệu, P. Phú Nhuận</p>
+          <p><strong>Chi nhánh 1:</strong> 183 Hoàng Văn Thái, P. Hòa Khánh Nam, TP. Đà Nẵng</p>
+          <p><strong>Chi nhánh 2:</strong> 111 Nguyễn Văn Linh, P. Phước Ninh, TP. Đà Nẵng</p>
           <p><strong>Điện thoại:</strong> 0865 666 666</p>
           <p><strong>Email:</strong> info@FruitStore.com.vn</p>
         </div>
@@ -39,13 +39,11 @@ function Footer() {
           <ul className="footer-links">
             <li><a href="/#">Tìm kiếm</a></li>
             <li><a href="/about">Câu chuyện thương hiệu</a></li>
-            <li><a href="/#">Chính sách thành viên</a></li>
-            <li><a href="/#">Chính sách giao hàng</a></li>
-            <li><a href="/#">Chính sách thanh toán</a></li>
+            <li><a href="/purchasepolicy">Chính sách mua hàng</a></li>
+            <li><a href="/paymentpolicy">Chính sách thanh toán</a></li>
             <li><a href="/policy-warranty">Chính sách bảo hành</a></li>
             <li><a href="/policy-inspection">Chính sách kiểm hàng</a></li>
             <li><a href="/chinh-sach-bao-mat">Chính sách bảo mật</a></li>
-            <li><a href="/#">Kiến thức trái cây</a></li>
             <li><a href="/huong-dan-mua-hang">Hướng dẫn mua hàng Online</a></li>
             <li><a href="/contact">Liên hệ</a></li>
           </ul>

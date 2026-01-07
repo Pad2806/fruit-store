@@ -526,3 +526,61 @@ tbody td { padding: 15px; font-size: 14px; color: var(--text); }
   .stat-card { width: 100%; }
   .action-buttons { flex-direction: column; }
 }
+.image-count {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+  margin-left: 6px;
+}
+
+.image-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .image-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.image-tile {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid rgba(0,0,0,0.06);
+  background: #fff;
+}
+
+.image-tile img {
+  width: 100%;
+  height: 70px;
+  object-fit: cover;
+  display: block;
+}
+
+.btn-remove-image {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-remove-image:hover {
+  background: rgba(0,0,0,0.65);
+  transform: scale(1.05);
+}
+
+

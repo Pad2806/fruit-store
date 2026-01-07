@@ -6,8 +6,8 @@ export default function PrivacyPolicy() {
   const location = useLocation();
 
   const menuItems = [
-    { name: "Chính sách mua hàng", path: "/chinh-sach-mua-hang" },
-    { name: "Chính sách thanh toán", path: "/chinh-sach-thanh-toan" },
+    { name: "Chính sách mua hàng", path: "/purchasepolicy" },
+    { name: "Chính sách thanh toán", path: "/paymentpolicy" },
     { name: "Chính sách bảo hành", path: "/policy-warranty" },
     { name: "Chính sách kiểm hàng", path: "/policy-inspection" },
     { name: "Chính sách bảo mật", path: "/chinh-sach-bao-mat" },

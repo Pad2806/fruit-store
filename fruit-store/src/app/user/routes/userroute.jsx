@@ -11,9 +11,11 @@ import User from '../pages/user/user';
 import PrivacyPolicy from "../pages/privacypolicy/privacypolicy";
 import OnlineShoppingGuide from "../pages/onlineshoppingguide/onlineshoppingguide";
 import OrderSuccess from "../pages/ordersuccess/ordersuccess";
-
 import WarrantyPolicy from "../pages/policy_warranty/warranty";
 import InspectionPolicy from "../pages/policy_inspection/inspection";
+import PurchasePolicy from "../pages/policies/purchasepolicy"; 
+import PaymentPolicy from "../pages/policies/paymentpolicy";
+
 
 const userRoutes = [
   {
@@ -28,12 +30,14 @@ const userRoutes = [
       {path: "/cart", element: <Cart />},
       {path: "/checkouts", element: <Checkout />},
       {path: "/user", element: <User />},
+
       { path: "/chinh-sach-bao-mat", element: <PrivacyPolicy /> },
       {path: "/huong-dan-mua-hang", element: <OnlineShoppingGuide />},
       {path: "/order-success", element: <OrderSuccess />},
       { path: "/policy-warranty", element: <WarrantyPolicy /> },
       { path: "/policy-inspection", element: <InspectionPolicy /> },
-
+      { path: "/purchasepolicy", element: <PurchasePolicy /> },
+      { path: "/paymentpolicy", element: <PaymentPolicy /> },
     ],
   },
 ];

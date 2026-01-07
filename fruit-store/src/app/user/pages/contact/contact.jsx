@@ -18,7 +18,7 @@ function Contact() {
               <FaMapMarkerAlt />
             </span>
             <p>
-              <b>Chi nhánh 1:</b> 183 Nguyễn Thái Học, Phường Bến Thành, TP.HCM
+              <b>Chi nhánh 1:</b> 183 Hoàng Văn Thái, P. Hòa Khánh Nam, TP. Đà Nẵng
             </p>
           </div>
 
@@ -27,7 +27,7 @@ function Contact() {
               <FaMapMarkerAlt />
             </span>
             <p>
-              <b>Chi nhánh 2:</b> 42B Trần Huy Liệu, Phường Phú Nhuận
+              <b>Chi nhánh 2:</b> 111 Nguyễn Văn Linh, P. Phước Ninh, TP. Đà Nẵng
             </p>
           </div>
 

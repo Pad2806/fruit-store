@@ -512,3 +512,39 @@ tbody td {
   background-color: #f47c4b !important;
   color: #fff !important;
 }
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.password-field input {
+  flex: 1;
+  padding-right: 46px;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.06);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  color: #555;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.btn-toggle-password:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
