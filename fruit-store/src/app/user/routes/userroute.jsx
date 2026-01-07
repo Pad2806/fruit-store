@@ -4,10 +4,11 @@ import About from "../pages/about/about";
 import Contact from "../pages/contact/contact";
 import Products from "../pages/products/products";
 import ProductDetail from "../pages/product_detail/product_detail";
-import Login from '../pages/auths/login';
-import Cart from '../pages/cart/cart';
-import Checkout from '../pages/checkout/checkout';
-import User from '../pages/user/user';
+import Login from "../pages/auths/login";
+import Cart from "../pages/cart/cart";
+import Checkout from "../pages/checkout/checkout";
+import User from "../pages/user/user";
+import Payment from "../pages/payment/payment";
 
 const userRoutes = [
   {
@@ -17,15 +18,14 @@ const userRoutes = [
       { path: "/products", element: <Products /> },
       { path: "/products/:id", element: <ProductDetail /> },
       { path: "/about", element: <About /> },
-      { path: "/contact", element: <Contact /> }, 
-      {path: "/login", element: <Login />},
-      {path: "/cart", element: <Cart />},
-      {path: "/checkouts", element: <Checkout />},
-      {path: "/user", element: <User />}
+      { path: "/contact", element: <Contact /> },
+      { path: "/login", element: <Login /> },
+      { path: "/cart", element: <Cart /> },
+      { path: "/checkouts", element: <Checkout /> },
+      { path: "/payment", element: <Payment /> },
+      { path: "/user", element: <User /> },
     ],
   },
 ];
 
 export { userRoutes };
-
-
