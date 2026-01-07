@@ -11,6 +11,10 @@ import User from '../pages/user/user';
 import PrivacyPolicy from "../pages/privacypolicy/privacypolicy";
 import OnlineShoppingGuide from "../pages/onlineshoppingguide/onlineshoppingguide";
 import OrderSuccess from "../pages/ordersuccess/ordersuccess";
+
+import WarrantyPolicy from "../pages/policy_warranty/warranty";
+import InspectionPolicy from "../pages/policy_inspection/inspection";
+
 const userRoutes = [
   {
     element: <UserLayout />,
@@ -27,6 +31,9 @@ const userRoutes = [
       { path: "/chinh-sach-bao-mat", element: <PrivacyPolicy /> },
       {path: "/huong-dan-mua-hang", element: <OnlineShoppingGuide />},
       {path: "/order-success", element: <OrderSuccess />},
+      { path: "/policy-warranty", element: <WarrantyPolicy /> },
+      { path: "/policy-inspection", element: <InspectionPolicy /> },
+
     ],
   },
 ];

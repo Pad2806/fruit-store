@@ -8,8 +8,8 @@ export default function OnlineShoppingGuide() {
   const menuItems = [
     { name: "Chính sách mua hàng", path: "/chinh-sach-mua-hang" },
     { name: "Chính sách thanh toán", path: "/chinh-sach-thanh-toan" },
-    { name: "Chính sách bảo hành", path: "/chinh-sach-bao-hanh" },
-    { name: "Chính sách kiểm hàng", path: "/chinh-sach-kiem-hang" },
+    { name: "Chính sách bảo hành", path: "/policy-warranty" },
+    { name: "Chính sách kiểm hàng", path: "/policy-inspection" },
     { name: "Chính sách bảo mật", path: "/chinh-sach-bao-mat" },
     { name: "Hướng dẫn mua hàng online", path: "/huong-dan-mua-hang" },
   ];

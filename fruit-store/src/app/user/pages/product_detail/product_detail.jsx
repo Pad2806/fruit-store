@@ -11,10 +11,35 @@ function ProductDetail() {
   const product = products.find(p => p.id === id);
   const [qty, setQty] = useState(1);
   const { addToCart } = useCart();
+  const images = Array.isArray(product.images)
+    ? product.images
+    : [product.images];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeImg = images[activeIndex];
+  const prevImage = () => {
+    setActiveIndex((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+  const nextImage = () => {
+    setActiveIndex((prev) =>
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [id]);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % images.length);
+    }, 2000); 
+
+    return () => clearInterval(timer);
+  }, [images.length]);
 
   if (!product) {
     return <Navigate to="/404" replace />;
@@ -24,9 +49,41 @@ function ProductDetail() {
     <>
       <section className={styles.productDetail}>
         <div className={styles.productDetailImage}>
-          <img src={product.image} alt={product.name} />
-        </div>
+          <div className={styles.imageWrapper}>
+            <img src={activeImg} alt={product.name} />
 
+            {images.length > 1 && (
+              <>
+                <button
+                  className={`${styles.navBtn} ${styles.prev}`}
+                  onClick={prevImage}
+                >
+                  ‹
+                </button>
+
+                <button
+                  className={`${styles.navBtn} ${styles.next}`}
+                  onClick={nextImage}
+                >
+                  ›
+                </button>
+              </>
+            )}
+          </div>
+
+          {images.length > 1 && (
+            <div className={styles.thumbList}>
+              {images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  className={index === activeIndex ? styles.activeThumb : ""}
+                  onClick={() => setActiveIndex(index)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
         <div className={styles.productDetailInfo}>
           <h1 className={styles.title}>{product.name}</h1>
 
@@ -39,10 +96,16 @@ function ProductDetail() {
 
           <div className={styles.price}>{product.price}</div>
 
-          <div className={styles.quantity}>
-            <button onClick={() => qty > 1 && setQty(qty - 1)}>-</button>
-            <span>{qty}</span>
-            <button onClick={() => setQty(qty + 1)}>+</button>
+          <div className={styles.quantityRow}>
+            <div className={styles.quantity}>
+              <button onClick={() => qty > 1 && setQty(qty - 1)}>-</button>
+              <span>{qty}</span>
+              <button onClick={() => setQty(qty + 1)}>+</button>
+            </div>
+
+            <span className={styles.unit}>
+              {product.unit || "đơn vị"}
+            </span>
           </div>
 
           <button
@@ -53,6 +116,15 @@ function ProductDetail() {
           >
             THÊM VÀO GIỎ HÀNG
           </button>
+
+          {product.shortDesc && (
+            <div className={styles.shortDescBox}>
+              <h4 className={styles.shortDescTitle}>Điểm nổi bật</h4>
+              <p className={styles.shortDesc}>
+                {product.shortDesc}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
