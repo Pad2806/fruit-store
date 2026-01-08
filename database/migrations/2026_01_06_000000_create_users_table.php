@@ -17,13 +17,15 @@ class CreateUsersTable extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('verify_code')->nullable();
+            $table->timestamp('expired_code_at')->nullable();
+            $table->string('role_id');
+            $table->enum('status', ['active', 'inactive', 'pending'])->default('active');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone_number', 10)->nullable();
             $table->string('address')->nullable();
             $table->date('dob')->nullable();
-            $table->string('role_id');
-            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->rememberToken();
             $table->timestamps();
 

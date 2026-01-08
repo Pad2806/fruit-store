@@ -42,6 +42,8 @@ class User extends Authenticatable
         'dob',
         'role_id',
         'status',
+        'verify_code',
+        'expired_code_at',
     ];
 
     /**
@@ -61,6 +63,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'expired_code_at' => 'datetime',
     ];
 
     public function role()

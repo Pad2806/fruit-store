@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Admin\User\CreateRequest;
 use App\Models\User;
 use App\Models\Role;
-use App\Http\Resources\AdminUserResource;
+use App\Http\Resources\Admin\AdminUserResource;
 
 use App\Http\Requests\Admin\User\UpdateRequest;
 
