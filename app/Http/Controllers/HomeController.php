@@ -7,48 +7,53 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function todayProducts(Request $request)
+    public function index(Request $request)
     {
         $query = Product::where('status', 'active');
 
-        // SORT
-        if ($request->filled('sort')) {
-            switch ($request->sort) {
-                case 'price_asc':
-                    $query->orderBy('price', 'asc');
-                    break;
-                case 'price_desc':
-                    $query->orderBy('price', 'desc');
-                    break;
-                case 'name_asc':
-                    $query->orderBy('name', 'asc');
-                    break;
-                case 'name_desc':
-                    $query->orderBy('name', 'desc');
-                    break;
-                default:
-                    $query->orderBy('created_at', 'desc');
-            }
-        } else {
-            $query->orderBy('created_at', 'desc');
+        switch ($request->get('sort')) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+
+            default:
+                $query->orderBy('created_at', 'desc');
         }
 
-        $limit = $request->get('limit', 6);
+        $limit  = (int) $request->get('limit', 5);
+        $offset = (int) $request->get('offset', 0);
 
         $products = $query
+            ->offset($offset)
             ->limit($limit)
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'image' => asset('storage/products/' . $product->image),
-                ];
-            });
+            ->get();
+
+        $data = $products->map(function ($product) {
+            return [
+                'id'     => $product->id,
+                'name'   => $product->name,
+                'price'  => number_format($product->price, 0, ',', '.') . 'đ',
+                'images' => [
+                    asset('storage/products/' . $product->image)
+                ],
+            ];
+        });
 
         return response()->json([
-            'data' => $products
+            'data'  => $data,
+            'count' => $data->count()
         ]);
     }
 
@@ -110,6 +115,4 @@ class HomeController extends Controller
                 ];
             });
     }
-
-
 }
