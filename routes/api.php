@@ -20,7 +20,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::get('/products', [HomeController::class, 'index']);
+Route::get('/home/products', [HomeController::class, 'todayProducts']);
+Route::get('/products/{id}', [HomeController::class, 'show']);
+
+
+
+
+
 
 
 
