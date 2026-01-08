@@ -14,6 +14,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -154,4 +156,38 @@ class AuthController extends Controller
             'message' => 'Update profile successful',
         ], 200);
     }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')
+            ->stateless()
+            ->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        $googleUser = Socialite::driver('google')->stateless()->user();
+
+        $user = User::where('email', $googleUser->email)->first();
+
+        if (!$user) {
+            $role = Role::where('name', 'user')->first();
+
+            $user = User::create([
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'password' => bcrypt(Str::random(16)),
+                'status' => 'active',
+                'email_verified_at' => now(),
+                'role_id' => $role->id,
+            ]);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return redirect()->to(
+            "http://localhost:5173/google-callback?token=$token"
+        );
+    }
+
 }
