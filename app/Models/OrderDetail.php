@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class OrderDetail extends Model
 {
     use HasFactory;
-
-    public $incrementing = false;
     protected $keyType = 'string';
-
+    public $incrementing = false;
     protected $fillable = [
         'id',
         'order_id',
@@ -25,11 +23,11 @@ class OrderDetail extends Model
 
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

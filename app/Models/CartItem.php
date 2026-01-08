@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class CartItem extends Model
 {
     use HasFactory;
-
-    public $incrementing = false;
     protected $keyType = 'string';
-
+    public $incrementing = false;
     protected $fillable = [
         'id',
         'cart_id',
@@ -24,11 +22,11 @@ class CartItem extends Model
 
     public function cart()
     {
-        return $this->belongsTo(Cart::class);
+        return $this->belongsTo(Cart::class, 'cart_id', 'id');
     }
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

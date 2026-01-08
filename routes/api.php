@@ -7,6 +7,12 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\StripeWebhookController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -46,4 +52,29 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']]
     // Example: Route::get('/profile', [UserController::class, 'profile']);
     Route::get('orders', [App\Http\Controllers\User\OrderController::class, 'index']);
     Route::get('orders/{id}', [App\Http\Controllers\User\OrderController::class, 'show']);
+
+    Route::group(['prefix' => 'carts'], function () {
+        Route::post('', [CartController::class, 'store']);
+        Route::delete('{cart}', [CartController::class, 'destroy']);
+        Route::get('{cart}', [CartController::class, 'show']);
+    });
+
+    Route::group(['prefix' => 'cart-items'], function () {
+        Route::post('{product}', [CartItemController::class, 'store']);
+        Route::put('{cartItem}', [CartItemController::class, 'updateQuantity']);
+        Route::delete('{cartItem}', [CartItemController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'orders'], function () {
+        Route::post('/confirm', [OrderController::class, 'confirm']);
+        Route::post('', [OrderController::class, 'store']);
+        Route::get('{order}', [OrderController::class, 'show']);
+        Route::post('{order}/cancel', [OrderController::class, 'cancel']);
+    });
+
+    Route::post('/checkout/stripe', [PaymentController::class, 'stripeCheckout']);
+    Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
+    
 });
+
+
