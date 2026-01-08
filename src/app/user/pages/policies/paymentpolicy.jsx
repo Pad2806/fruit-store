@@ -96,8 +96,8 @@ const PaymentPolicy = () => {
             <div className={styles.walletGrid}>
               
               <div className={styles.walletCard}>
-                <div className={styles.walletLogo}>V</div>
-                <h4 className={styles.h4}>VNPay</h4>
+                <div className={styles.walletLogo}></div>
+                <h4 className={styles.h4}>Sepay & Stripe</h4>
                 <p>Liên kết thẻ ngân hàng</p>
               </div>
             </div>

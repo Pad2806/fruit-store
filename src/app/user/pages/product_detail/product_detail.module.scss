@@ -1,7 +1,7 @@
 .productDetail {
   max-width: 1200px;
-  margin: 40px auto;
-  padding: 0 16px;
+  margin: auto;
+  padding: 20px 16px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
@@ -254,8 +254,8 @@
 
 .relatedProducts {
   max-width: 1200px;
-  margin: 60px auto;
-  padding: 0 16px;
+  margin: 10px auto;
+  padding: 20px 16px;
   font-family: "Montserrat", sans-serif;
 
   h2 {

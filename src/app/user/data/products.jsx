@@ -14,7 +14,7 @@ export const products = [
     name: "Dưa xiêm gọt trọc",
     price: "19.000đ",
     images: [img1, img7, img8],
-    unit: "trái",               
+    unit: "trái",
     shortDesc: "Dưa tươi gọt sẵn, tiện lợi dùng ngay, ngọt mát tự nhiên.",
     description: (
       <>
