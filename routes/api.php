@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,27 +17,31 @@ use App\Http\Controllers\HomeController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+Route::post('verify-code', [AuthController::class, 'verifyCode']);
+Route::post('resend-code', [AuthController::class, 'resendCode']);
 
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('users', [AuthController::class, 'getProfile']);
+    Route::post('update-profile', [AuthController::class, 'updateProfile']);
+    Route::post('logout', [AuthController::class, 'logout']);
+});
 
-
-// Admin Routes
-Route::group(['prefix' => 'admin', 'middleware' => ['auth:api', 'role:admin']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::post('/users', [AdminUserController::class, 'store']);
     Route::get('/users', [AdminUserController::class, 'index']);
     Route::put('/users/{user}', [AdminUserController::class, 'update']);
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy']);
 });
 
-// Seller Routes
-Route::group(['prefix' => 'seller', 'middleware' => ['auth:api', 'role:seller']], function () {
+Route::group(['prefix' => 'seller', 'middleware' => ['auth:sanctum', 'role:seller']], function () {
     // Define seller routes here
 });
 
-// User Routes
-Route::group(['prefix' => 'user', 'middleware' => ['auth:api', 'role:user']], function () {
+Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']], function () {
     // Define user routes here
     // Example: Route::get('/profile', [UserController::class, 'profile']);
+    Route::get('orders', [App\Http\Controllers\User\OrderController::class, 'index']);
+    Route::get('orders/{id}', [App\Http\Controllers\User\OrderController::class, 'show']);
 });

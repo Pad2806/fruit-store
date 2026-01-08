@@ -88,7 +88,7 @@ class InitialDataSeeder extends Seeder
                 'active', @now
             ),
             (
-                UUID(), 'User 01', 'user01@example.com', '0900000001', 'Hà Nội', '1998-01-01',
+                UUID(), 'User 01', 'user@example.com', '0900000001', 'Hà Nội', '1998-01-01',
                 '\$2y\$10\$examplehashedpassworduser',
                 (SELECT id FROM roles WHERE name='user' LIMIT 1),
                 'active', @now
