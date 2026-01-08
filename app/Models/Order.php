@@ -35,4 +35,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetail::class, 'order_id', 'id');
     }
+
+    public function details()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
 }
