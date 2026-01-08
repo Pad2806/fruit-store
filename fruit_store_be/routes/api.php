@@ -37,7 +37,9 @@ Route::group(['prefix' => 'cart-items'], function () {
 
 Route::group(['prefix' => 'orders'], function () {
     Route::post('/confirm', [OrderController::class, 'confirm']);
-    Route::post('{user}', [OrderController::class, 'store']);
+    Route::post('', [OrderController::class, 'store']);
+    Route::get('{order}', [OrderController::class, 'show']);
+    Route::post('{order}/cancel', [OrderController::class, 'cancel']);
 });
 
 Route::post('/checkout/stripe', [PaymentController::class, 'stripeCheckout']);

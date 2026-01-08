@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Order\CreateRequest;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Exception;
 use Faker\Provider\Payment;
@@ -16,10 +17,10 @@ use Stripe\Stripe;
 
 class OrderController extends Controller
 {
-    public function store(CreateRequest $request, User $user)
+    public function store(CreateRequest $request)
     {
        $data = $request->validated();
-       $cart = Cart::where('user_id', $user->id)->first();
+       $cart = Cart::where('user_id', $data['user_id'])->first();
 
        if (!$cart) {
            return response()->json(['message' => 'Cart not found.'], 404);
@@ -30,27 +31,10 @@ class OrderController extends Controller
        }
 
        $data['id'] = (string) Str::uuid();
-       $data['user_id'] = $user->id;
 
-       if($data['payment_method'] === 'banking') {
-           DB::transaction(function () use ($cart, $data, &$order) {
-               $data['status'] = 'pending';
-               $order = Order::create($data);
-                $this->createOrderDetailsFromCart($order, $cart);
-
-                $paymentSuccessful = true;
-                if(!$paymentSuccessful) {
-                    throw new \Exception('Payment failed.');
-                }
-               // Here you can add additional logic for banking payment processing if needed
-               // if payment successful, update order status
-               // $order->status = 'processing';
-               // $order->save();
-               // if payment fails, you can throw an exception to rollback the transaction
-               // delete the order and order details created above
-           });
-       }else {
+       if($data['payment_method'] === 'cod') {
            $data['status'] = 'pending';
+           $data['payment_status'] = 'pending';
            $order = Order::create($data);
            $this->createOrderDetailsFromCart($order, $cart);
        }
@@ -63,36 +47,77 @@ class OrderController extends Controller
 
     public function confirm(Request $request)
     {
-       $paymentIntentId = $request->payment_intent_id;
-       Stripe::setApiKey(config('services.stripe.secret'));
+        $paymentIntentId = $request->payment_intent_id;
+        Stripe::setApiKey(config('services.stripe.secret'));
 
-       try {
+        try {
             $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
             $metadata = $paymentIntent->metadata;
-            $order = Order::where('payment_intent_id', $paymentIntentId)->first();
-            if (!$order) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Order not created.'
-                ], 404);
-            }
-            return response()->json([
-                'status' => $order->status,
-                'message' => 'Order created successfully.'
-            ], 200);
 
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 500);
+            $cart = Cart::with('cartItems')->where('user_id', $metadata->user_id)->first();
+
+            if(!$cart || $cart->cartItems->isEmpty()) {
+                return response()->json(['status'=>'cancelled','message'=>'Cart empty'],200);
+            }
+
+            $order = Order::where('payment_intent_id',$paymentIntentId)->first();
+            if($order){
+                return response()->json(['status'=>$order->status,'order_id'=>$order->id],200);
+            }
+
+            DB::beginTransaction();
+
+            $order = Order::create([
+                        'id' => (string) Str::uuid(),
+                        'user_id' => $metadata->user_id,
+                        'payment_intent_id' => $paymentIntent->id,
+                        'total_amount' => $paymentIntent->amount,
+                        'payment_method' => 'banking',
+                        'payment_status' => 'paid',
+                        'shipping_fee' => $metadata->shipping_fee ?? 0,
+                        'recipient_name' => $metadata->recipient_name,
+                        'recipient_email' => $metadata->recipient_email,
+                        'recipient_address' => $metadata->recipient_address,
+                        'recipient_phone_number' => $metadata->recipient_phone_number,
+                        'recipient_city' => $metadata->recipient_city,
+                        'recipient_ward' => $metadata->recipient_ward,
+                        'recipient_district' => $metadata->recipient_district,
+                        'note' => $metadata->note,
+                        'datetime_order' => now()->toString(),
+                        'status' => 'confirmed',
+            ]);
+
+            $this->createOrderDetailsFromCart($order, $cart);
+            DB::commit();
+
+            return response()->json(['status'=>'completed','order_id'=>$order->id],200);
+
+        } catch(Exception $e){
+            DB::rollBack();
+            if(isset($paymentIntent) && $paymentIntent->status==='succeeded'){
+                \Stripe\Refund::create(['payment_intent'=>$paymentIntentId]);
+            }
+            return response()->json(['status'=>'refunded','message'=>$e->getMessage()],200);
         }
     }
-
 
     protected function createOrderDetailsFromCart(Order $order,Cart $cart)
     {
         foreach ($cart->cartItems as $cartItem) {
+
+           $product = Product::lockForUpdate()->find($cartItem->product_id);
+
+            if(!$product){
+                throw new Exception('Product not found');
+            }
+
+            if($product->stock_quantity < $cartItem->quantity){
+                throw new Exception("Not enough stock for {$product->name}");
+            }
+
+            $product->decrement('stock_quantity',$cartItem->quantity);
+            $product->increment('sold_quantity',$cartItem->quantity);
+
             $order->orderDetails()->create([
                 'id' => (string) Str::uuid(),
                 'product_id' => $cartItem->product_id,

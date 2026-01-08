@@ -14,6 +14,7 @@ class CreateRequest extends BaseRequest
     public function rules()
     {
         return [
+            'user_id' => 'required|exists:users,id',
             'recipient_name' => 'required|string|max:255',
             'recipient_email' => 'required|string|email|max:255',
             'recipient_address' => 'required|string|max:500',
@@ -22,8 +23,8 @@ class CreateRequest extends BaseRequest
             'recipient_district' => 'required|string|max:255',
             'recipient_phone_number' => 'required|string|max:12',
             'payment_method' => 'required|string|in:cod,banking',
-            'total_amount' => 'required|numeric|min:0',
-            'shipping_fee' => 'required|numeric|min:0',
+            'total_amount' => 'sometimes|numeric|min:0',
+            'shipping_fee' => 'sometimes|numeric|min:0',
             'note' => 'nullable|string|max:1000',
         ];
     }

@@ -32,7 +32,7 @@ function Payment() {
           recipient_district: "Lien Chieu",
         }
       );
-
+      console.log(data);
       const { client_secret } = data;
       const result = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
@@ -44,9 +44,21 @@ function Payment() {
         },
       });
 
+      console.log(result);
+
       if (result.error) {
         alert(result.error.message);
-      } else if (result.paymentIntent.status === "succeeded") {
+        setLoading(false);
+        return;
+      }
+
+      if (result.paymentIntent.status === "failed") {
+        alert("Thanh toán thất bại!");
+        setLoading(false);
+        return;
+      }
+
+      if (result.paymentIntent.status === "succeeded") {
         const res = await axios.post(
           "http://localhost:8000/api/orders/confirm",
           {
@@ -61,8 +73,15 @@ function Payment() {
         }
       }
     } catch (error) {
-      console.error("Payment error:", error);
-      alert("Thanh toán thất bại!");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(error.response.data.message || "Thanh toán thất bại!");
+      } else {
+        alert("Thanh toán thất bại!");
+      }
     } finally {
       setLoading(false);
     }

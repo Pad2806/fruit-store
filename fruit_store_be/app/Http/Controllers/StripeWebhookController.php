@@ -42,68 +42,68 @@ class StripeWebhookController extends Controller
         DB::beginTransaction();
 
         try {
-            if($event->type == 'payment_intent.succeeded'){
-                $paymentIntent = $event->data->object;
-                $metadata = $paymentIntent->metadata;
+            // if($event->type == 'payment_intent.succeeded'){
+            //     $paymentIntent = $event->data->object;
+            //     $metadata = $paymentIntent->metadata;
 
-                $cart = Cart::with('cartItems')
-                    ->where('user_id', $metadata->user_id)
-                    ->first();
+            //     $cart = Cart::with('cartItems')
+            //         ->where('user_id', $metadata->user_id)
+            //         ->first();
 
-                if (!$cart || $cart->cartItems->isEmpty()) {
-                    DB::commit();
-                    return response()->json(['status' => 'no cart items'], 200);
-                }
-                if(Order::where('payment_intent_id', $paymentIntent->id)->exists()) {
-                        DB::commit();
-                        return response()->json(['status' => 'success'], 200);
-                }
-                $order = Order::create([
-                        'id' => (string) Str::uuid(),
-                        'user_id' => $metadata->user_id,
-                        'payment_intent_id' => $paymentIntent->id,
-                        'total_amount' => $paymentIntent->amount,
-                        'payment_method' => 'banking',
-                        'shipping_fee' => $metadata->shipping_fee ?? 0,
-                        'recipient_name' => $metadata->recipient_name,
-                        'recipient_email' => $metadata->recipient_email,
-                        'recipient_address' => $metadata->recipient_address,
-                        'recipient_phone_number' => $metadata->recipient_phone_number,
-                        'recipient_city' => $metadata->recipient_city,
-                        'recipient_ward' => $metadata->recipient_ward,
-                        'recipient_district' => $metadata->recipient_district,
-                        'status' => 'completed',
-                ]);
+            //     if (!$cart || $cart->cartItems->isEmpty()) {
+            //         DB::commit();
+            //         return response()->json(['status' => 'no cart items'], 200);
+            //     }
+            //     if(Order::where('payment_intent_id', $paymentIntent->id)->exists()) {
+            //             DB::commit();
+            //             return response()->json(['status' => 'success'], 200);
+            //     }
+            //     $order = Order::create([
+            //             'id' => (string) Str::uuid(),
+            //             'user_id' => $metadata->user_id,
+            //             'payment_intent_id' => $paymentIntent->id,
+            //             'total_amount' => $paymentIntent->amount,
+            //             'payment_method' => 'banking',
+            //             'shipping_fee' => $metadata->shipping_fee ?? 0,
+            //             'recipient_name' => $metadata->recipient_name,
+            //             'recipient_email' => $metadata->recipient_email,
+            //             'recipient_address' => $metadata->recipient_address,
+            //             'recipient_phone_number' => $metadata->recipient_phone_number,
+            //             'recipient_city' => $metadata->recipient_city,
+            //             'recipient_ward' => $metadata->recipient_ward,
+            //             'recipient_district' => $metadata->recipient_district,
+            //             'status' => 'completed',
+            //     ]);
 
-                foreach ($cart->cartItems as $cartItem) {
-                        $product = Product::lockForUpdate()
-                            ->where('id', $cartItem->product_id)
-                            ->first();
+            //     foreach ($cart->cartItems as $cartItem) {
+            //             $product = Product::lockForUpdate()
+            //                 ->where('id', $cartItem->product_id)
+            //                 ->first();
 
-                        if (!$product) {
-                            throw new Exception('Product not found');
-                        }
+            //             if (!$product) {
+            //                 throw new Exception('Product not found');
+            //             }
 
-                        if ($product->stock_quantity < $cartItem->quantity) {
-                            throw new Exception("Not enough stock for: " . $product->name);
-                        }
+            //             if ($product->stock_quantity < $cartItem->quantity) {
+            //                 throw new Exception("Not enough stock for: " . $product->name);
+            //             }
 
-                        $product->decrement('stock_quantity', $cartItem->quantity);
-                        $product->increment('sold_quantity', $cartItem->quantity);
+            //             $product->decrement('stock_quantity', $cartItem->quantity);
+            //             $product->increment('sold_quantity', $cartItem->quantity);
 
-                        $order->orderDetails()->create([
-                            'id' => (string) Str::uuid(),
-                            'product_id' => $cartItem->product_id,
-                            'product_name' => $cartItem->product_name,
-                            'product_price' => $cartItem->product_price,
-                            'quantity' => $cartItem->quantity,
-                            'unit'=> $cartItem->unit,
-                            'total_price' => $cartItem->product_price * $cartItem->quantity
-                        ]);
-                }
+            //             $order->orderDetails()->create([
+            //                 'id' => (string) Str::uuid(),
+            //                 'product_id' => $cartItem->product_id,
+            //                 'product_name' => $cartItem->product_name,
+            //                 'product_price' => $cartItem->product_price,
+            //                 'quantity' => $cartItem->quantity,
+            //                 'unit'=> $cartItem->unit,
+            //                 'total_price' => $cartItem->product_price * $cartItem->quantity
+            //             ]);
+            //     }
 
-                $cart->cartItems()->delete();
-            }
+            //     $cart->cartItems()->delete();
+            // }
 
             if($event->type == 'payment_intent.payment_failed' || $event->type == 'charge.refunded')
             {
