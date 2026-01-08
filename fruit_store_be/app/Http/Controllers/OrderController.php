@@ -101,6 +101,31 @@ class OrderController extends Controller
         }
     }
 
+    public function show(Order $order)
+    {
+        $order = Order::where('id', $order->id)
+            ->with('orderDetails')
+            ->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found.'], 404);
+        }
+
+        return response()->json($order, 200);
+    }
+
+    public function cancel(Order $order)
+    {
+        if ($order->status === 'cancelled') {
+            return response()->json(['message' => 'Order is already cancelled.'], 400);
+        }
+
+        $order->status = 'cancelled';
+        $order->save();
+
+        return response()->json(['message' => 'Order cancelled successfully.'], 200);
+    }
+
     protected function createOrderDetailsFromCart(Order $order,Cart $cart)
     {
         foreach ($cart->cartItems as $cartItem) {
