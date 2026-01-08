@@ -22,6 +22,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/home/products', [HomeController::class, 'todayProducts']);
 Route::get('/products/{id}', [HomeController::class, 'show']);
+Route::get('/search/suggestions', [HomeController::class, 'searchSuggestions']);
 
 
 
