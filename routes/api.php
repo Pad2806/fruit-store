@@ -23,6 +23,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 // Product routes
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/category/{categoryId}', [ProductController::class, 'getByCategory']);
+Route::post('/products', [ProductController::class, 'store']);
+Route::post('/products/{id}', [ProductController::class, 'update']); // Use POST for file upload
+Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
 //category routes
 Route::get('/categories', [CategoryController::class, 'index']);
