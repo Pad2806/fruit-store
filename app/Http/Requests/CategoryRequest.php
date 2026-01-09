@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCategoryRequest extends FormRequest
+class CategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,15 +19,21 @@ class UpdateCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'sometimes|required|string|max:255',
+        $rules = [
             'description' => 'nullable|string|max:1000',
         ];
+
+        // Nếu là POST (create) thì name bắt buộc
+        // Nếu là PUT/PATCH (update) thì name chỉ bắt buộc khi có truyền vào
+        if ($this->isMethod('POST')) {
+            $rules['name'] = 'required|string|max:255';
+        } else {
+            $rules['name'] = 'sometimes|required|string|max:255';
+        }
+
+        return $rules;
     }
 
-    /**
-     * Get custom messages for validator errors.
-     */
     public function messages(): array
     {
         return [
