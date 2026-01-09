@@ -3,32 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CategoryRequest;
-use App\Http\Resources\CategoryResource;
+use App\Http\Requests\OriginRequest;
+use App\Http\Resources\OriginResource;
 use Illuminate\Http\JsonResponse;
-use App\Models\Category;
+use App\Models\Origin;
 use Illuminate\Support\Str;
 
-class CategoryController extends Controller
+class OriginController extends Controller
 {
     public function index(): JsonResponse
     {
-        $categories = Category::all();
-        return response()->json(
-            [
-                'data' => $categories
-            ]
-        );
+        $origins = Origin::all();
+        return response()->json([
+            'data' => $origins
+        ]);
     }
 
-    public function store(CategoryRequest $request): JsonResponse
+    public function store(OriginRequest $request): JsonResponse
     {
         $validated = $request->validated();
 
         // Generate unique UUID
         $uuid = $this->generateUniqueUuid();
 
-        $category = Category::create([
+        $origin = Origin::create([
             'id' => $uuid,
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
@@ -36,55 +34,55 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Tạo danh mục thành công.',
-            'data' => new CategoryResource($category)
+            'message' => 'Tạo xuất xứ thành công.',
+            'data' => new OriginResource($origin)
         ], 201);
     }
 
-    public function update(CategoryRequest $request, string $id): JsonResponse
+    public function update(OriginRequest $request, string $id): JsonResponse
     {
-        $category = Category::find($id);
+        $origin = Origin::find($id);
 
-        if (!$category) {
+        if (!$origin) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy danh mục.'
+                'message' => 'Không tìm thấy xuất xứ.'
             ], 404);
         }
 
         $validated = $request->validated();
-        $category->update($validated);
+        $origin->update($validated);
 
         return response()->json([
             'success' => true,
-            'message' => 'Cập nhật danh mục thành công.',
-            'data' => new CategoryResource($category)
+            'message' => 'Cập nhật xuất xứ thành công.',
+            'data' => new OriginResource($origin)
         ]);
     }
 
     public function destroy(string $id): JsonResponse
     {
-        $category = Category::find($id);
+        $origin = Origin::find($id);
 
-        if (!$category) {
+        if (!$origin) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy danh mục.'
+                'message' => 'Không tìm thấy xuất xứ.'
             ], 404);
         }
 
-        if ($category->products()->count() > 0) {
+        if ($origin->products()->count() > 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không thể xóa danh mục vì còn sản phẩm thuộc danh mục này.'
+                'message' => 'Không thể xóa xuất xứ vì còn sản phẩm thuộc xuất xứ này.'
             ], 422);
         }
 
-        $category->delete();
+        $origin->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Xóa danh mục thành công.'
+            'message' => 'Xóa xuất xứ thành công.'
         ]);
     }
 
@@ -95,7 +93,7 @@ class CategoryController extends Controller
 
         do {
             $uuid = (string) Str::uuid();
-            $exists = Category::where('id', $uuid)->exists();
+            $exists = Origin::where('id', $uuid)->exists();
             $attempts++;
 
             if ($attempts >= $maxAttempts) {

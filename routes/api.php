@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OriginController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +29,12 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);
 Route::put('/categories/{id}', [CategoryController::class, 'update']);
 Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+// Origin routes
+Route::get('/origins', [OriginController::class, 'index']);
+Route::post('/origins', [OriginController::class, 'store']);
+Route::put('/origins/{id}', [OriginController::class, 'update']);
+Route::delete('/origins/{id}', [OriginController::class, 'destroy']);
+
 
 
