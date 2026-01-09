@@ -9,6 +9,8 @@ import {
   X,
   Save,
   LogOut,
+  Tags,
+  MapPin,
 } from 'lucide-react';
 import './sellerdashboard.css';
 
@@ -115,16 +117,34 @@ const SellerDashboard = () => {
     },
   ]);
 
+  const [categories, setCategories] = useState([
+    { id: 'cate_1', name: 'Trái cây nội địa', description: 'Sản phẩm trồng và thu hoạch trong nước.' },
+    { id: 'cate_2', name: 'Trái cây nhập khẩu', description: 'Hàng nhập khẩu chính ngạch, chất lượng cao.' },
+    { id: 'cate_3', name: 'Trái cây theo mùa', description: 'Sản phẩm theo mùa vụ, tươi ngon.' },
+  ]);
+
+  const [origins, setOrigins] = useState([
+    { id: 'ori_1', name: 'Việt Nam', description: 'Nguồn gốc trong nước.' },
+    { id: 'ori_2', name: 'New Zealand / Mỹ', description: 'Nguồn gốc nhập khẩu (NZ/US).' },
+    { id: 'ori_3', name: 'Đà Lạt (Việt Nam)', description: 'Nguồn gốc Đà Lạt, khí hậu ôn hoà.' },
+  ]);
+
   const [showProductModal, setShowProductModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showOriginModal, setShowOriginModal] = useState(false);
+
   const [modalMode, setModalMode] = useState('create');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [productFormError, setProductFormError] = useState('');
   const [orderFormError, setOrderFormError] = useState('');
+  const [categoryFormError, setCategoryFormError] = useState('');
+  const [originFormError, setOriginFormError] = useState('');
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
 
   const [currentProduct, setCurrentProduct] = useState({
     id: null,
@@ -151,25 +171,15 @@ const SellerDashboard = () => {
     date: new Date().toISOString().split('T')[0],
   });
 
+  const [currentCategory, setCurrentCategory] = useState({ id: '', name: '', description: '' });
+  const [currentOrigin, setCurrentOrigin] = useState({ id: '', name: '', description: '' });
+
   const units = ['kg', 'hộp', 'trái', 'bó'];
 
-  const categories = [
-    { id: 'cate_1', name: 'Trái cây nội địa' },
-    { id: 'cate_2', name: 'Trái cây nhập khẩu' },
-    { id: 'cate_3', name: 'Trái cây theo mùa' },
-  ];
-
-  // FIX: thêm ori_3 để khớp dữ liệu product #4
-  const origins = [
-    { id: 'ori_1', name: 'Việt Nam' },
-    { id: 'ori_2', name: 'New Zealand / Mỹ' },
-    { id: 'ori_3', name: 'Đà Lạt (Việt Nam)' },
-  ];
-
   const productStatuses = [
-    { value: 'available', label: 'Còn hàng' },
-    { value: 'low_stock', label: 'Sắp hết' },
-    { value: 'out_of_stock', label: 'Hết hàng' },
+    { value: 'available', label: 'Còn hàng', color: '#27ae60' },
+    { value: 'low_stock', label: 'Sắp hết', color: '#f39c12' },
+    { value: 'out_of_stock', label: 'Hết hàng', color: '#e74c3c' },
   ];
 
   const orderStatuses = [
@@ -180,6 +190,8 @@ const SellerDashboard = () => {
     { value: 'cancelled', label: 'Đã hủy', color: '#e74c3c' },
   ];
 
+  const isView = modalMode === 'view';
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     window.location.href = '/login';
@@ -187,6 +199,34 @@ const SellerDashboard = () => {
 
   const statusLabelOfProduct = (status) =>
     productStatuses.find((s) => s.value === status)?.label || status;
+
+  const getProductStatusColor = (status) =>
+    productStatuses.find((s) => s.value === status)?.color || '#95a5a6';
+
+  const getOrderStatusColor = (status) =>
+    orderStatuses.find((s) => s.value === status)?.color || '#95a5a6';
+  const getOrderStatusLabel = (status) =>
+    orderStatuses.find((s) => s.value === status)?.label || status;
+
+  const formatMoney = (value) => Number(value || 0).toLocaleString('vi-VN') + '₫';
+
+  const categoryNameOf = (id) => categories.find((c) => c.id === id)?.name || id || '-';
+  const originNameOf = (id) => origins.find((o) => o.id === id)?.name || id || '-';
+
+  const usedCountByCategory = (cateId) => products.filter((p) => p.category_id === cateId).length;
+  const usedCountByOrigin = (oriId) => products.filter((p) => p.origin_id === oriId).length;
+
+  // ===== Helpers =====
+  const nextCodeId = (prefix, items) => {
+    const nums = (items || [])
+      .map((x) => {
+        const m = String(x.id || '').match(new RegExp(`^${prefix}_(\\d+)$`));
+        return m ? Number(m[1]) : 0;
+      })
+      .filter((n) => Number.isFinite(n));
+    const next = Math.max(0, ...nums) + 1;
+    return `${prefix}_${next}`;
+  };
 
   const openProductModal = (mode, product = null) => {
     setModalMode(mode);
@@ -227,6 +267,7 @@ const SellerDashboard = () => {
   const handleViewProduct = (product) => openProductModal('view', product);
 
   const openDeleteProductModal = (product) => {
+    setDeleteError('');
     setDeleteTarget({
       type: 'product',
       id: product.id,
@@ -337,7 +378,6 @@ const SellerDashboard = () => {
   const openOrderModal = (mode, order) => {
     setModalMode(mode);
     setOrderFormError('');
-    // FIX: clone để tránh sửa trực tiếp object trong list
     setCurrentOrder({ ...order });
     setShowOrderModal(true);
   };
@@ -351,6 +391,7 @@ const SellerDashboard = () => {
   const handleEditOrder = (order) => openOrderModal('edit', order);
 
   const openDeleteOrderModal = (order) => {
+    setDeleteError('');
     setDeleteTarget({
       type: 'order',
       id: order.id,
@@ -376,15 +417,160 @@ const SellerDashboard = () => {
     closeOrderModal();
   };
 
+  const openCategoryModal = (mode, category = null) => {
+    setModalMode(mode);
+    setCategoryFormError('');
+
+    if (mode === 'create') {
+      setCurrentCategory({ id: nextCodeId('cate', categories), name: '', description: '' });
+    } else if (category) {
+      setCurrentCategory({ ...category });
+    }
+
+    setShowCategoryModal(true);
+  };
+
+  const closeCategoryModal = () => {
+    setShowCategoryModal(false);
+    setCategoryFormError('');
+  };
+
+  const handleCreateCategory = () => openCategoryModal('create');
+  const handleEditCategory = (c) => openCategoryModal('edit', c);
+  const handleViewCategory = (c) => openCategoryModal('view', c);
+
+  const handleSaveCategory = () => {
+    const name = String(currentCategory.name || '').trim();
+    const description = String(currentCategory.description || '').trim();
+
+    if (!name) {
+      setCategoryFormError('Vui lòng nhập tên danh mục.');
+      return;
+    }
+
+    const dup = categories.some(
+      (c) =>
+        c.id !== currentCategory.id &&
+        String(c.name).trim().toLowerCase() === name.toLowerCase()
+    );
+    if (dup) {
+      setCategoryFormError('Tên danh mục đã tồn tại.');
+      return;
+    }
+
+    setCategoryFormError('');
+
+    const payload = { ...currentCategory, name, description };
+
+    if (modalMode === 'create') {
+      setCategories((prev) => [...prev, payload]);
+    } else {
+      setCategories((prev) => prev.map((c) => (c.id === payload.id ? payload : c)));
+    }
+
+    closeCategoryModal();
+  };
+
+  const openDeleteCategoryModal = (c) => {
+    setDeleteError('');
+    setDeleteTarget({
+      type: 'category',
+      id: c.id,
+      title: c.name,
+      subtitle: `ID: ${c.id}`,
+    });
+    setShowDeleteModal(true);
+  };
+
+  const openOriginModal = (mode, origin = null) => {
+    setModalMode(mode);
+    setOriginFormError('');
+
+    if (mode === 'create') {
+      setCurrentOrigin({ id: nextCodeId('ori', origins), name: '', description: '' });
+    } else if (origin) {
+      setCurrentOrigin({ ...origin });
+    }
+
+    setShowOriginModal(true);
+  };
+
+  const closeOriginModal = () => {
+    setShowOriginModal(false);
+    setOriginFormError('');
+  };
+
+  const handleCreateOrigin = () => openOriginModal('create');
+  const handleEditOrigin = (o) => openOriginModal('edit', o);
+  const handleViewOrigin = (o) => openOriginModal('view', o);
+
+  const handleSaveOrigin = () => {
+    const name = String(currentOrigin.name || '').trim();
+    const description = String(currentOrigin.description || '').trim();
+
+    if (!name) {
+      setOriginFormError('Vui lòng nhập tên xuất xứ.');
+      return;
+    }
+
+    const dup = origins.some(
+      (o) =>
+        o.id !== currentOrigin.id &&
+        String(o.name).trim().toLowerCase() === name.toLowerCase()
+    );
+    if (dup) {
+      setOriginFormError('Tên xuất xứ đã tồn tại.');
+      return;
+    }
+
+    setOriginFormError('');
+
+    const payload = { ...currentOrigin, name, description };
+
+    if (modalMode === 'create') {
+      setOrigins((prev) => [...prev, payload]);
+    } else {
+      setOrigins((prev) => prev.map((o) => (o.id === payload.id ? payload : o)));
+    }
+
+    closeOriginModal();
+  };
+
+  const openDeleteOriginModal = (o) => {
+    setDeleteError('');
+    setDeleteTarget({
+      type: 'origin',
+      id: o.id,
+      title: o.name,
+      subtitle: `ID: ${o.id}`,
+    });
+    setShowDeleteModal(true);
+  };
+
   const cancelDelete = () => {
     setShowDeleteModal(false);
     setDeleteTarget(null);
+    setDeleteError('');
   };
 
   const confirmDelete = () => {
     if (!deleteTarget) return;
 
-    if (deleteTarget.type === 'product') {
+    if (deleteTarget.type === 'category') {
+      const used = usedCountByCategory(deleteTarget.id);
+      if (used > 0) {
+        setDeleteError(`Không thể xoá danh mục vì đang được dùng bởi ${used} sản phẩm.`);
+        return;
+      }
+      setCategories((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+    } else if (deleteTarget.type === 'origin') {
+      const used = usedCountByOrigin(deleteTarget.id);
+      if (used > 0) {
+        setDeleteError(`Không thể xoá xuất xứ vì đang được dùng bởi ${used} sản phẩm.`);
+        return;
+      }
+      setOrigins((prev) => prev.filter((o) => o.id !== deleteTarget.id));
+    } else if (deleteTarget.type === 'product') {
       setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
     } else {
       setOrders((prev) => prev.filter((o) => o.id !== deleteTarget.id));
@@ -392,6 +578,7 @@ const SellerDashboard = () => {
 
     setShowDeleteModal(false);
     setDeleteTarget(null);
+    setDeleteError('');
   };
 
   const filteredProducts = useMemo(() => {
@@ -410,13 +597,28 @@ const SellerDashboard = () => {
     );
   }, [orders, searchTerm]);
 
-  const getOrderStatusColor = (status) =>
-    orderStatuses.find((s) => s.value === status)?.color || '#95a5a6';
-  const getOrderStatusLabel = (status) =>
-    orderStatuses.find((s) => s.value === status)?.label || status;
+  const filteredCategories = useMemo(() => {
+    const t = searchTerm.toLowerCase().trim();
+    return categories.filter(
+      (c) => c.name.toLowerCase().includes(t) || c.id.toLowerCase().includes(t)
+    );
+  }, [categories, searchTerm]);
 
-  // FIX: khai báo isView đúng vị trí
-  const isView = modalMode === 'view';
+  const filteredOrigins = useMemo(() => {
+    const t = searchTerm.toLowerCase().trim();
+    return origins.filter(
+      (o) => o.name.toLowerCase().includes(t) || o.id.toLowerCase().includes(t)
+    );
+  }, [origins, searchTerm]);
+
+  const deleteLabel =
+    deleteTarget?.type === 'product'
+      ? 'sản phẩm'
+      : deleteTarget?.type === 'order'
+        ? 'đơn hàng'
+        : deleteTarget?.type === 'category'
+          ? 'danh mục'
+          : 'xuất xứ';
 
   return (
     <div className="seller-container">
@@ -441,6 +643,22 @@ const SellerDashboard = () => {
               <div>
                 <span className="stat-number">{orders.length}</span>
                 <span className="stat-label">Đơn hàng</span>
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <Tags size={24} />
+              <div>
+                <span className="stat-number">{categories.length}</span>
+                <span className="stat-label">Danh mục</span>
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <MapPin size={24} />
+              <div>
+                <span className="stat-number">{origins.length}</span>
+                <span className="stat-label">Xuất xứ</span>
               </div>
             </div>
           </div>
@@ -474,6 +692,22 @@ const SellerDashboard = () => {
           >
             <ShoppingCart size={20} />
             Quản lý đơn hàng
+          </button>
+
+          <button
+            className={`tab ${activeTab === 'categories' ? 'active' : ''}`}
+            onClick={() => setActiveTab('categories')}
+          >
+            <Tags size={20} />
+            Quản lý danh mục
+          </button>
+
+          <button
+            className={`tab ${activeTab === 'origins' ? 'active' : ''}`}
+            onClick={() => setActiveTab('origins')}
+          >
+            <MapPin size={20} />
+            Quản lý xuất xứ
           </button>
         </div>
 
@@ -535,10 +769,7 @@ const SellerDashboard = () => {
                               alt={product.name}
                             />
                           ) : (
-                            <div
-                              className="product-thumb placeholder"
-                              title="Chưa có hình"
-                            >
+                            <div className="product-thumb placeholder" title="Chưa có hình">
                               <span>🍊</span>
                             </div>
                           )}
@@ -547,15 +778,12 @@ const SellerDashboard = () => {
                         <td className="product-name">{product.name}</td>
 
                         <td className="price">
-                          {Number(product.price).toLocaleString('vi-VN')}₫/
-                          {product.unit}
+                          {formatMoney(product.price)}/{product.unit}
                         </td>
 
                         <td>
                           <span
-                            className={`stock ${
-                              Number(product.stock) <= 10 ? 'low' : ''
-                            }`}
+                            className={`stock ${Number(product.stock) <= 10 ? 'low' : ''}`}
                           >
                             {product.stock} {product.unit}
                           </span>
@@ -575,7 +803,6 @@ const SellerDashboard = () => {
                                 e.stopPropagation();
                                 handleEditProduct(product);
                               }}
-                              aria-label="Edit product"
                               title="Sửa"
                             >
                               <Edit2 size={16} />
@@ -586,7 +813,6 @@ const SellerDashboard = () => {
                                 e.stopPropagation();
                                 openDeleteProductModal(product);
                               }}
-                              aria-label="Delete product"
                               title="Xoá"
                             >
                               <Trash2 size={16} />
@@ -643,16 +869,12 @@ const SellerDashboard = () => {
                       <td>{order.customer}</td>
                       <td>{order.phone}</td>
                       <td className="order-products">{order.products}</td>
-                      <td className="price">
-                        {Number(order.total).toLocaleString('vi-VN')}₫
-                      </td>
+                      <td className="price">{formatMoney(order.total)}</td>
 
                       <td>
                         <span
                           className="order-status"
-                          style={{
-                            backgroundColor: getOrderStatusColor(order.status),
-                          }}
+                          style={{ backgroundColor: getOrderStatusColor(order.status) }}
                         >
                           {getOrderStatusLabel(order.status)}
                         </span>
@@ -668,7 +890,6 @@ const SellerDashboard = () => {
                               e.stopPropagation();
                               handleEditOrder(order);
                             }}
-                            aria-label="Edit order"
                             title="Sửa"
                           >
                             <Edit2 size={16} />
@@ -679,7 +900,6 @@ const SellerDashboard = () => {
                               e.stopPropagation();
                               openDeleteOrderModal(order);
                             }}
-                            aria-label="Delete order"
                             title="Xoá"
                           >
                             <Trash2 size={16} />
@@ -688,6 +908,162 @@ const SellerDashboard = () => {
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'categories' && (
+          <div className="tab-content">
+            <div className="toolbar">
+              <div className="search-box">
+                <Search size={20} />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm danh mục..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              <button className="btn-create" onClick={handleCreateCategory}>
+                <Plus size={20} />
+                Thêm danh mục
+              </button>
+            </div>
+
+            <div className="products-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Tên danh mục</th>
+                    <th>Mô tả</th>
+                    <th>Số sản phẩm</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredCategories.map((c) => {
+                    const used = usedCountByCategory(c.id);
+                    return (
+                      <tr
+                        key={c.id}
+                        onClick={() => handleViewCategory(c)}
+                        style={{ cursor: 'pointer' }}
+                        title="Bấm để xem chi tiết"
+                      >
+                        <td className="order-id">{c.id}</td>
+                        <td className="product-name">{c.name}</td>
+                        <td className="muted-cell">{c.description || '-'}</td>
+                        <td>{used}</td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-edit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditCategory(c);
+                              }}
+                              title="Sửa"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              className="btn-delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteCategoryModal(c);
+                              }}
+                              title="Xoá"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'origins' && (
+          <div className="tab-content">
+            <div className="toolbar">
+              <div className="search-box">
+                <Search size={20} />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm xuất xứ..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              <button className="btn-create" onClick={handleCreateOrigin}>
+                <Plus size={20} />
+                Thêm xuất xứ
+              </button>
+            </div>
+
+            <div className="products-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Tên xuất xứ</th>
+                    <th>Mô tả</th>
+                    <th>Số sản phẩm</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredOrigins.map((o) => {
+                    const used = usedCountByOrigin(o.id);
+                    return (
+                      <tr
+                        key={o.id}
+                        onClick={() => handleViewOrigin(o)}
+                        style={{ cursor: 'pointer' }}
+                        title="Bấm để xem chi tiết"
+                      >
+                        <td className="order-id">{o.id}</td>
+                        <td className="product-name">{o.name}</td>
+                        <td className="muted-cell">{o.description || '-'}</td>
+                        <td>{used}</td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-edit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditOrigin(o);
+                              }}
+                              title="Sửa"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              className="btn-delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteOriginModal(o);
+                              }}
+                              title="Xoá"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -703,8 +1079,8 @@ const SellerDashboard = () => {
                 {modalMode === 'create'
                   ? 'Thêm sản phẩm mới'
                   : modalMode === 'edit'
-                  ? 'Chỉnh sửa sản phẩm'
-                  : 'Chi tiết sản phẩm'}
+                    ? 'Chỉnh sửa sản phẩm'
+                    : 'Chi tiết sản phẩm'}
               </h2>
               <button className="btn-close" onClick={closeProductModal}>
                 <X size={24} />
@@ -712,273 +1088,300 @@ const SellerDashboard = () => {
             </div>
 
             <div className="modal-body">
-              {productFormError && (
-                <div className="form-error">{productFormError}</div>
-              )}
+              {productFormError && <div className="form-error">{productFormError}</div>}
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Tên sản phẩm *</label>
-                  <input
-                    type="text"
-                    value={currentProduct.name}
-                    disabled={isView}
-                    onChange={(e) => {
-                      setCurrentProduct({
-                        ...currentProduct,
-                        name: e.target.value,
-                      });
-                      if (productFormError) setProductFormError('');
-                    }}
-                    placeholder="VD: Cam Sành Cao Cấp"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Trạng thái *</label>
-                  <select
-                    value={currentProduct.status}
-                    disabled={isView}
-                    onChange={(e) => {
-                      setCurrentProduct({
-                        ...currentProduct,
-                        status: e.target.value,
-                      });
-                      if (productFormError) setProductFormError('');
-                    }}
-                  >
-                    {productStatuses.map((s) => (
-                      <option key={s.value} value={s.value}>
-                        {s.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Danh mục *</label>
-                  <select
-                    value={currentProduct.category_id}
-                    disabled={isView}
-                    onChange={(e) =>
-                      setCurrentProduct({
-                        ...currentProduct,
-                        category_id: e.target.value,
-                      })
-                    }
-                  >
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Xuất xứ *</label>
-                  <select
-                    value={currentProduct.origin_id}
-                    disabled={isView}
-                    onChange={(e) =>
-                      setCurrentProduct({
-                        ...currentProduct,
-                        origin_id: e.target.value,
-                      })
-                    }
-                  >
-                    {origins.map((o) => (
-                      <option key={o.id} value={o.id}>
-                        {o.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Giá bán *</label>
-                  <input
-                    type="number"
-                    value={currentProduct.price}
-                    disabled={isView}
-                    onChange={(e) => {
-                      setCurrentProduct({
-                        ...currentProduct,
-                        price: e.target.value,
-                      });
-                      if (productFormError) setProductFormError('');
-                    }}
-                    placeholder="45000"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Đơn vị</label>
-                  <select
-                    value={currentProduct.unit}
-                    disabled={isView}
-                    onChange={(e) =>
-                      setCurrentProduct({
-                        ...currentProduct,
-                        unit: e.target.value,
-                      })
-                    }
-                  >
-                    {units.map((unit) => (
-                      <option key={unit} value={unit}>
-                        {unit}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Tồn kho *</label>
-                  <input
-                    type="number"
-                    value={currentProduct.stock}
-                    disabled={isView}
-                    onChange={(e) => {
-                      setCurrentProduct({
-                        ...currentProduct,
-                        stock: e.target.value,
-                      });
-                      if (productFormError) setProductFormError('');
-                    }}
-                    placeholder="150"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Đã bán</label>
-                  <input
-                    type="number"
-                    value={currentProduct.sold_quantity}
-                    disabled={isView}
-                    onChange={(e) =>
-                      setCurrentProduct({
-                        ...currentProduct,
-                        sold_quantity: e.target.value,
-                      })
-                    }
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Mô tả ngắn</label>
-                  <input
-                    type="text"
-                    value={currentProduct.short_desc}
-                    disabled={isView}
-                    onChange={(e) =>
-                      setCurrentProduct({
-                        ...currentProduct,
-                        short_desc: e.target.value,
-                      })
-                    }
-                    placeholder="VD: Cam sành ngọt, nhiều nước"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Mô tả chi tiết</label>
-                  <input
-                    type="text"
-                    value={currentProduct.detail_desc}
-                    disabled={isView}
-                    onChange={(e) =>
-                      setCurrentProduct({
-                        ...currentProduct,
-                        detail_desc: e.target.value,
-                      })
-                    }
-                    placeholder="VD: Cam tuyển chọn, phù hợp ép nước..."
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Hình ảnh (tối đa {MAX_IMAGES})</label>
-
-                  {!isView && (
-                    <div className="image-upload">
-                      <input
-                        id="product-images-input"
-                        className="file-input"
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImagesChange}
-                      />
-                      <label className="btn-file" htmlFor="product-images-input">
-                        Chọn hình ảnh
-                      </label>
-
-                      {(currentProduct.images || []).length > 0 && (
-                        <button
-                          type="button"
-                          className="btn-clear-image"
-                          onClick={clearAllImages}
-                          title="Xoá tất cả"
-                        >
-                          <X size={16} />
-                        </button>
+              {isView ? (
+                <>
+                  <div className="detail-media">
+                    <div className="detail-media-title">Hình ảnh</div>
+                    <div className="image-preview view">
+                      {(currentProduct.images || []).length > 0 ? (
+                        <div className="image-grid">
+                          {(currentProduct.images || []).map((src, idx) => (
+                            <div key={idx} className="image-tile">
+                              <img src={src} alt={`product-${idx}`} />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="image-empty">Chưa có hình</div>
                       )}
-
-                      <div className="image-count">
-                        {(currentProduct.images || []).length}/{MAX_IMAGES}
-                      </div>
                     </div>
-                  )}
-
-                  {isView && (
-                    <div
-                      className="image-upload"
-                      style={{ justifyContent: 'space-between' }}
-                    >
-                      <div className="image-count">
-                        {(currentProduct.images || []).length}/{MAX_IMAGES}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="image-preview">
-                    {(currentProduct.images || []).length > 0 ? (
-                      <div className="image-grid">
-                        {(currentProduct.images || []).map((src, idx) => (
-                          <div key={idx} className="image-tile">
-                            <img src={src} alt={`preview-${idx}`} />
-                            {!isView && (
-                              <button
-                                type="button"
-                                className="btn-remove-image"
-                                onClick={() => removeImageAt(idx)}
-                                title="Xoá ảnh"
-                              >
-                                <X size={14} />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="image-empty">Chưa có hình</div>
-                    )}
                   </div>
-                </div>
 
-                <div className="form-group" />
-              </div>
+                  <div className="order-detail">
+                    <div className="detail-row">
+                      <span className="label">Mã sản phẩm:</span>
+                      <span className="value">#{currentProduct.id}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Tên sản phẩm:</span>
+                      <span className="value">{currentProduct.name}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Danh mục:</span>
+                      <span className="value">{categoryNameOf(currentProduct.category_id)}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Xuất xứ:</span>
+                      <span className="value">{originNameOf(currentProduct.origin_id)}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Giá bán:</span>
+                      <span className="value price">
+                        {formatMoney(currentProduct.price)}/{currentProduct.unit}
+                      </span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Tồn kho:</span>
+                      <span className="value">
+                        {currentProduct.stock} {currentProduct.unit}
+                      </span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Đã bán:</span>
+                      <span className="value">{currentProduct.sold_quantity}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Mô tả ngắn:</span>
+                      <span className="value">{currentProduct.short_desc || '-'}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Mô tả chi tiết:</span>
+                      <span className="value">{currentProduct.detail_desc || '-'}</span>
+                    </div>
+                  </div>
+
+                  <div className="status-display">
+                    <span
+                      className="order-status large"
+                      style={{ backgroundColor: getProductStatusColor(currentProduct.status) }}
+                    >
+                      {statusLabelOfProduct(currentProduct.status)}
+                    </span>
+                  </div>
+                </>
+              ) : (
+
+                <>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Tên sản phẩm *</label>
+                      <input
+                        type="text"
+                        value={currentProduct.name}
+                        onChange={(e) => {
+                          setCurrentProduct({ ...currentProduct, name: e.target.value });
+                          if (productFormError) setProductFormError('');
+                        }}
+                        placeholder="VD: Cam Sành Cao Cấp"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Trạng thái *</label>
+                      <select
+                        value={currentProduct.status}
+                        onChange={(e) => {
+                          setCurrentProduct({ ...currentProduct, status: e.target.value });
+                          if (productFormError) setProductFormError('');
+                        }}
+                      >
+                        {productStatuses.map((s) => (
+                          <option key={s.value} value={s.value}>
+                            {s.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Danh mục *</label>
+                      <select
+                        value={currentProduct.category_id}
+                        onChange={(e) =>
+                          setCurrentProduct({ ...currentProduct, category_id: e.target.value })
+                        }
+                      >
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Xuất xứ *</label>
+                      <select
+                        value={currentProduct.origin_id}
+                        onChange={(e) =>
+                          setCurrentProduct({ ...currentProduct, origin_id: e.target.value })
+                        }
+                      >
+                        {origins.map((o) => (
+                          <option key={o.id} value={o.id}>
+                            {o.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Giá bán *</label>
+                      <input
+                        type="number"
+                        value={currentProduct.price}
+                        onChange={(e) => {
+                          setCurrentProduct({ ...currentProduct, price: e.target.value });
+                          if (productFormError) setProductFormError('');
+                        }}
+                        placeholder="45000"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Đơn vị</label>
+                      <select
+                        value={currentProduct.unit}
+                        onChange={(e) =>
+                          setCurrentProduct({ ...currentProduct, unit: e.target.value })
+                        }
+                      >
+                        {units.map((unit) => (
+                          <option key={unit} value={unit}>
+                            {unit}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Tồn kho *</label>
+                      <input
+                        type="number"
+                        value={currentProduct.stock}
+                        onChange={(e) => {
+                          setCurrentProduct({ ...currentProduct, stock: e.target.value });
+                          if (productFormError) setProductFormError('');
+                        }}
+                        placeholder="150"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Đã bán</label>
+                      <input
+                        type="number"
+                        value={currentProduct.sold_quantity}
+                        onChange={(e) =>
+                          setCurrentProduct({ ...currentProduct, sold_quantity: e.target.value })
+                        }
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Mô tả ngắn</label>
+                      <input
+                        type="text"
+                        value={currentProduct.short_desc}
+                        onChange={(e) =>
+                          setCurrentProduct({ ...currentProduct, short_desc: e.target.value })
+                        }
+                        placeholder="VD: Cam sành ngọt, nhiều nước"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Mô tả chi tiết</label>
+                      <input
+                        type="text"
+                        value={currentProduct.detail_desc}
+                        onChange={(e) =>
+                          setCurrentProduct({ ...currentProduct, detail_desc: e.target.value })
+                        }
+                        placeholder="VD: Cam tuyển chọn, phù hợp ép nước..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Hình ảnh (tối đa {MAX_IMAGES})</label>
+
+                      <div className="image-upload">
+                        <input
+                          id="product-images-input"
+                          className="file-input"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImagesChange}
+                        />
+                        <label className="btn-file" htmlFor="product-images-input">
+                          Chọn hình ảnh
+                        </label>
+
+                        {(currentProduct.images || []).length > 0 && (
+                          <button
+                            type="button"
+                            className="btn-clear-image"
+                            onClick={clearAllImages}
+                            title="Xoá tất cả"
+                          >
+                            <X size={16} />
+                          </button>
+                        )}
+
+                        <div className="image-count">
+                          {(currentProduct.images || []).length}/{MAX_IMAGES}
+                        </div>
+                      </div>
+
+                      <div className="image-preview">
+                        {(currentProduct.images || []).length > 0 ? (
+                          <div className="image-grid">
+                            {(currentProduct.images || []).map((src, idx) => (
+                              <div key={idx} className="image-tile">
+                                <img src={src} alt={`preview-${idx}`} />
+                                <button
+                                  type="button"
+                                  className="btn-remove-image"
+                                  onClick={() => removeImageAt(idx)}
+                                  title="Xoá ảnh"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="image-empty">Chưa có hình</div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-group" />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="modal-footer">
@@ -1001,9 +1404,7 @@ const SellerDashboard = () => {
         <div className="modal-overlay" onClick={closeOrderModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>
-                {modalMode === 'view' ? 'Chi tiết đơn hàng' : 'Cập nhật đơn hàng'}
-              </h2>
+              <h2>{modalMode === 'view' ? 'Chi tiết đơn hàng' : 'Cập nhật đơn hàng'}</h2>
               <button className="btn-close" onClick={closeOrderModal}>
                 <X size={24} />
               </button>
@@ -1035,9 +1436,7 @@ const SellerDashboard = () => {
 
                 <div className="detail-row">
                   <span className="label">Tổng tiền:</span>
-                  <span className="value price">
-                    {Number(currentOrder.total).toLocaleString('vi-VN')}₫
-                  </span>
+                  <span className="value price">{formatMoney(currentOrder.total)}</span>
                 </div>
 
                 <div className="detail-row">
@@ -1093,12 +1492,220 @@ const SellerDashboard = () => {
         </div>
       )}
 
+      {showCategoryModal && (
+        <div className="modal-overlay" onClick={closeCategoryModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                {modalMode === 'create'
+                  ? 'Thêm danh mục mới'
+                  : modalMode === 'edit'
+                    ? 'Chỉnh sửa danh mục'
+                    : 'Chi tiết danh mục'}
+              </h2>
+              <button className="btn-close" onClick={closeCategoryModal}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {categoryFormError && <div className="form-error">{categoryFormError}</div>}
+
+              {isView ? (
+                <>
+                  <div className="order-detail">
+                    <div className="detail-row">
+                      <span className="label">ID:</span>
+                      <span className="value">{currentCategory.id}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Tên danh mục:</span>
+                      <span className="value">{currentCategory.name}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Mô tả:</span>
+                      <span className="value">{currentCategory.description || '-'}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Số sản phẩm:</span>
+                      <span className="value">{usedCountByCategory(currentCategory.id)}</span>
+                    </div>
+                  </div>
+
+                  <div className="status-display">
+                    <span className="order-status large info-pill">
+                      {usedCountByCategory(currentCategory.id)} SẢN PHẨM
+                    </span>
+                  </div>
+                </>
+              ) : (
+
+                <>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>ID</label>
+                      <input type="text" value={currentCategory.id} disabled />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Tên danh mục *</label>
+                      <input
+                        type="text"
+                        value={currentCategory.name}
+                        onChange={(e) => {
+                          setCurrentCategory({ ...currentCategory, name: e.target.value });
+                          if (categoryFormError) setCategoryFormError('');
+                        }}
+                        placeholder="VD: Trái cây nội địa"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row single">
+                    <div className="form-group">
+                      <label>Mô tả</label>
+                      <textarea
+                        className="textarea"
+                        value={currentCategory.description}
+                        onChange={(e) =>
+                          setCurrentCategory({ ...currentCategory, description: e.target.value })
+                        }
+                        placeholder="Mô tả danh mục..."
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn-cancel" onClick={closeCategoryModal}>
+                Đóng
+              </button>
+
+              {!isView && (
+                <button className="btn-save" onClick={handleSaveCategory}>
+                  <Save size={20} />
+                  Lưu
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showOriginModal && (
+        <div className="modal-overlay" onClick={closeOriginModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                {modalMode === 'create'
+                  ? 'Thêm xuất xứ mới'
+                  : modalMode === 'edit'
+                    ? 'Chỉnh sửa xuất xứ'
+                    : 'Chi tiết xuất xứ'}
+              </h2>
+              <button className="btn-close" onClick={closeOriginModal}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {originFormError && <div className="form-error">{originFormError}</div>}
+
+              {isView ? (
+                <>
+                  <div className="order-detail">
+                    <div className="detail-row">
+                      <span className="label">ID:</span>
+                      <span className="value">{currentOrigin.id}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Tên xuất xứ:</span>
+                      <span className="value">{currentOrigin.name}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Mô tả:</span>
+                      <span className="value">{currentOrigin.description || '-'}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="label">Số sản phẩm:</span>
+                      <span className="value">{usedCountByOrigin(currentOrigin.id)}</span>
+                    </div>
+                  </div>
+
+                  <div className="status-display">
+                    <span className="order-status large info-pill">
+                      {usedCountByOrigin(currentOrigin.id)} SẢN PHẨM
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>ID</label>
+                      <input type="text" value={currentOrigin.id} disabled />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Tên xuất xứ *</label>
+                      <input
+                        type="text"
+                        value={currentOrigin.name}
+                        onChange={(e) => {
+                          setCurrentOrigin({ ...currentOrigin, name: e.target.value });
+                          if (originFormError) setOriginFormError('');
+                        }}
+                        placeholder="VD: Việt Nam"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row single">
+                    <div className="form-group">
+                      <label>Mô tả</label>
+                      <textarea
+                        className="textarea"
+                        value={currentOrigin.description}
+                        onChange={(e) =>
+                          setCurrentOrigin({ ...currentOrigin, description: e.target.value })
+                        }
+                        placeholder="Mô tả xuất xứ..."
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn-cancel" onClick={closeOriginModal}>
+                Đóng
+              </button>
+
+              {!isView && (
+                <button className="btn-save" onClick={handleSaveOrigin}>
+                  <Save size={20} />
+                  Lưu
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showDeleteModal && (
         <div className="modal-overlay" onClick={cancelDelete}>
-          <div
-            className="modal-content delete-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header delete">
               <h2>Xác nhận xoá</h2>
               <button className="btn-close" onClick={cancelDelete}>
@@ -1108,16 +1715,15 @@ const SellerDashboard = () => {
 
             <div className="modal-body">
               <p>
-                Bạn có chắc chắn muốn xoá{' '}
-                <strong>
-                  {deleteTarget?.type === 'product' ? 'sản phẩm' : 'đơn hàng'}
-                </strong>
-                : <strong>{deleteTarget?.title}</strong>?
+                Bạn có chắc chắn muốn xoá <strong>{deleteLabel}</strong>:{' '}
+                <strong>{deleteTarget?.title}</strong>?
               </p>
 
               {deleteTarget?.subtitle && (
                 <p className="delete-subtitle">{deleteTarget.subtitle}</p>
               )}
+
+              {deleteError && <div className="form-error">{deleteError}</div>}
 
               <p className="delete-warning">
                 Hành động này <strong>không thể hoàn tác</strong>.
