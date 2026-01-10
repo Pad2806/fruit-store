@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    /**
-     * Get all products.
-     *
-     * @return JsonResponse
-     */
     public function index(): JsonResponse
     {
         $products = Product::with(['category', 'origin'])->get();
@@ -79,7 +74,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Tạo sản phẩm thành công.',
+            'message' => 'Create product successfully.',
             'data' => new ProductResource($product)
         ], 201);
     }
@@ -91,7 +86,7 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy sản phẩm.'
+                'message' => 'Not found product.'
             ], 404);
         }
 
@@ -168,7 +163,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Cập nhật sản phẩm thành công.',
+            'message' => 'Update product successfully.',
             'data' => new ProductResource($product)
         ]);
     }
@@ -180,7 +175,7 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy sản phẩm.'
+                'message' => 'Not found product.'
             ], 404);
         }
 
@@ -188,7 +183,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Xóa sản phẩm thành công.'
+            'message' => 'Delete product successfully.'
         ]);
     }
 
@@ -203,7 +198,7 @@ class ProductController extends Controller
             $attempts++;
 
             if ($attempts >= $maxAttempts) {
-                throw new \RuntimeException('Không thể tạo UUID duy nhất sau ' . $maxAttempts . ' lần thử.');
+                throw new \RuntimeException('Cannot create unique UUID after ' . $maxAttempts . ' attempts.');
             }
         } while ($exists);
 
