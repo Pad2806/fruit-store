@@ -6,19 +6,43 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $categories = Category::all();
-        return response()->json(
-            [
-                'data' => $categories
+        $perPage = (int) $request->input('per_page', 5);
+        $search = $request->input('search', '');
+
+        $query = Category::query();
+
+        // Search by name or description
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Order by created_at descending (newest first)
+        $query->orderBy('created_at', 'desc');
+
+        $categories = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => CategoryResource::collection($categories),
+            'pagination' => [
+                'current_page' => $categories->currentPage(),
+                'last_page' => $categories->lastPage(),
+                'per_page' => $categories->perPage(),
+                'total' => $categories->total(),
+                'from' => $categories->firstItem(),
+                'to' => $categories->lastItem(),
             ]
-        );
+        ]);
     }
 
     public function store(CategoryRequest $request): JsonResponse
