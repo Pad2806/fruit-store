@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Package,
   ShoppingCart,
@@ -13,11 +13,27 @@ import {
   MapPin,
 } from 'lucide-react';
 import './sellerdashboard.css';
+import CategoryManagement from './category';
+import { categoryApi } from '@/services/api';
 
 const MAX_IMAGES = 5;
 
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('products');
+  const [categoriesCount, setCategoriesCount] = useState(0);
+
+  // Fetch categories count on mount
+  useEffect(() => {
+    const fetchCategoriesCount = async () => {
+      try {
+        const response = await categoryApi.getAll();
+        setCategoriesCount((response.data || []).length);
+      } catch (error) {
+        console.error('Error fetching categories count:', error);
+      }
+    };
+    fetchCategoriesCount();
+  }, []);
 
   const [products, setProducts] = useState([
     {
@@ -117,11 +133,6 @@ const SellerDashboard = () => {
     },
   ]);
 
-  const [categories, setCategories] = useState([
-    { id: 'cate_1', name: 'Trái cây nội địa', description: 'Sản phẩm trồng và thu hoạch trong nước.' },
-    { id: 'cate_2', name: 'Trái cây nhập khẩu', description: 'Hàng nhập khẩu chính ngạch, chất lượng cao.' },
-    { id: 'cate_3', name: 'Trái cây theo mùa', description: 'Sản phẩm theo mùa vụ, tươi ngon.' },
-  ]);
 
   const [origins, setOrigins] = useState([
     { id: 'ori_1', name: 'Việt Nam', description: 'Nguồn gốc trong nước.' },
@@ -131,7 +142,6 @@ const SellerDashboard = () => {
 
   const [showProductModal, setShowProductModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showOriginModal, setShowOriginModal] = useState(false);
 
   const [modalMode, setModalMode] = useState('create');
@@ -139,7 +149,6 @@ const SellerDashboard = () => {
 
   const [productFormError, setProductFormError] = useState('');
   const [orderFormError, setOrderFormError] = useState('');
-  const [categoryFormError, setCategoryFormError] = useState('');
   const [originFormError, setOriginFormError] = useState('');
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -171,7 +180,6 @@ const SellerDashboard = () => {
     date: new Date().toISOString().split('T')[0],
   });
 
-  const [currentCategory, setCurrentCategory] = useState({ id: '', name: '', description: '' });
   const [currentOrigin, setCurrentOrigin] = useState({ id: '', name: '', description: '' });
 
   const units = ['kg', 'hộp', 'trái', 'bó'];
@@ -210,10 +218,8 @@ const SellerDashboard = () => {
 
   const formatMoney = (value) => Number(value || 0).toLocaleString('vi-VN') + '₫';
 
-  const categoryNameOf = (id) => categories.find((c) => c.id === id)?.name || id || '-';
   const originNameOf = (id) => origins.find((o) => o.id === id)?.name || id || '-';
 
-  const usedCountByCategory = (cateId) => products.filter((p) => p.category_id === cateId).length;
   const usedCountByOrigin = (oriId) => products.filter((p) => p.origin_id === oriId).length;
 
   // ===== Helpers =====
@@ -417,71 +423,6 @@ const SellerDashboard = () => {
     closeOrderModal();
   };
 
-  const openCategoryModal = (mode, category = null) => {
-    setModalMode(mode);
-    setCategoryFormError('');
-
-    if (mode === 'create') {
-      setCurrentCategory({ id: nextCodeId('cate', categories), name: '', description: '' });
-    } else if (category) {
-      setCurrentCategory({ ...category });
-    }
-
-    setShowCategoryModal(true);
-  };
-
-  const closeCategoryModal = () => {
-    setShowCategoryModal(false);
-    setCategoryFormError('');
-  };
-
-  const handleCreateCategory = () => openCategoryModal('create');
-  const handleEditCategory = (c) => openCategoryModal('edit', c);
-  const handleViewCategory = (c) => openCategoryModal('view', c);
-
-  const handleSaveCategory = () => {
-    const name = String(currentCategory.name || '').trim();
-    const description = String(currentCategory.description || '').trim();
-
-    if (!name) {
-      setCategoryFormError('Vui lòng nhập tên danh mục.');
-      return;
-    }
-
-    const dup = categories.some(
-      (c) =>
-        c.id !== currentCategory.id &&
-        String(c.name).trim().toLowerCase() === name.toLowerCase()
-    );
-    if (dup) {
-      setCategoryFormError('Tên danh mục đã tồn tại.');
-      return;
-    }
-
-    setCategoryFormError('');
-
-    const payload = { ...currentCategory, name, description };
-
-    if (modalMode === 'create') {
-      setCategories((prev) => [...prev, payload]);
-    } else {
-      setCategories((prev) => prev.map((c) => (c.id === payload.id ? payload : c)));
-    }
-
-    closeCategoryModal();
-  };
-
-  const openDeleteCategoryModal = (c) => {
-    setDeleteError('');
-    setDeleteTarget({
-      type: 'category',
-      id: c.id,
-      title: c.name,
-      subtitle: `ID: ${c.id}`,
-    });
-    setShowDeleteModal(true);
-  };
-
   const openOriginModal = (mode, origin = null) => {
     setModalMode(mode);
     setOriginFormError('');
@@ -556,14 +497,7 @@ const SellerDashboard = () => {
   const confirmDelete = () => {
     if (!deleteTarget) return;
 
-    if (deleteTarget.type === 'category') {
-      const used = usedCountByCategory(deleteTarget.id);
-      if (used > 0) {
-        setDeleteError(`Không thể xoá danh mục vì đang được dùng bởi ${used} sản phẩm.`);
-        return;
-      }
-      setCategories((prev) => prev.filter((c) => c.id !== deleteTarget.id));
-    } else if (deleteTarget.type === 'origin') {
+    if (deleteTarget.type === 'origin') {
       const used = usedCountByOrigin(deleteTarget.id);
       if (used > 0) {
         setDeleteError(`Không thể xoá xuất xứ vì đang được dùng bởi ${used} sản phẩm.`);
@@ -597,13 +531,6 @@ const SellerDashboard = () => {
     );
   }, [orders, searchTerm]);
 
-  const filteredCategories = useMemo(() => {
-    const t = searchTerm.toLowerCase().trim();
-    return categories.filter(
-      (c) => c.name.toLowerCase().includes(t) || c.id.toLowerCase().includes(t)
-    );
-  }, [categories, searchTerm]);
-
   const filteredOrigins = useMemo(() => {
     const t = searchTerm.toLowerCase().trim();
     return origins.filter(
@@ -616,9 +543,7 @@ const SellerDashboard = () => {
       ? 'sản phẩm'
       : deleteTarget?.type === 'order'
         ? 'đơn hàng'
-        : deleteTarget?.type === 'category'
-          ? 'danh mục'
-          : 'xuất xứ';
+        : 'xuất xứ';
 
   return (
     <div className="seller-container">
@@ -649,7 +574,7 @@ const SellerDashboard = () => {
             <div className="stat-card">
               <Tags size={24} />
               <div>
-                <span className="stat-number">{categories.length}</span>
+                <span className="stat-number">{categoriesCount}</span>
                 <span className="stat-label">Danh mục</span>
               </div>
             </div>
@@ -916,79 +841,9 @@ const SellerDashboard = () => {
 
         {activeTab === 'categories' && (
           <div className="tab-content">
-            <div className="toolbar">
-              <div className="search-box">
-                <Search size={20} />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm danh mục..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-
-              <button className="btn-create" onClick={handleCreateCategory}>
-                <Plus size={20} />
-                Thêm danh mục
-              </button>
-            </div>
-
-            <div className="products-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Tên danh mục</th>
-                    <th>Mô tả</th>
-                    <th>Số sản phẩm</th>
-                    <th>Thao tác</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredCategories.map((c) => {
-                    const used = usedCountByCategory(c.id);
-                    return (
-                      <tr
-                        key={c.id}
-                        onClick={() => handleViewCategory(c)}
-                        style={{ cursor: 'pointer' }}
-                        title="Bấm để xem chi tiết"
-                      >
-                        <td className="order-id">{c.id}</td>
-                        <td className="product-name">{c.name}</td>
-                        <td className="muted-cell">{c.description || '-'}</td>
-                        <td>{used}</td>
-                        <td>
-                          <div className="action-buttons">
-                            <button
-                              className="btn-edit"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditCategory(c);
-                              }}
-                              title="Sửa"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                            <button
-                              className="btn-delete"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openDeleteCategoryModal(c);
-                              }}
-                              title="Xoá"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <CategoryManagement
+              onCategoriesChange={(cats, total) => setCategoriesCount(total || cats.length)}
+            />
           </div>
         )}
 
@@ -1485,112 +1340,6 @@ const SellerDashboard = () => {
                 <button className="btn-save" onClick={handleSaveOrder}>
                   <Save size={20} />
                   Cập nhật
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showCategoryModal && (
-        <div className="modal-overlay" onClick={closeCategoryModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>
-                {modalMode === 'create'
-                  ? 'Thêm danh mục mới'
-                  : modalMode === 'edit'
-                    ? 'Chỉnh sửa danh mục'
-                    : 'Chi tiết danh mục'}
-              </h2>
-              <button className="btn-close" onClick={closeCategoryModal}>
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="modal-body">
-              {categoryFormError && <div className="form-error">{categoryFormError}</div>}
-
-              {isView ? (
-                <>
-                  <div className="order-detail">
-                    <div className="detail-row">
-                      <span className="label">ID:</span>
-                      <span className="value">{currentCategory.id}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="label">Tên danh mục:</span>
-                      <span className="value">{currentCategory.name}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="label">Mô tả:</span>
-                      <span className="value">{currentCategory.description || '-'}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="label">Số sản phẩm:</span>
-                      <span className="value">{usedCountByCategory(currentCategory.id)}</span>
-                    </div>
-                  </div>
-
-                  <div className="status-display">
-                    <span className="order-status large info-pill">
-                      {usedCountByCategory(currentCategory.id)} SẢN PHẨM
-                    </span>
-                  </div>
-                </>
-              ) : (
-
-                <>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>ID</label>
-                      <input type="text" value={currentCategory.id} disabled />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Tên danh mục *</label>
-                      <input
-                        type="text"
-                        value={currentCategory.name}
-                        onChange={(e) => {
-                          setCurrentCategory({ ...currentCategory, name: e.target.value });
-                          if (categoryFormError) setCategoryFormError('');
-                        }}
-                        placeholder="VD: Trái cây nội địa"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-row single">
-                    <div className="form-group">
-                      <label>Mô tả</label>
-                      <textarea
-                        className="textarea"
-                        value={currentCategory.description}
-                        onChange={(e) =>
-                          setCurrentCategory({ ...currentCategory, description: e.target.value })
-                        }
-                        placeholder="Mô tả danh mục..."
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={closeCategoryModal}>
-                Đóng
-              </button>
-
-              {!isView && (
-                <button className="btn-save" onClick={handleSaveCategory}>
-                  <Save size={20} />
-                  Lưu
                 </button>
               )}
             </div>
