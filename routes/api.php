@@ -13,6 +13,7 @@ use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StripeWebhookController;
+use Illuminate\Session\Middleware\StartSession;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,11 @@ Route::post('verify-code', [AuthController::class, 'verifyCode']);
 Route::post('resend-code', [AuthController::class, 'resendCode']);
 Route::get('auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+Route::middleware([StartSession::class])->group(function () {
+    Route::post('chatbot', [ChatBotController::class, 'chat']);
+    Route::post('chatbot/reset', [ChatBotController::class, 'reset']);
+});
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
