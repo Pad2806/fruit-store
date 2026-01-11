@@ -15,7 +15,8 @@ import {
 import './sellerdashboard.css';
 import CategoryManagement from './category';
 import OriginManagement from './origin';
-import { categoryApi, originApi } from '@/services/api';
+import OrderManagement from './order';
+import { categoryApi, originApi, orderApi } from '@/services/api';
 
 const MAX_IMAGES = 5;
 
@@ -23,17 +24,20 @@ const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('products');
   const [categoriesCount, setCategoriesCount] = useState(0);
   const [originsCount, setOriginsCount] = useState(0);
+  const [ordersCount, setOrdersCount] = useState(0);
 
-  // Fetch categories and origins count on mount
+  // Fetch categories, origins and orders count on mount
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const [catResponse, oriResponse] = await Promise.all([
+        const [catResponse, oriResponse, orderResponse] = await Promise.all([
           categoryApi.getAll(),
           originApi.getAll(),
+          orderApi.getAll(),
         ]);
         setCategoriesCount(catResponse.pagination?.total || (catResponse.data || []).length);
         setOriginsCount(oriResponse.pagination?.total || (oriResponse.data || []).length);
+        setOrdersCount(orderResponse.pagination?.total || (orderResponse.data || []).length);
       } catch (error) {
         console.error('Error fetching counts:', error);
       }
@@ -100,54 +104,12 @@ const SellerDashboard = () => {
     },
   ]);
 
-  const [orders, setOrders] = useState([
-    {
-      id: 1001,
-      customer: 'Nguyễn Văn A',
-      phone: '0901234567',
-      products: 'Cam Sành x2kg, Táo Envy x1kg',
-      total: 175000,
-      status: 'pending',
-      date: '2024-12-27',
-    },
-    {
-      id: 1002,
-      customer: 'Trần Thị B',
-      phone: '0912345678',
-      products: 'Nho Mỹ x1kg',
-      total: 120000,
-      status: 'confirmed',
-      date: '2024-12-27',
-    },
-    {
-      id: 1003,
-      customer: 'Lê Văn C',
-      phone: '0923456789',
-      products: 'Dâu Tây x2hộp',
-      total: 300000,
-      status: 'shipping',
-      date: '2024-12-26',
-    },
-    {
-      id: 1004,
-      customer: 'Phạm Thị D',
-      phone: '0934567890',
-      products: 'Cam Sành x5kg',
-      total: 225000,
-      status: 'completed',
-      date: '2024-12-25',
-    },
-  ]);
-
-
   const [showProductModal, setShowProductModal] = useState(false);
-  const [showOrderModal, setShowOrderModal] = useState(false);
 
   const [modalMode, setModalMode] = useState('create');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [productFormError, setProductFormError] = useState('');
-  const [orderFormError, setOrderFormError] = useState('');
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -168,30 +130,12 @@ const SellerDashboard = () => {
     sold_quantity: 0,
   });
 
-  const [currentOrder, setCurrentOrder] = useState({
-    id: null,
-    customer: '',
-    phone: '',
-    products: '',
-    total: '',
-    status: 'pending',
-    date: new Date().toISOString().split('T')[0],
-  });
-
   const units = ['kg', 'hộp', 'trái', 'bó'];
 
   const productStatuses = [
     { value: 'available', label: 'Còn hàng', color: '#27ae60' },
     { value: 'low_stock', label: 'Sắp hết', color: '#f39c12' },
     { value: 'out_of_stock', label: 'Hết hàng', color: '#e74c3c' },
-  ];
-
-  const orderStatuses = [
-    { value: 'pending', label: 'Chờ xác nhận', color: '#f39c12' },
-    { value: 'confirmed', label: 'Đã xác nhận', color: '#3498db' },
-    { value: 'shipping', label: 'Đang giao', color: '#9b59b6' },
-    { value: 'completed', label: 'Hoàn thành', color: '#27ae60' },
-    { value: 'cancelled', label: 'Đã hủy', color: '#e74c3c' },
   ];
 
   const isView = modalMode === 'view';
@@ -206,11 +150,6 @@ const SellerDashboard = () => {
 
   const getProductStatusColor = (status) =>
     productStatuses.find((s) => s.value === status)?.color || '#95a5a6';
-
-  const getOrderStatusColor = (status) =>
-    orderStatuses.find((s) => s.value === status)?.color || '#95a5a6';
-  const getOrderStatusLabel = (status) =>
-    orderStatuses.find((s) => s.value === status)?.label || status;
 
   const formatMoney = (value) => Number(value || 0).toLocaleString('vi-VN') + '₫';
 
@@ -489,17 +428,8 @@ const SellerDashboard = () => {
   const confirmDelete = () => {
     if (!deleteTarget) return;
 
-    if (deleteTarget.type === 'origin') {
-      const used = usedCountByOrigin(deleteTarget.id);
-      if (used > 0) {
-        setDeleteError(`Không thể xoá xuất xứ vì đang được dùng bởi ${used} sản phẩm.`);
-        return;
-      }
-      setOrigins((prev) => prev.filter((o) => o.id !== deleteTarget.id));
-    } else if (deleteTarget.type === 'product') {
+    if (deleteTarget.type === 'product') {
       setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
-    } else {
-      setOrders((prev) => prev.filter((o) => o.id !== deleteTarget.id));
     }
 
     setShowDeleteModal(false);
@@ -514,19 +444,7 @@ const SellerDashboard = () => {
     );
   }, [products, searchTerm]);
 
-  const filteredOrders = useMemo(() => {
-    const t = searchTerm.toLowerCase().trim();
-    return orders.filter(
-      (order) =>
-        order.customer.toLowerCase().includes(t) ||
-        order.id.toString().includes(t)
-    );
-  }, [orders, searchTerm]);
-
-  const deleteLabel =
-    deleteTarget?.type === 'product'
-      ? 'sản phẩm'
-      : 'đơn hàng';
+  const deleteLabel = 'sản phẩm';
 
   return (
     <div className="seller-container">
@@ -549,7 +467,7 @@ const SellerDashboard = () => {
             <div className="stat-card">
               <ShoppingCart size={24} />
               <div>
-                <span className="stat-number">{orders.length}</span>
+                <span className="stat-number">{ordersCount}</span>
                 <span className="stat-label">Đơn hàng</span>
               </div>
             </div>
@@ -738,87 +656,9 @@ const SellerDashboard = () => {
 
         {activeTab === 'orders' && (
           <div className="tab-content">
-            <div className="toolbar">
-              <div className="search-box">
-                <Search size={20} />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm đơn hàng..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="orders-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Mã ĐH</th>
-                    <th>Khách hàng</th>
-                    <th>Số điện thoại</th>
-                    <th>Sản phẩm</th>
-                    <th>Tổng tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày đặt</th>
-                    <th>Thao tác</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredOrders.map((order) => (
-                    <tr
-                      key={order.id}
-                      onClick={() => handleViewOrder(order)}
-                      style={{ cursor: 'pointer' }}
-                      title="Bấm để xem chi tiết"
-                    >
-                      <td className="order-id">#{order.id}</td>
-                      <td>{order.customer}</td>
-                      <td>{order.phone}</td>
-                      <td className="order-products">{order.products}</td>
-                      <td className="price">{formatMoney(order.total)}</td>
-
-                      <td>
-                        <span
-                          className="order-status"
-                          style={{ backgroundColor: getOrderStatusColor(order.status) }}
-                        >
-                          {getOrderStatusLabel(order.status)}
-                        </span>
-                      </td>
-
-                      <td>{order.date}</td>
-
-                      <td>
-                        <div className="action-buttons">
-                          <button
-                            className="btn-edit"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditOrder(order);
-                            }}
-                            title="Sửa"
-                          >
-                            <Edit2 size={16} />
-                          </button>
-                          <button
-                            className="btn-delete"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteOrderModal(order);
-                            }}
-                            title="Xoá"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <OrderManagement
+              onOrdersChange={(ords, total) => setOrdersCount(total || ords.length)}
+            />
           </div>
         )}
 
@@ -1161,98 +1001,6 @@ const SellerDashboard = () => {
                 <button className="btn-save" onClick={handleSaveProduct}>
                   <Save size={20} />
                   Lưu
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showOrderModal && (
-        <div className="modal-overlay" onClick={closeOrderModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{modalMode === 'view' ? 'Chi tiết đơn hàng' : 'Cập nhật đơn hàng'}</h2>
-              <button className="btn-close" onClick={closeOrderModal}>
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="modal-body">
-              {orderFormError && <div className="form-error">{orderFormError}</div>}
-
-              <div className="order-detail">
-                <div className="detail-row">
-                  <span className="label">Mã đơn hàng:</span>
-                  <span className="value">#{currentOrder.id}</span>
-                </div>
-
-                <div className="detail-row">
-                  <span className="label">Khách hàng:</span>
-                  <span className="value">{currentOrder.customer}</span>
-                </div>
-
-                <div className="detail-row">
-                  <span className="label">Số điện thoại:</span>
-                  <span className="value">{currentOrder.phone}</span>
-                </div>
-
-                <div className="detail-row">
-                  <span className="label">Sản phẩm:</span>
-                  <span className="value">{currentOrder.products}</span>
-                </div>
-
-                <div className="detail-row">
-                  <span className="label">Tổng tiền:</span>
-                  <span className="value price">{formatMoney(currentOrder.total)}</span>
-                </div>
-
-                <div className="detail-row">
-                  <span className="label">Ngày đặt:</span>
-                  <span className="value">{currentOrder.date}</span>
-                </div>
-              </div>
-
-              {modalMode === 'edit' && (
-                <div className="form-group">
-                  <label>Trạng thái đơn hàng</label>
-                  <select
-                    value={currentOrder.status}
-                    onChange={(e) => {
-                      setCurrentOrder({ ...currentOrder, status: e.target.value });
-                      if (orderFormError) setOrderFormError('');
-                    }}
-                  >
-                    {orderStatuses.map((status) => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {modalMode === 'view' && (
-                <div className="status-display">
-                  <span
-                    className="order-status large"
-                    style={{ backgroundColor: getOrderStatusColor(currentOrder.status) }}
-                  >
-                    {getOrderStatusLabel(currentOrder.status)}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={closeOrderModal}>
-                Đóng
-              </button>
-
-              {modalMode === 'edit' && (
-                <button className="btn-save" onClick={handleSaveOrder}>
-                  <Save size={20} />
-                  Cập nhật
                 </button>
               )}
             </div>

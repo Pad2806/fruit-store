@@ -92,7 +92,15 @@ export const productApi = {
 
 // Order APIs
 export const orderApi = {
-  getAll: () => request('/orders'),
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.per_page) queryParams.append('per_page', params.per_page);
+    if (params.search) queryParams.append('search', params.search);
+    
+    const queryString = queryParams.toString();
+    return request(`/orders${queryString ? `?${queryString}` : ''}`);
+  },
   getById: (id) => request(`/orders/${id}`),
   updateStatus: (id, status) => request(`/orders/${id}/status`, {
     method: 'PATCH',

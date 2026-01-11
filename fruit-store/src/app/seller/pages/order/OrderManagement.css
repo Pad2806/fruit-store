@@ -1,0 +1,533 @@
+/* Order Management Styles */
+.order-management {
+    padding: 0;
+}
+
+.order-management .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.order-management .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--surface-2, #f8f9fa);
+    padding: 12px 20px;
+    border-radius: 25px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 500px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.order-management .search-box:focus-within {
+    border-color: var(--primary, #f47c4b);
+    background: var(--surface, #ffffff);
+    box-shadow: 0 0 0 3px rgba(244, 124, 75, 0.15);
+}
+
+.order-management .search-box svg {
+    color: #999;
+    margin-right: 10px;
+}
+
+.order-management .search-box input {
+    border: none;
+    background: none;
+    flex: 1;
+    font-size: 15px;
+    outline: none;
+}
+
+/* Table Styles */
+.order-management .order-table {
+    overflow-x: auto;
+}
+
+.order-management table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface, #ffffff);
+}
+
+.order-management thead {
+    background: var(--primary, #f47c4b);
+}
+
+.order-management thead th {
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.order-management tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.order-management tbody tr:hover {
+    background: #fff8f0;
+}
+
+.order-management tbody td {
+    padding: 14px 12px;
+    font-size: 14px;
+    color: var(--text, #333);
+    vertical-align: middle;
+}
+
+.order-management .table-status {
+    text-align: center;
+    padding: 2rem !important;
+    color: var(--muted, #666);
+    font-weight: 500;
+}
+
+.order-management .order-stt {
+    font-weight: 700;
+    color: var(--primary, #f47c4b);
+    font-size: 14px;
+    text-align: center;
+    width: 50px;
+}
+
+.order-management .order-id {
+    font-weight: 700;
+    color: var(--text, #333);
+    font-family: monospace;
+}
+
+.order-management .order-customer {
+    font-weight: 600;
+    color: var(--text, #333);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.order-management .order-phone {
+    color: var(--muted, #666);
+    font-family: monospace;
+}
+
+.order-management .order-total {
+    font-weight: 700;
+    color: #27ae60;
+}
+
+.order-management .order-date {
+    color: var(--muted, #666);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.order-management .order-status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.order-management .action-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.order-management .btn-view,
+.order-management .btn-edit,
+.order-management .btn-delete {
+    padding: 7px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-management .btn-view {
+    background: #17a2b8;
+    color: white;
+}
+
+.order-management .btn-view:hover {
+    background: #138496;
+    transform: scale(1.1);
+}
+
+.order-management .btn-edit {
+    background: var(--edit, #3498db);
+    color: white;
+}
+
+.order-management .btn-edit:hover {
+    background: var(--edit-hover, #2980b9);
+    transform: scale(1.1);
+}
+
+.order-management .btn-delete {
+    background: var(--danger, #e74c3c);
+    color: white;
+}
+
+.order-management .btn-delete:hover {
+    background: var(--danger-hover, #c0392b);
+    transform: scale(1.1);
+}
+
+/* Modal Styles */
+.order-management .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.order-management .modal-content {
+    background: var(--surface, #ffffff);
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.order-management .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px;
+    border-bottom: 2px solid #f0f0f0;
+    background: var(--primary, #f47c4b);
+    color: white;
+}
+
+.order-management .modal-header h2 {
+    font-size: 1.4em;
+}
+
+.order-management .modal-header.delete {
+    background: var(--primary, #f47c4b);
+}
+
+.order-management .btn-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.order-management .btn-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.order-management .modal-body {
+    padding: 25px;
+}
+
+.order-management .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px 25px;
+    border-top: 2px solid #f0f0f0;
+    background: var(--surface-2, #f8f9fa);
+}
+
+/* Order Detail Styles */
+.order-management .order-detail {
+    background: var(--surface-2, #f8f9fa);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.order-management .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border, #e0e0e0);
+}
+
+.order-management .detail-row:last-child {
+    border-bottom: none;
+}
+
+.order-management .detail-row .label {
+    font-weight: 600;
+    color: var(--muted, #666);
+    white-space: nowrap;
+}
+
+.order-management .detail-row .value {
+    color: var(--text, #333);
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.order-management .detail-row .value.highlight {
+    color: #27ae60;
+    font-size: 1.1em;
+}
+
+/* Status Update Styles */
+.order-management .status-update {
+    text-align: center;
+}
+
+.order-management .status-instruction {
+    color: var(--muted, #666);
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.order-management .status-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.order-management .status-option {
+    padding: 12px 20px;
+    border: 2px solid;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.order-management .status-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.order-management .status-option.active {
+    cursor: default;
+    transform: none;
+}
+
+/* Button Styles */
+.order-management .btn-cancel,
+.order-management .btn-edit-status,
+.order-management .btn-delete-confirm {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.order-management .btn-cancel {
+    background: #e0e0e0;
+    color: #555;
+}
+
+.order-management .btn-cancel:hover {
+    background: #d0d0d0;
+}
+
+.order-management .btn-edit-status {
+    background: var(--primary, #f47c4b);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(244, 124, 75, 0.35);
+}
+
+.order-management .btn-edit-status:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(244, 124, 75, 0.45);
+}
+
+.order-management .btn-delete-confirm {
+    background: var(--primary, #f47c4b);
+    color: white;
+}
+
+.order-management .btn-delete-confirm:hover {
+    background: var(--primary-hover, #e96f3f);
+}
+
+/* Delete Modal Styles */
+.order-management .delete-modal {
+    max-width: 420px;
+}
+
+.order-management .delete-subtitle {
+    margin-top: 8px;
+    color: #555;
+    font-size: 14px;
+}
+
+.order-management .delete-warning {
+    margin-top: 10px;
+    color: var(--danger-hover, #c0392b);
+    font-size: 14px;
+}
+
+/* Pagination Styles */
+.order-management .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 15px 0;
+    border-top: 1px solid var(--border, #e0e0e0);
+}
+
+.order-management .pagination-info {
+    color: var(--muted, #666);
+    font-size: 14px;
+}
+
+.order-management .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.order-management .pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border, #e0e0e0);
+    background: var(--surface, #ffffff);
+    color: var(--text, #333);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.order-management .pagination-btn:hover:not(:disabled) {
+    background: var(--primary, #f47c4b);
+    color: white;
+    border-color: var(--primary, #f47c4b);
+}
+
+.order-management .pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.order-management .pagination-btn.active {
+    background: var(--primary, #f47c4b);
+    color: white;
+    border-color: var(--primary, #f47c4b);
+}
+
+.order-management .pagination-ellipsis {
+    padding: 0 8px;
+    color: var(--muted, #666);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .order-management .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .order-management .search-box {
+        max-width: 100%;
+    }
+
+    .order-management table {
+        min-width: 800px;
+    }
+
+    .order-management .modal-content {
+        width: 95%;
+    }
+
+    .order-management .pagination {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .order-management .action-buttons {
+        flex-direction: column;
+    }
+
+    .order-management .pagination-info {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .order-management .pagination-btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .order-management .status-options {
+        flex-direction: column;
+    }
+}
