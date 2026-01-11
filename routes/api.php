@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\User\UserController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
@@ -31,6 +31,9 @@ Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 Route::get('auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::get('/products', [HomeController::class, 'index']);
+Route::get('/products/{id}', [HomeController::class, 'show']);
+Route::get('/search/suggestions', [HomeController::class, 'searchSuggestions']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users', [AuthController::class, 'getProfile']);
@@ -79,5 +82,16 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']]
     Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
     
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
