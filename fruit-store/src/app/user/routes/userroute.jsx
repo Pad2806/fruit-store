@@ -15,7 +15,7 @@ import WarrantyPolicy from "../pages/policy_warranty/warranty";
 import InspectionPolicy from "../pages/policy_inspection/inspection";
 import PurchasePolicy from "../pages/policies/purchasepolicy"; 
 import PaymentPolicy from "../pages/policies/paymentpolicy";
-
+import PaymentVisa from "../pages/payment_visa/payment_visa";
 
 const userRoutes = [
   {
@@ -38,6 +38,7 @@ const userRoutes = [
       { path: "/policy-inspection", element: <InspectionPolicy /> },
       { path: "/purchasepolicy", element: <PurchasePolicy /> },
       { path: "/paymentpolicy", element: <PaymentPolicy /> },
+      { path: "/payment-visa", element: <PaymentVisa /> }
     ],
   },
 ];

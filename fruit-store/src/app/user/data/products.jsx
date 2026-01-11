@@ -10,7 +10,7 @@ import img8 from "@/app/user/assets/8.png";
 
 export const products = [
   {
-    id: "1",
+    id: "82c4841c-ed64-11f0-a64b-06f3c06f8a6d",
     name: "Dưa xiêm gọt trọc",
     price: "19.000đ",
     images: [img1, img7, img8],

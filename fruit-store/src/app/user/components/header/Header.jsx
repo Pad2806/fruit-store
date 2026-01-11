@@ -1,8 +1,7 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaHome, FaEnvelope } from "react-icons/fa";
-
+import { getCartDetails } from "../../../../api/cart";
 import SearchBar from "../search/SearchBar";
 import "./Header.css";
 
@@ -10,8 +9,30 @@ function Header() {
   const [openMenu, setOpenMenu] = useState(false);
   const [menuTop, setMenuTop] = useState(0);
   const headerRef = useRef(null);
-  const { cartCount } = useCart();
   const navigate = useNavigate();
+
+  const cartId = "327c4288-8b80-45ac-9027-392acf36b7fd";
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const data = await getCartDetails(cartId);
+
+        const count =
+          data?.cart_items_count ??
+          data?.data?.cart_items_count ??
+          data?.cart_items?.length ??
+          0;
+
+        setCartCount(Number(count) || 0);
+      } catch (e) {
+        setCartCount(0);
+      }
+    };
+
+    fetchCount();
+  }, []);
 
   useLayoutEffect(() => {
     if (openMenu && headerRef.current) {
@@ -64,10 +85,7 @@ function Header() {
 
       {openMenu && (
         <>
-          <div
-            className="menu-overlay"
-            onClick={() => setOpenMenu(false)}
-          />
+          <div className="menu-overlay" onClick={() => setOpenMenu(false)} />
           <div
             className="menu-dropdown"
             style={{ top: `${menuTop}px` }}
@@ -104,11 +122,11 @@ function Header() {
 
               <div className="menu-support">
                 <p>
-                  <FaPhoneAlt size={14}  style={{marginRight: "10px"}}/>
+                  <FaPhoneAlt size={14} style={{ marginRight: "10px" }} />
                   <span>0865666666</span>
                 </p>
                 <p>
-                  <FaEnvelope size={14}  style={{marginRight: "10px"}}/>
+                  <FaEnvelope size={14} style={{ marginRight: "10px" }} />
                   <span>hello@fruitstore.com.vn</span>
                 </p>
               </div>
