@@ -6,16 +6,42 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OriginRequest;
 use App\Http\Resources\OriginResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use App\Models\Origin;
 use Illuminate\Support\Str;
 
 class OriginController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $origins = Origin::all();
+        $perPage = (int) $request->input('per_page', 5);
+        $search = $request->input('search', '');
+
+        $query = Origin::query();
+
+        // Search by name or description
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Order by created_at descending (newest first)
+        $query->orderBy('created_at', 'desc');
+
+        $origins = $query->paginate($perPage);
+
         return response()->json([
-            'data' => $origins
+            'data' => OriginResource::collection($origins),
+            'pagination' => [
+                'current_page' => $origins->currentPage(),
+                'last_page' => $origins->lastPage(),
+                'per_page' => $origins->perPage(),
+                'total' => $origins->total(),
+                'from' => $origins->firstItem(),
+                'to' => $origins->lastItem(),
+            ]
         ]);
     }
 
