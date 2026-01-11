@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { CheckCircle, Home, Package, Truck, CreditCard } from "lucide-react";
-import styles from "./ordersuccess.module.scss";
+import styles from "./order_success.module.scss";
 
 export default function OrderSuccess() {
   const location = useLocation();

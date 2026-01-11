@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./paymentpolicy.module.scss";
+import styles from "./payment_policy.module.scss";
 
 const PaymentPolicy = () => {
   return (
@@ -94,11 +94,13 @@ const PaymentPolicy = () => {
             <p>FruitStore hỗ trợ thanh toán qua các ví điện tử phổ biến tại Việt Nam:</p>
 
             <div className={styles.walletGrid}>
-              
+
               <div className={styles.walletCard}>
-                <div className={styles.walletLogo}></div>
-                <h4 className={styles.h4}>Sepay & Stripe</h4>
-                <p>Liên kết thẻ ngân hàng</p>
+                <div className={styles.walletLogo}>
+                  <img width={"95px"} height={"95px"} src="https://img.icons8.com/?size=100&id=113575&format=png&color=000000" alt="QRCode" />
+                </div>
+                <h4 className={styles.h4}>Stripe</h4>
+                <p>Liên kết thẻ ngân hàng - Quét mã QR liền tay</p>
               </div>
             </div>
 

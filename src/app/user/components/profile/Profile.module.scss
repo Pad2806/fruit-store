@@ -10,13 +10,20 @@ $bg-disabled: #f1f2f6;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .header {
   margin-bottom: 25px;
-  
+
   .title {
     font-size: 22px;
     font-weight: 700;
@@ -59,7 +66,8 @@ $bg-disabled: #f1f2f6;
     margin-bottom: 8px;
   }
 
-  input, textarea {
+  input,
+  textarea {
     width: 100%;
     padding: 12px 16px;
     border: 1.5px solid $border-color;
@@ -127,12 +135,35 @@ $bg-disabled: #f1f2f6;
     grid-template-columns: 1fr;
     gap: 0;
   }
-  
+
   .formBody {
     padding: 20px;
   }
-  
+
   .btnUpdate {
     width: 100%;
   }
+}
+
+.errorInput {
+  border-color: #ff4d4f !important;
+}
+
+.errorText {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.successMessage {
+  padding: 10px 15px;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
 }

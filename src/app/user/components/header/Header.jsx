@@ -1,6 +1,8 @@
 import { useState, useRef, useLayoutEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { Dropdown } from "antd";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaHome, FaEnvelope } from "react-icons/fa";
 
 import SearchBar from "../search/SearchBar";
@@ -11,6 +13,7 @@ function Header() {
   const [menuTop, setMenuTop] = useState(0);
   const headerRef = useRef(null);
   const { cartCount } = useCart();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
@@ -49,10 +52,34 @@ function Header() {
               <span className="icon"><FaPhoneAlt size={16} /></span>
               <span>Hotline 0865666666</span>
             </div>
-            <div className="action" onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
-              <span className="icon"><FaUser size={18} /></span>
-              <span>Tài khoản</span>
-            </div>
+            {user ? (
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'profile',
+                      label: 'Hồ sơ',
+                      onClick: () => navigate('/user'),
+                    },
+                    {
+                      key: 'logout',
+                      label: 'Đăng xuất',
+                      onClick: logout,
+                    },
+                  ],
+                }}
+              >
+                <div className="action" style={{ cursor: "pointer" }}>
+                  <span className="icon"><FaUser size={18} /></span>
+                  <span>{user.name || "Tài khoản"}</span>
+                </div>
+              </Dropdown>
+            ) : (
+              <div className="action" onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
+                <span className="icon"><FaUser size={18} /></span>
+                <span>Tài khoản</span>
+              </div>
+            )}
             <div className="action cart" onClick={() => navigate("/cart")} style={{ cursor: "pointer" }}>
               <span className="icon"><FaShoppingCart size={18} /></span>
               <span>Giỏ hàng</span>
@@ -104,11 +131,11 @@ function Header() {
 
               <div className="menu-support">
                 <p>
-                  <FaPhoneAlt size={14}  style={{marginRight: "10px"}}/>
+                  <FaPhoneAlt size={14} style={{ marginRight: "10px" }} />
                   <span>0865666666</span>
                 </p>
                 <p>
-                  <FaEnvelope size={14}  style={{marginRight: "10px"}}/>
+                  <FaEnvelope size={14} style={{ marginRight: "10px" }} />
                   <span>hello@fruitstore.com.vn</span>
                 </p>
               </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./purchasepolicy.module.scss";
+import styles from "./purchase_policy.module.scss";
 
 const PurchasePolicy = () => {
     return (

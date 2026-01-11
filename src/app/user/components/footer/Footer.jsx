@@ -39,12 +39,12 @@ function Footer() {
           <ul className="footer-links">
             <li><a href="/#">Tìm kiếm</a></li>
             <li><a href="/about">Câu chuyện thương hiệu</a></li>
-            <li><a href="/purchasepolicy">Chính sách mua hàng</a></li>
-            <li><a href="/paymentpolicy">Chính sách thanh toán</a></li>
+            <li><a href="/purchase-policy">Chính sách mua hàng</a></li>
+            <li><a href="/payment-policy">Chính sách thanh toán</a></li>
             <li><a href="/policy-warranty">Chính sách bảo hành</a></li>
             <li><a href="/policy-inspection">Chính sách kiểm hàng</a></li>
-            <li><a href="/chinh-sach-bao-mat">Chính sách bảo mật</a></li>
-            <li><a href="/huong-dan-mua-hang">Hướng dẫn mua hàng Online</a></li>
+            <li><a href="/policy">Chính sách bảo mật</a></li>
+            <li><a href="/guide">Hướng dẫn mua hàng Online</a></li>
             <li><a href="/contact">Liên hệ</a></li>
           </ul>
         </div>

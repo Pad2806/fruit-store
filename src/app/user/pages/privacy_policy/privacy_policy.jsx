@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import styles from "./privacypolicy.module.scss";
+import styles from "./privacy_policy.module.scss";
 
 export default function PrivacyPolicy() {
   const location = useLocation();

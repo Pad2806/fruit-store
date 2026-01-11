@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import styles from "./onlineshoppingguide.module.scss";
+import styles from "./online_shopping_guide.module.scss";
 
 export default function OnlineShoppingGuide() {
   const location = useLocation();

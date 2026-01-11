@@ -25,7 +25,6 @@ $accent: #ff7f50;
 .content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
   width: 100%;
 }
 
@@ -247,8 +246,8 @@ $accent: #ff7f50;
 }
 
 .walletLogo {
-  width: 60px;
-  height: 60px;
+  width: 100px;
+  height: 100px;
   background: linear-gradient(135deg, $accent, #ff6347);
   color: white;
   border-radius: 50%;

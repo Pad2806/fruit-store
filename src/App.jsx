@@ -9,15 +9,19 @@ function AppRoutes() {
   return useRoutes(appRoutes);
 }
 
+import { AuthProvider } from "./app/user/context/AuthContext";
+
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <ScrollButton />
-      <CartProvider>
-        <PageTitle />
-        <AppRoutes />
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <PageTitle />
+          <AppRoutes />
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

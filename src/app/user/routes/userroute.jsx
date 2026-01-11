@@ -8,13 +8,14 @@ import Login from '../pages/auths/login';
 import Cart from '../pages/cart/cart';
 import Checkout from '../pages/checkout/checkout';
 import User from '../pages/user/user';
-import PrivacyPolicy from "../pages/privacypolicy/privacypolicy";
-import OnlineShoppingGuide from "../pages/onlineshoppingguide/onlineshoppingguide";
-import OrderSuccess from "../pages/ordersuccess/ordersuccess";
+import PrivacyPolicy from "../pages/privacy_policy/privacy_policy";
+import OnlineShoppingGuide from "../pages/online_shopping_guide/online_shopping_guide";
+import OrderSuccess from "../pages/order_success/order_success";
 import WarrantyPolicy from "../pages/policy_warranty/warranty";
 import InspectionPolicy from "../pages/policy_inspection/inspection";
-import PurchasePolicy from "../pages/policies/purchasepolicy"; 
-import PaymentPolicy from "../pages/policies/paymentpolicy";
+import PurchasePolicy from "../pages/policies/purchase_policy";
+import PaymentPolicy from "../pages/policies/payment_policy";
+import GoogleCallback from "../pages/GoogleCallback";
 
 
 const userRoutes = [
@@ -31,13 +32,14 @@ const userRoutes = [
       {path: "/checkouts", element: <Checkout />},
       {path: "/user", element: <User />},
 
-      { path: "/chinh-sach-bao-mat", element: <PrivacyPolicy /> },
-      {path: "/huong-dan-mua-hang", element: <OnlineShoppingGuide />},
+      { path: "/policy", element: <PrivacyPolicy /> },
+      {path: "/guide", element: <OnlineShoppingGuide />},
       {path: "/order-success", element: <OrderSuccess />},
       { path: "/policy-warranty", element: <WarrantyPolicy /> },
       { path: "/policy-inspection", element: <InspectionPolicy /> },
-      { path: "/purchasepolicy", element: <PurchasePolicy /> },
-      { path: "/paymentpolicy", element: <PaymentPolicy /> },
+      { path: "/purchase-policy", element: <PurchasePolicy /> },
+      { path: "/payment-policy", element: <PaymentPolicy /> },
+      { path: "/google-callback", element: <GoogleCallback /> }
     ],
   },
 ];

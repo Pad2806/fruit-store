@@ -47,7 +47,7 @@ function Products() {
 
       <section className={styles.productsPage}>
         <div className={styles.productsHeader}>
-          <h2>Trái cây ngon mỗi ngày</h2>
+          <h2>Trái cây ngon hôm nay</h2>
 
           <select className={styles.sortSelect}>
             <option>Sắp xếp</option>
@@ -63,7 +63,7 @@ function Products() {
         {visibleCount < products.length && (
           <div className={styles.loadMore}>
             <button onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
-              Xem thêm <strong>trái cây ngon mỗi ngày</strong>
+              Xem thêm <strong>trái cây ngon hôm nay</strong>
             </button>
           </div>
         )}
