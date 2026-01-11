@@ -11,9 +11,11 @@ use App\Http\Resources\User\UserResource;
 use App\Mail\SendMail;
 use App\Models\Role;
 use App\Models\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
@@ -49,19 +51,19 @@ class AuthController extends Controller
         
         if (!$user) {
             return response()->json([
-                'message' => 'User not found',
+                'message' => 'Không tìm thấy người dùng',
             ], 404);
         }
 
         if ($user->expired_code_at < now()) {
             return response()->json([
-                'message' => 'Code has expired',
+                'message' => 'Mã xác thực đã hết hạn',
             ], 400);
         }
 
         if ($user->verify_code !== $userRequest['code']) {
             return response()->json([
-                'message' => 'Code is incorrect',
+                'message' => 'Mã xác thực không chính xác',
             ], 400);
         }
 
@@ -71,7 +73,7 @@ class AuthController extends Controller
         $user->save();
 
         return response()->json([
-            'message' => 'Code verified successfully',
+            'message' => 'Xác thực thành công',
         ], 200);
     }
 
@@ -83,7 +85,7 @@ class AuthController extends Controller
 
         if (!$user) {
             return response()->json([
-                'message' => 'User not found',
+                'message' => 'Không tìm thấy người dùng',
             ], 404);
         }
 
@@ -96,7 +98,7 @@ class AuthController extends Controller
         Mail::to($user->email)->send(new SendMail($code));
 
         return response()->json([
-            'message' => 'Code resent successfully',
+            'message' => 'Đã gửi lại mã thành công',
         ], 200);
     }
 
@@ -107,7 +109,7 @@ class AuthController extends Controller
 
         if (!$user || $user->status !== 'active') {
             return response()->json([
-                'message' => 'User not verified',
+                'message' => 'Tài khoản chưa được xác thực',
             ], 401);
         }
 
@@ -115,7 +117,7 @@ class AuthController extends Controller
 
         if (!$user || !$checkUser) {
             return response()->json([
-                'message' => 'Password or email is incorrect',
+                'message' => 'Email hoặc mật khẩu không chính xác',
             ], 401);
         }
 
@@ -123,7 +125,7 @@ class AuthController extends Controller
         
         return response()->json([
             'user' => new UserResource($user),
-            'message' => 'Login successful',
+            'message' => 'Đăng nhập thành công',
             'access_token' => $accessToken,
         ], 200);
     }
@@ -188,6 +190,78 @@ class AuthController extends Controller
         return redirect()->to(
             "http://localhost:5173/google-callback?token=$token"
         );
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'Vui lòng nhập email',
+            'email.email' => 'Email không hợp lệ',
+            'email.exists' => 'Email không tồn tại trong hệ thống',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        // Generate OTP
+        $code = rand(100000, 999999);
+        $user->verify_code = $code;
+        $user->expired_code_at = now()->addMinutes(10);
+        $user->save();
+
+        // Send OTP via Mail
+        Mail::to($user->email)->send(new SendMail($code));
+
+        return response()->json([
+            'message' => 'Mã OTP đã được gửi đến email của bạn.',
+        ], 200);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'code' => 'required|numeric',
+            'password' => 'required|string|min:6|confirmed',
+        ], [
+            'email.required' => 'Vui lòng nhập email',
+            'email.email' => 'Email không hợp lệ',
+            'email.exists' => 'Email không tồn tại',
+            'code.required' => 'Vui lòng nhập mã OTP',
+            'code.numeric' => 'Mã OTP phải là số',
+            'password.required' => 'Vui lòng nhập mật khẩu mới',
+            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
+            'password.confirmed' => 'Mật khẩu xác nhận không khớp',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->verify_code != $request->code) {
+             return response()->json(['message' => 'Mã OTP không hợp lệ'], 400);
+        }
+
+        if ($user->expired_code_at < now()) {
+            return response()->json(['message' => 'Mã OTP đã hết hạn'], 400);
+        }
+
+        // Update password
+        $user->password = Hash::make($request->password);
+        $user->verify_code = null;
+        $user->expired_code_at = null;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Đặt lại mật khẩu thành công.',
+        ], 200);
     }
 
 }
