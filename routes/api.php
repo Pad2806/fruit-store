@@ -9,6 +9,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StripeWebhookController;
@@ -29,6 +30,7 @@ Route::post('verify-code', [AuthController::class, 'verifyCode']);
 Route::post('resend-code', [AuthController::class, 'resendCode']);
 Route::get('auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users', [AuthController::class, 'getProfile']);
@@ -74,7 +76,7 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']]
 
     Route::post('/checkout/stripe', [PaymentController::class, 'stripeCheckout']);
     Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
-    
+
 });
 
 
