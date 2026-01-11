@@ -75,7 +75,15 @@ export const originApi = {
 
 // Product APIs
 export const productApi = {
-  getAll: () => request('/products'),
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.per_page) queryParams.append('per_page', params.per_page);
+    if (params.search) queryParams.append('search', params.search);
+    
+    const queryString = queryParams.toString();
+    return request(`/products${queryString ? `?${queryString}` : ''}`);
+  },
   getByCategory: (categoryId) => request(`/products/category/${categoryId}`),
   create: (formData) => fetch(`${API_BASE_URL}/products`, {
     method: 'POST',
