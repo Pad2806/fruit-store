@@ -3,6 +3,11 @@
 use App\Http\Controllers\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Seller\ProductController;
+use App\Http\Controllers\Seller\CategoryController; 
+use App\Http\Controllers\Seller\OriginController;
+use App\Http\Controllers\Seller\SellerOrderController;
+
 
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\User\UserController;
@@ -49,7 +54,29 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'role:admin'
 });
 
 Route::group(['prefix' => 'seller', 'middleware' => ['auth:sanctum', 'role:seller']], function () {
-    // Define seller routes here
+    // Product routes
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/category/{categoryId}', [ProductController::class, 'getByCategory']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::post('/products/{id}', [ProductController::class, 'update']); 
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
+    //category routes
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+    // Origin routes
+    Route::get('/origins', [OriginController::class, 'index']);
+    Route::post('/origins', [OriginController::class, 'store']);
+    Route::put('/origins/{id}', [OriginController::class, 'update']);
+    Route::delete('/origins/{id}', [OriginController::class, 'destroy']);
+    // Order routes
+    Route::get('/orders', [SellerOrderController::class, 'index']);
+    Route::get('/orders/{id}', [SellerOrderController::class, 'show']);
+    Route::patch('/orders/{id}/status', [SellerOrderController::class, 'updateStatus']);
+    Route::delete('/orders/{id}', [SellerOrderController::class, 'destroy']);
 });
 
 Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']], function () {

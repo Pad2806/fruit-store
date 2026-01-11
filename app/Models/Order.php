@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory;
-    protected $keyType = 'string';
+    use HasFactory, SoftDeletes;
+
     public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = [
         'id',
         'user_id',
