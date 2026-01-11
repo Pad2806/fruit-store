@@ -20,6 +20,7 @@ class OrderResource extends BaseResource
             'payment_method' => $this->payment_method,
             'payment_status' => $this->payment_status,
             'datetime_order' => $this->datetime_order,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'total_amount' => $this->total_amount,
             'shipping_fee' => $this->shipping_fee,
             'status' => $this->status,
