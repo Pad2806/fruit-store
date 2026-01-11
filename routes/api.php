@@ -27,6 +27,8 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('verify-code', [AuthController::class, 'verifyCode']);
 Route::post('resend-code', [AuthController::class, 'resendCode']);
+Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('reset-password', [AuthController::class, 'resetPassword']);
 Route::get('auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
@@ -52,6 +54,7 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']]
     // Example: Route::get('/profile', [UserController::class, 'profile']);
     Route::get('orders', [App\Http\Controllers\User\OrderController::class, 'index']);
     Route::get('orders/{id}', [App\Http\Controllers\User\OrderController::class, 'show']);
+    Route::post('orders/{id}/cancel', [App\Http\Controllers\User\OrderController::class, 'cancel']);
 
     Route::group(['prefix' => 'carts'], function () {
         Route::post('', [CartController::class, 'store']);
