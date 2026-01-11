@@ -5,6 +5,8 @@ import { CartProvider } from "./app/user/context/CartContext";
 import ScrollToTop from "./layout/components/scroll-to-top/ScrollToTop";
 import ScrollButton from "./layout/components/scroll-to-top/ScrollToTopButton";
 import { Toaster } from "react-hot-toast";
+import ChatBox from "./app/user/components/chatbox/ChatBox";
+
 function AppRoutes() {
   return useRoutes(appRoutes);
 }
@@ -17,6 +19,7 @@ function App() {
       <ScrollButton />
       <CartProvider>
         <PageTitle />
+        <ChatBox />
         <AppRoutes />
       </CartProvider>
     </BrowserRouter>

@@ -13,6 +13,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
+import { CloudCog } from "lucide-react";
 
 const stripePromise = loadStripe(import.meta.env.STRIPE_KEY || "pk_test_51SmxkjAjfmLAwcOovm27OG3LMVmkrDlxZcppPPbs50hwmlIjTTx6rP1Yyv1lLvpk67yXwCkaokDjdLtnVqUjSiJM00V4zMsIgl");
 
@@ -115,6 +116,7 @@ function PaymentVisaInner() {
 
       if (result?.error) {
         ToastService.error(result.error.message);
+        console.log(result.error.message);
         return;
       }
 
