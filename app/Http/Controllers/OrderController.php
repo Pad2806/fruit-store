@@ -11,16 +11,40 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class OrderController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $orders = Order::withCount('details as total_products')
-            ->withSum('details as total_quantity', 'quantity')
-            ->orderBy('datetime_order', 'desc')
-            ->get();
+        $perPage = (int) $request->input('per_page', 5);
+        $search = $request->input('search', '');
 
-        return OrderResource::collection($orders)->additional([
+        $query = Order::withCount('details as total_products')
+            ->withSum('details as total_quantity', 'quantity');
+
+        // Search by recipient name, phone, or order id
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('recipient_name', 'like', "%{$search}%")
+                  ->orWhere('recipient_phone_number', 'like', "%{$search}%")
+                  ->orWhere('id', 'like', "%{$search}%");
+            });
+        }
+
+        // Order by datetime_order descending (newest first)
+        $query->orderBy('datetime_order', 'desc');
+
+        $orders = $query->paginate($perPage);
+
+        return response()->json([
             'success' => true,
             'message' => 'Orders retrieved successfully',
+            'data' => OrderResource::collection($orders),
+            'pagination' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+                'from' => $orders->firstItem(),
+                'to' => $orders->lastItem(),
+            ]
         ]);
     }
 
