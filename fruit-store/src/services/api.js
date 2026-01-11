@@ -51,7 +51,15 @@ export const categoryApi = {
 
 // Origin APIs
 export const originApi = {
-  getAll: () => request('/origins'),
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.per_page) queryParams.append('per_page', params.per_page);
+    if (params.search) queryParams.append('search', params.search);
+    
+    const queryString = queryParams.toString();
+    return request(`/origins${queryString ? `?${queryString}` : ''}`);
+  },
   create: (data) => request('/origins', {
     method: 'POST',
     body: JSON.stringify(data),

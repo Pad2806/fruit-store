@@ -1,0 +1,529 @@
+/* Origin Management Styles */
+.origin-management {
+  padding: 0;
+}
+
+.origin-management .toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.origin-management .search-box {
+  display: flex;
+  align-items: center;
+  background: var(--surface-2, #f8f9fa);
+  padding: 12px 20px;
+  border-radius: 25px;
+  flex: 1;
+  min-width: 250px;
+  max-width: 420px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.origin-management .search-box:focus-within {
+  border-color: var(--primary, #f47c4b);
+  background: var(--surface, #ffffff);
+  box-shadow: 0 0 0 3px rgba(244, 124, 75, 0.15);
+}
+
+.origin-management .search-box svg {
+  color: #999;
+  margin-right: 10px;
+}
+
+.origin-management .search-box input {
+  border: none;
+  background: none;
+  flex: 1;
+  font-size: 15px;
+  outline: none;
+}
+
+.origin-management .btn-create {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.origin-management .btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(39, 174, 96, 0.4);
+}
+
+/* Table Styles */
+.origin-management .origin-table {
+  overflow-x: auto;
+}
+
+.origin-management table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface, #ffffff);
+}
+
+.origin-management thead {
+  background: var(--primary, #f47c4b);
+}
+
+.origin-management thead th {
+  color: white;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.origin-management tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.origin-management tbody tr:hover {
+  background: #fff8f0;
+}
+
+.origin-management tbody td {
+  padding: 15px;
+  font-size: 14px;
+  color: var(--text, #333);
+  vertical-align: top;
+}
+
+.origin-management .table-status {
+  text-align: center;
+  padding: 2rem !important;
+  color: var(--muted, #666);
+  font-weight: 500;
+}
+
+.origin-management .origin-stt {
+  font-weight: 700;
+  color: var(--primary, #f47c4b);
+  font-size: 14px;
+  text-align: center;
+  width: 60px;
+}
+
+.origin-management .origin-name {
+  font-weight: 600;
+  color: var(--text, #333);
+}
+
+.origin-management .muted-cell {
+  color: var(--muted, #666);
+  font-size: 13px;
+  max-width: 420px;
+}
+
+.origin-management .action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.origin-management .btn-edit,
+.origin-management .btn-delete {
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.origin-management .btn-edit {
+  background: var(--edit, #3498db);
+  color: white;
+}
+
+.origin-management .btn-edit:hover {
+  background: var(--edit-hover, #2980b9);
+  transform: scale(1.1);
+}
+
+.origin-management .btn-delete {
+  background: var(--danger, #e74c3c);
+  color: white;
+}
+
+.origin-management .btn-delete:hover {
+  background: var(--danger-hover, #c0392b);
+  transform: scale(1.1);
+}
+
+/* Modal Styles */
+.origin-management .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.origin-management .modal-content {
+  background: var(--surface, #ffffff);
+  border-radius: 15px;
+  width: 90%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.origin-management .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  border-bottom: 2px solid #f0f0f0;
+  background: var(--primary, #f47c4b);
+  color: white;
+}
+
+.origin-management .modal-header h2 {
+  font-size: 1.5em;
+}
+
+.origin-management .modal-header.delete {
+  background: var(--primary, #f47c4b);
+}
+
+.origin-management .btn-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.origin-management .btn-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.origin-management .modal-body {
+  padding: 25px;
+}
+
+.origin-management .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px 25px;
+  border-top: 2px solid #f0f0f0;
+  background: var(--surface-2, #f8f9fa);
+}
+
+/* Form Styles */
+.origin-management .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.origin-management .form-row.single {
+  grid-template-columns: 1fr;
+}
+
+.origin-management .form-group {
+  margin-bottom: 20px;
+}
+
+.origin-management .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text, #333);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.origin-management .form-group input,
+.origin-management .form-group select,
+.origin-management .textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: var(--surface-2, #f8f9fa);
+}
+
+.origin-management .textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.origin-management .form-group input:focus,
+.origin-management .form-group select:focus,
+.origin-management .textarea:focus {
+  outline: none;
+  border-color: var(--primary, #f47c4b);
+  background: var(--surface, #ffffff);
+  box-shadow: 0 0 0 3px rgba(244, 124, 75, 0.15);
+}
+
+.origin-management .form-group input:disabled {
+  background: #e9ecef;
+  cursor: not-allowed;
+}
+
+.origin-management .form-error {
+  background: #fdecea;
+  color: #b42318;
+  border: 1px solid #f5c2c0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Detail View Styles */
+.origin-management .origin-detail {
+  background: var(--surface-2, #f8f9fa);
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+
+.origin-management .detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border, #e0e0e0);
+}
+
+.origin-management .detail-row:last-child {
+  border-bottom: none;
+}
+
+.origin-management .detail-row .label {
+  font-weight: 600;
+  color: var(--muted, #666);
+  white-space: nowrap;
+}
+
+.origin-management .detail-row .value {
+  color: var(--text, #333);
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* Button Styles */
+.origin-management .btn-cancel,
+.origin-management .btn-save,
+.origin-management .btn-delete-confirm {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.origin-management .btn-cancel {
+  background: #e0e0e0;
+  color: #555;
+}
+
+.origin-management .btn-cancel:hover {
+  background: #d0d0d0;
+}
+
+.origin-management .btn-save {
+  background: var(--primary, #f47c4b);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(244, 124, 75, 0.35);
+}
+
+.origin-management .btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(244, 124, 75, 0.45);
+}
+
+.origin-management .btn-delete-confirm {
+  background: var(--primary, #f47c4b);
+  color: white;
+}
+
+.origin-management .btn-delete-confirm:hover {
+  background: var(--primary-hover, #e96f3f);
+}
+
+/* Delete Modal Styles */
+.origin-management .delete-modal {
+  max-width: 420px;
+}
+
+.origin-management .delete-subtitle {
+  margin-top: 8px;
+  color: #555;
+  font-size: 14px;
+}
+
+.origin-management .delete-warning {
+  margin-top: 10px;
+  color: var(--danger-hover, #c0392b);
+  font-size: 14px;
+}
+
+/* Pagination Styles */
+.origin-management .pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding: 15px 0;
+  border-top: 1px solid var(--border, #e0e0e0);
+}
+
+.origin-management .pagination-info {
+  color: var(--muted, #666);
+  font-size: 14px;
+}
+
+.origin-management .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.origin-management .pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border, #e0e0e0);
+  background: var(--surface, #ffffff);
+  color: var(--text, #333);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.origin-management .pagination-btn:hover:not(:disabled) {
+  background: var(--primary, #f47c4b);
+  color: white;
+  border-color: var(--primary, #f47c4b);
+}
+
+.origin-management .pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.origin-management .pagination-btn.active {
+  background: var(--primary, #f47c4b);
+  color: white;
+  border-color: var(--primary, #f47c4b);
+}
+
+.origin-management .pagination-ellipsis {
+  padding: 0 8px;
+  color: var(--muted, #666);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .origin-management .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .origin-management .search-box {
+    max-width: 100%;
+  }
+
+  .origin-management table {
+    min-width: 600px;
+  }
+
+  .origin-management .modal-content {
+    width: 95%;
+  }
+
+  .origin-management .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .origin-management .pagination {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .origin-management .action-buttons {
+    flex-direction: column;
+  }
+
+  .origin-management .pagination-info {
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .origin-management .pagination-btn {
+    min-width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+}

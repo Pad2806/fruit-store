@@ -14,25 +14,31 @@ import {
 } from 'lucide-react';
 import './sellerdashboard.css';
 import CategoryManagement from './category';
-import { categoryApi } from '@/services/api';
+import OriginManagement from './origin';
+import { categoryApi, originApi } from '@/services/api';
 
 const MAX_IMAGES = 5;
 
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('products');
   const [categoriesCount, setCategoriesCount] = useState(0);
+  const [originsCount, setOriginsCount] = useState(0);
 
-  // Fetch categories count on mount
+  // Fetch categories and origins count on mount
   useEffect(() => {
-    const fetchCategoriesCount = async () => {
+    const fetchCounts = async () => {
       try {
-        const response = await categoryApi.getAll();
-        setCategoriesCount((response.data || []).length);
+        const [catResponse, oriResponse] = await Promise.all([
+          categoryApi.getAll(),
+          originApi.getAll(),
+        ]);
+        setCategoriesCount(catResponse.pagination?.total || (catResponse.data || []).length);
+        setOriginsCount(oriResponse.pagination?.total || (oriResponse.data || []).length);
       } catch (error) {
-        console.error('Error fetching categories count:', error);
+        console.error('Error fetching counts:', error);
       }
     };
-    fetchCategoriesCount();
+    fetchCounts();
   }, []);
 
   const [products, setProducts] = useState([
@@ -134,22 +140,14 @@ const SellerDashboard = () => {
   ]);
 
 
-  const [origins, setOrigins] = useState([
-    { id: 'ori_1', name: 'Việt Nam', description: 'Nguồn gốc trong nước.' },
-    { id: 'ori_2', name: 'New Zealand / Mỹ', description: 'Nguồn gốc nhập khẩu (NZ/US).' },
-    { id: 'ori_3', name: 'Đà Lạt (Việt Nam)', description: 'Nguồn gốc Đà Lạt, khí hậu ôn hoà.' },
-  ]);
-
   const [showProductModal, setShowProductModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [showOriginModal, setShowOriginModal] = useState(false);
 
   const [modalMode, setModalMode] = useState('create');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [productFormError, setProductFormError] = useState('');
   const [orderFormError, setOrderFormError] = useState('');
-  const [originFormError, setOriginFormError] = useState('');
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -179,8 +177,6 @@ const SellerDashboard = () => {
     status: 'pending',
     date: new Date().toISOString().split('T')[0],
   });
-
-  const [currentOrigin, setCurrentOrigin] = useState({ id: '', name: '', description: '' });
 
   const units = ['kg', 'hộp', 'trái', 'bó'];
 
@@ -217,10 +213,6 @@ const SellerDashboard = () => {
     orderStatuses.find((s) => s.value === status)?.label || status;
 
   const formatMoney = (value) => Number(value || 0).toLocaleString('vi-VN') + '₫';
-
-  const originNameOf = (id) => origins.find((o) => o.id === id)?.name || id || '-';
-
-  const usedCountByOrigin = (oriId) => products.filter((p) => p.origin_id === oriId).length;
 
   // ===== Helpers =====
   const nextCodeId = (prefix, items) => {
@@ -531,19 +523,10 @@ const SellerDashboard = () => {
     );
   }, [orders, searchTerm]);
 
-  const filteredOrigins = useMemo(() => {
-    const t = searchTerm.toLowerCase().trim();
-    return origins.filter(
-      (o) => o.name.toLowerCase().includes(t) || o.id.toLowerCase().includes(t)
-    );
-  }, [origins, searchTerm]);
-
   const deleteLabel =
     deleteTarget?.type === 'product'
       ? 'sản phẩm'
-      : deleteTarget?.type === 'order'
-        ? 'đơn hàng'
-        : 'xuất xứ';
+      : 'đơn hàng';
 
   return (
     <div className="seller-container">
@@ -582,7 +565,7 @@ const SellerDashboard = () => {
             <div className="stat-card">
               <MapPin size={24} />
               <div>
-                <span className="stat-number">{origins.length}</span>
+                <span className="stat-number">{originsCount}</span>
                 <span className="stat-label">Xuất xứ</span>
               </div>
             </div>
@@ -849,79 +832,9 @@ const SellerDashboard = () => {
 
         {activeTab === 'origins' && (
           <div className="tab-content">
-            <div className="toolbar">
-              <div className="search-box">
-                <Search size={20} />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm xuất xứ..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-
-              <button className="btn-create" onClick={handleCreateOrigin}>
-                <Plus size={20} />
-                Thêm xuất xứ
-              </button>
-            </div>
-
-            <div className="products-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Tên xuất xứ</th>
-                    <th>Mô tả</th>
-                    <th>Số sản phẩm</th>
-                    <th>Thao tác</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredOrigins.map((o) => {
-                    const used = usedCountByOrigin(o.id);
-                    return (
-                      <tr
-                        key={o.id}
-                        onClick={() => handleViewOrigin(o)}
-                        style={{ cursor: 'pointer' }}
-                        title="Bấm để xem chi tiết"
-                      >
-                        <td className="order-id">{o.id}</td>
-                        <td className="product-name">{o.name}</td>
-                        <td className="muted-cell">{o.description || '-'}</td>
-                        <td>{used}</td>
-                        <td>
-                          <div className="action-buttons">
-                            <button
-                              className="btn-edit"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditOrigin(o);
-                              }}
-                              title="Sửa"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                            <button
-                              className="btn-delete"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openDeleteOriginModal(o);
-                              }}
-                              title="Xoá"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <OriginManagement
+              onOriginsChange={(oris, total) => setOriginsCount(total || oris.length)}
+            />
           </div>
         )}
       </div>
@@ -1340,111 +1253,6 @@ const SellerDashboard = () => {
                 <button className="btn-save" onClick={handleSaveOrder}>
                   <Save size={20} />
                   Cập nhật
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showOriginModal && (
-        <div className="modal-overlay" onClick={closeOriginModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>
-                {modalMode === 'create'
-                  ? 'Thêm xuất xứ mới'
-                  : modalMode === 'edit'
-                    ? 'Chỉnh sửa xuất xứ'
-                    : 'Chi tiết xuất xứ'}
-              </h2>
-              <button className="btn-close" onClick={closeOriginModal}>
-                <X size={24} />
-              </button>
-            </div>
-
-            <div className="modal-body">
-              {originFormError && <div className="form-error">{originFormError}</div>}
-
-              {isView ? (
-                <>
-                  <div className="order-detail">
-                    <div className="detail-row">
-                      <span className="label">ID:</span>
-                      <span className="value">{currentOrigin.id}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="label">Tên xuất xứ:</span>
-                      <span className="value">{currentOrigin.name}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="label">Mô tả:</span>
-                      <span className="value">{currentOrigin.description || '-'}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="label">Số sản phẩm:</span>
-                      <span className="value">{usedCountByOrigin(currentOrigin.id)}</span>
-                    </div>
-                  </div>
-
-                  <div className="status-display">
-                    <span className="order-status large info-pill">
-                      {usedCountByOrigin(currentOrigin.id)} SẢN PHẨM
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>ID</label>
-                      <input type="text" value={currentOrigin.id} disabled />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Tên xuất xứ *</label>
-                      <input
-                        type="text"
-                        value={currentOrigin.name}
-                        onChange={(e) => {
-                          setCurrentOrigin({ ...currentOrigin, name: e.target.value });
-                          if (originFormError) setOriginFormError('');
-                        }}
-                        placeholder="VD: Việt Nam"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-row single">
-                    <div className="form-group">
-                      <label>Mô tả</label>
-                      <textarea
-                        className="textarea"
-                        value={currentOrigin.description}
-                        onChange={(e) =>
-                          setCurrentOrigin({ ...currentOrigin, description: e.target.value })
-                        }
-                        placeholder="Mô tả xuất xứ..."
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="modal-footer">
-              <button className="btn-cancel" onClick={closeOriginModal}>
-                Đóng
-              </button>
-
-              {!isView && (
-                <button className="btn-save" onClick={handleSaveOrigin}>
-                  <Save size={20} />
-                  Lưu
                 </button>
               )}
             </div>
