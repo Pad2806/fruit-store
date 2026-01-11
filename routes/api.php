@@ -14,6 +14,7 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StripeWebhookController;
@@ -39,6 +40,7 @@ Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback
 Route::get('/products', [HomeController::class, 'index']);
 Route::get('/products/{id}', [HomeController::class, 'show']);
 Route::get('/search/suggestions', [HomeController::class, 'searchSuggestions']);
+
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users', [AuthController::class, 'getProfile']);
@@ -107,7 +109,7 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']]
 
     Route::post('/checkout/stripe', [PaymentController::class, 'stripeCheckout']);
     Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
-    
+
 });
 
 
