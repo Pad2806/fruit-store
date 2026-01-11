@@ -8,17 +8,42 @@ use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $products = Product::with(['category', 'origin'])->get();
+        $perPage = (int) $request->input('per_page', 5);
+        $search = $request->input('search', '');
+
+        $query = Product::with(['category', 'origin']);
+
+        // Search by name
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('short_desc', 'like', "%{$search}%");
+            });
+        }
+
+        // Order by created_at descending (newest first)
+        $query->orderBy('created_at', 'desc');
+
+        $products = $query->paginate($perPage);
 
         return response()->json([
             'success' => true,
             'message' => 'Products retrieved successfully',
             'data' => ProductResource::collection($products),
+            'pagination' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'from' => $products->firstItem(),
+                'to' => $products->lastItem(),
+            ]
         ]);
     }
 
