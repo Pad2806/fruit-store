@@ -1,3 +1,4 @@
+/* ... (keep existing CSS) */
 * {
   margin: 0;
   padding: 0;
@@ -139,7 +140,7 @@ body {
   overflow-x: auto;
 }
 
-.users-table > table {
+.users-table>table {
   width: 100%;
   border-collapse: collapse;
   background: white;
@@ -274,6 +275,87 @@ tbody td {
   transform: scale(1.05);
 }
 
+/* Pagination Styles */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #666;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-page {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  color: #555;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: #f47c4b;
+  color: #f47c4b;
+  background: #fff8f5;
+}
+
+.btn-page.active {
+  background: #f47c4b;
+  color: white;
+  border-color: #f47c4b;
+  box-shadow: 0 2px 8px rgba(244, 124, 75, 0.25);
+}
+
+.btn-page:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f8f9fa;
+  border-color: #eee;
+}
+
+.page-size-select {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: white;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-size-select:hover {
+  border-color: #f47c4b;
+}
+
+.page-size-select:focus {
+  border-color: #f47c4b;
+  box-shadow: 0 0 0 2px rgba(244, 124, 75, 0.1);
+}
+
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -292,6 +374,7 @@ tbody td {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -318,6 +401,7 @@ tbody td {
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -400,6 +484,11 @@ tbody td {
   border-color: #f47c4b;
   background: white;
   box-shadow: 0 0 0 3px rgba(244, 124, 75, 0.15);
+}
+
+.input-error {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8 !important;
 }
 
 .modal-footer {
@@ -512,6 +601,7 @@ tbody td {
   background-color: #f47c4b !important;
   color: #fff !important;
 }
+
 .password-field {
   position: relative;
   display: flex;
