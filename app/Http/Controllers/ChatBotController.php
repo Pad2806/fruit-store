@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class ChatBotController extends Controller
 {
@@ -22,6 +23,9 @@ class ChatBotController extends Controller
 
     public function chat(Request $request)
     {
+        // Authenticate user from token if provided (optional authentication)
+        $this->authenticateFromToken($request);
+
         $data = $request->validate([
             'message' => 'required|string'
         ]);
@@ -144,7 +148,8 @@ class ChatBotController extends Controller
             1. Phần 'intro': Tối đa 20 từ. Trả lời đúng trọng tâm câu hỏi.
             2. Nếu khách hỏi giá -> Trả lời giá. Khách hỏi ngon không -> Trả lời vị. Không chào hỏi rườm rà.
             3. Nếu lịch sử chat không liên quan đến câu hỏi hiện tại -> Bỏ qua lịch sử.
-            4. OUTPUT JSON FORMAT:
+            4. Format lại đơn vị giá của sản phẩm.
+            5. OUTPUT JSON FORMAT:
             {
                 \"intro\": \"...\",
                 \"products\": [ ... ],
@@ -162,6 +167,7 @@ class ChatBotController extends Controller
 
             Yêu cầu:
             1. Viết 1 đoạn giới thiệu ngắn hấp dẫn về sản phẩm này (công dụng, hương vị).
+            2. Format lại đơn vị giá sản phẩm.
             2. Output JSON:
             {
                 \"intro\": \"Lời giới thiệu sản phẩm...\",
@@ -203,113 +209,6 @@ class ChatBotController extends Controller
             return [];
         }
     }
-
-    private function callAIToSuggest(string $message)
-    {
-        $context = Session::get('chatbot_context', []);
-        $previousIntent = $context['intent'] ?? null;
-        $previousProducts = $context['products'] ?? [];
-        $lastMessage = $context['last_message'] ?? null;
-
-        $contextText = '';
-
-        if($previousIntent) {
-            $contextText .= "Ngữ cảnh trước đó:\n";
-            $contextText .= "-Mục tiêu khách hàng: $previousIntent\n";
-        }
-
-        if(!empty($previousProducts)) {
-            $productNamesText = implode(', ',$previousProducts);
-            $contextText .= "- Sản phẩm đã gợi ý trước đó: $productNamesText\n";
-        }
-
-        if($lastMessage) {
-            $contextText .= "- Câu hỏi trước đó của khách: $lastMessage\n";
-        }
-
-        $productText = Cache::remember(
-            'chatbot_product_list',
-            now()->addMinute(30),
-            function(){
-                return Product::select('name', 'price')
-                ->get()
-                ->map(fn($p)=> "-{$p->name}: {$p->price}đ")
-                ->implode("\n");
-            }
-        );
-
-        $systemPrompt = "Bạn là chatbot tư vấn bán trái cây cho website bán hàng của tôi.
-
-        $contextText
-
-        Danh sách trái cây đang bán:
-        $productText
-
-        Nguyên tắc:
-        -Chỉ tư vấn sản phẩm có trong danh sách
-        -Giải thích ngắn gọn, dễ hiểu
-        -Tư vấn thân thiện, ngắn gọn
-        -Ưu tiên bán hàng
-        -Gợi ý sản phẩm phù hợp
-        -Kết thúc bằng câu hỏi chốt đơn
-
-        YÊU CẦU OUTPUT (BẮT BUỘC):
-        - Trả về JSON hợp lệ
-        - KHÔNG trả text thường
-        - Format như sau:
-
-        {
-        \"intro\": \"...\",
-        \"products\": [
-            {
-            \"name\": \"Cam sành\",
-            \"description\": \"...\",
-            \"price\": 45000
-            }
-        ],
-        \"cta\": \"Bạn muốn mình tư vấn kỹ hơn về loại nào trong số trên ạ?\"
-        }
-
-        Khách hỏi: $message
-        ";
-
-        $response = Http::post(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . config('services.gemini.key'),
-        [
-            'contents' => [
-                [
-                    "role" => 'user',
-                    "parts" => [
-                        ['text' => $systemPrompt]
-                    ]
-                ]
-            ]
-        ]);
-
-        $text = $response['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
-
-        $data =$this->extractJson($text);
-
-        if (!$data || empty($data['products'])) {
-            return response()->json([
-                'message' => 'Mình chưa tìm được sản phẩm phù hợp ạ.'
-            ]);
-        }
-
-        $productNames = collect($data['products'] ?? [])
-                        ->pluck('name')
-                        ->toArray();
-        $intent = $this->detectIntent($message);
-        Session::put('chatbot_context', [
-            'intent' => $intent,
-            'products' => $productNames,
-            'last_message' => $message,
-        ]);
-        Session::save();
-
-        return $data;
-    }
-
 
     private function handleAddToCart(string $productName)
     {
@@ -373,6 +272,25 @@ class ChatBotController extends Controller
         return response()->json([
             'message' => 'Chat đã được reset'
         ]);
+    }
+
+    protected function authenticateFromToken(Request $request)
+    {
+        $token = $request->bearerToken();
+
+        if ($token) {
+            $accessToken = PersonalAccessToken::findToken($token);
+
+            if ($accessToken && $accessToken->tokenable) {
+                $expiration = config('sanctum.expiration');
+                $isValid = !$expiration || $accessToken->created_at->gt(now()->subMinutes($expiration));
+
+                if ($isValid) {
+                    $user = $accessToken->tokenable->withAccessToken($accessToken);
+                    Auth::setUser($user);
+                }
+            }
+        }
     }
 
     protected function extractJson(string $text): ?array
