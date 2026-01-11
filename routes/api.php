@@ -18,6 +18,7 @@ use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StripeWebhookController;
+use Illuminate\Session\Middleware\StartSession;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,11 @@ Route::get('auth/google/callback', [AuthController::class, 'handleGoogleCallback
 Route::get('/products', [HomeController::class, 'index']);
 Route::get('/products/{id}', [HomeController::class, 'show']);
 Route::get('/search/suggestions', [HomeController::class, 'searchSuggestions']);
+
+Route::middleware([StartSession::class])->group(function () {
+    Route::post('chatbot', [ChatBotController::class, 'chat']);
+    Route::post('chatbot/reset', [ChatBotController::class, 'reset']);
+});
 
 Route::middleware([StartSession::class])->group(function () {
     Route::post('chatbot', [ChatBotController::class, 'chat']);
