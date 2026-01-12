@@ -49,9 +49,10 @@ export default function Cart() {
         try {
           await removeCartItem(cartItemId);
           setCartItems(prev => prev.filter(item => item.id !== cartItemId));
-          refreshCartCount();
-          ToastService.error("Đã xóa sản phẩm thành công");
+          
+          ToastService.success("Đã xóa sản phẩm thành công");
         } catch (error) {
+          console.log(error);
           ToastService.error("Lỗi khi xóa sản phẩm");
         }
       }

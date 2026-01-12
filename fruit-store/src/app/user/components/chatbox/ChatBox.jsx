@@ -1,142 +1,118 @@
 import { useState, useRef, useEffect } from "react";
 import "./ChatBox.css";
- 
-const API_URL = "http://localhost:8000/api/chatbot";
- 
+
 function ChatBox() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { id: 1, text: "Xin chào! Tôi có thể giúp gì cho bạn?", sender: "bot" },
+    { id: crypto.randomUUID(), text: "Xin chào! Tôi có thể giúp gì cho bạn?", sender: "bot" },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
- 
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
- 
+
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
- 
+  }, [messages, loading]);
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
+    const userText = inputValue;
+
     setMessages((prev) => [
       ...prev,
-      {
-        id: Date.now(),
-        text: inputValue,
-        sender: "user",
-      },
+      { id: crypto.randomUUID(), text: userText, sender: "user" },
     ]);
- 
-    const messageToSend = inputValue;
+
     setInputValue("");
- 
+    setLoading(true);
+
     try {
       const res = await fetch("http://localhost:8000/api/chatbot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: "Bearer 16|SZHk522wv9U8AcFWiepeZptCc7Y2ILf20t5SLyIX",
+          Authorization: "Bearer 19|CWhxy9RCDu255HBfARE6YNQTnjfdL89pWULng90G",
         },
         credentials: "include",
-        body: JSON.stringify({
-          message: messageToSend,
-        }),
+        body: JSON.stringify({ message: userText }),
       });
- 
+
       const data = await res.json();
- 
-      if (data.intro) {
+
+      const botText = data.intro ?? data.message ?? "";
+      if (botText) {
         setMessages((prev) => [
           ...prev,
-          {
-            id: Date.now() + 1,
-            text: data.intro,
-            sender: "bot",
-          },
+          { id: crypto.randomUUID(), text: botText, sender: "bot" },
         ]);
       }
- 
-      let text = "";
-      if (data.products && data.products.length > 0) {
-        data.products.forEach((p) => {
-          text += `${p.name} – ${formatPrice(p.price?.toLocaleString())}/${
-            p.unit
-          }\n`;
-        });
+
+      if (Array.isArray(data.products) && data.products.length > 0) {
+        const productText = data.products
+          .map((p) => `+ ${p.name} – ${p.price}`)
+          .join("\n");
+
         setMessages((prev) => [
           ...prev,
-          {
-            id: Date.now() + 10,
-            text: text.trim(),
-            sender: "bot",
-          },
+          { id: crypto.randomUUID(), text: productText, sender: "bot" },
         ]);
       }
- 
+
       if (data.cta) {
         setMessages((prev) => [
           ...prev,
-          {
-            id: Date.now() + 99,
-            text: data.cta,
-            sender: "bot",
-          },
+          { id: crypto.randomUUID(), text: data.cta, sender: "bot" },
         ]);
       }
     } catch (err) {
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now() + 999,
-          text: "❌ Lỗi kết nối máy chủ, vui lòng thử lại.",
+          id: crypto.randomUUID(),
+          text: " Lỗi kết nối máy chủ, vui lòng thử lại.",
           sender: "bot",
         },
       ]);
-      console.log(err);
     } finally {
       setLoading(false);
     }
   };
- 
-  const formatPrice = (price) => {
-    if (!price) return "0";
-    return new Intl.NumberFormat("vi-VN").format(price);
-  };
+
   return (
     <>
       <button className="chat-toggle-btn" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? "✕" : "💬"}
       </button>
- 
+
       {isOpen && (
         <div className="chat-box">
           <div className="chat-header">
             <h3>Hỗ trợ AI</h3>
           </div>
- 
+
           <div className="chat-messages">
             {messages.map((msg) => (
               <div key={msg.id} className={`message ${msg.sender}`}>
                 <div className="message-bubble">{msg.text}</div>
               </div>
             ))}
- 
+
             {loading && (
               <div className="message bot">
                 <div className="message-bubble">Đang trả lời...</div>
               </div>
             )}
- 
+
             <div ref={messagesEndRef} />
           </div>
- 
+
           <form className="chat-input" onSubmit={handleSend}>
             <input
               type="text"
@@ -154,5 +130,5 @@ function ChatBox() {
     </>
   );
 }
- 
+
 export default ChatBox;
