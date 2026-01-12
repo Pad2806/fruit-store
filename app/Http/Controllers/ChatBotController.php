@@ -178,44 +178,95 @@ class ChatBotController extends Controller
         return $this->callGemini($prompt);
     }
 
-    private function callGemini($prompt)
-    {
-        try {
-            $apiKey = config('services.gemini.key');
+    // private function callGemini($prompt)
+    // {
+    //     try {
+    //         $apiKey = config('services.gemini.key');
 
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey;
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json'
-            ])->retry(3, 1000)->post($url, [
-                'contents' => [
-                    [
-                        'role' => 'user',
-                        'parts' => [['text' => $prompt]]
-                    ]
+    //         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey;
+    //         $response = Http::withHeaders([
+    //             'Content-Type' => 'application/json'
+    //         ])->retry(3, 1000)->post($url, [
+    //             'contents' => [
+    //                 [
+    //                     'role' => 'user',
+    //                     'parts' => [['text' => $prompt]]
+    //                 ]
+    //             ]
+    //         ]);
+    //         if ($response->failed()) {
+    //             Log::error('Gemini API Error: ' . $response->body());
+    //             return [];
+    //         }
+
+    //         $text = $response['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
+    //         $text = preg_replace('/^```json\s*|```$/m', '', $text);
+
+    //         return json_decode($text, true) ?? [];
+
+    //     } catch (\Exception $e) {
+    //         Log::error("Gemini Exception: " . $e->getMessage());
+    //         return [];
+    //     }
+    // }
+    private function callGemini(string $prompt): array
+{
+    try {
+        $apiKey = config('services.gemini.key');
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type'  => 'application/json',
+            'HTTP-Referer'  => config('app.url'),
+            'X-Title'       => 'Laravel App',
+        ])
+        ->retry(3, 1000)
+        ->post('https://openrouter.ai/api/v1/chat/completions', [
+            'model' => 'allenai/molmo-2-8b:free',
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'Bạn là AI trả lời JSON thuần, không markdown.'
+                ],
+                [
+                    'role' => 'user',
+                    'content' => $prompt
                 ]
+            ],
+            'temperature' => 0.2,
+            'max_tokens'  => 1024,
+        ]);
+
+        if ($response->failed()) {
+            Log::error('Molmo API Error', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
             ]);
-            if ($response->failed()) {
-                Log::error('Gemini API Error: ' . $response->body());
-                return [];
-            }
-
-            $text = $response['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
-            $text = preg_replace('/^```json\s*|```$/m', '', $text);
-
-            return json_decode($text, true) ?? [];
-
-        } catch (\Exception $e) {
-            Log::error("Gemini Exception: " . $e->getMessage());
             return [];
         }
+
+        $text = $response['choices'][0]['message']['content'] ?? '';
+
+        // Remove ```json ``` nếu model lỡ trả markdown
+        $text = preg_replace('/^```json\s*|```$/m', '', trim($text));
+
+        return json_decode($text, true) ?? [];
+
+    } catch (\Throwable $e) {
+        Log::error('Molmo Exception: ' . $e->getMessage());
+        return [];
     }
+}
 
     private function handleAddToCart(string $productName)
     {
         if(!Auth::check()) {
             return response()->json([
-                'message' => 'Bạn cần đăng nhập để thêm vào giỏ hàng ạ.'
-            ], 401);
+                'intro' => "Đã thêm {$product->name} vào giỏ hàng!",
+                'products' => [],
+                'cta' => "Bạn muốn thêm sản phẩm nào nữa không ạ?",
+]);
+
         }
 
         $product = Product::where('name', $productName)->first();

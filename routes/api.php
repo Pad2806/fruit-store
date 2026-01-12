@@ -47,12 +47,6 @@ Route::middleware([StartSession::class])->group(function () {
     Route::post('chatbot/reset', [ChatBotController::class, 'reset']);
 });
 
-Route::middleware([StartSession::class])->group(function () {
-    Route::post('chatbot', [ChatBotController::class, 'chat']);
-    Route::post('chatbot/reset', [ChatBotController::class, 'reset']);
-});
-
-
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users', [AuthController::class, 'getProfile']);
     Route::post('update-profile', [AuthController::class, 'updateProfile']);
