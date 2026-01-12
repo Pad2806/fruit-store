@@ -96,7 +96,7 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']]
     Route::group(['prefix' => 'carts'], function () {
         Route::post('', [CartController::class, 'store']);
         Route::delete('{cart}', [CartController::class, 'destroy']);
-        Route::get('{cart}', [CartController::class, 'show']);
+        Route::get('', [CartController::class, 'show']);
     });
 
     Route::group(['prefix' => 'cart-items'], function () {

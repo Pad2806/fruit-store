@@ -57,7 +57,7 @@ class ChatBotController extends Controller
                     'state' => self::STATE_IDLE,
                 ]);
                 return response()->json([
-                    'message' => 'Dạ vâng ạ 😊. Vậy bạn cần tư vấn thêm về sản phẩm nào khác không ạ?'
+                    'message' => 'Dạ vâng ạ. Vậy bạn cần tư vấn thêm về sản phẩm nào khác không ạ?'
                 ]);
             }
 
@@ -68,7 +68,7 @@ class ChatBotController extends Controller
 
         if (preg_match('/^(không|ko|thôi|thế thôi|đủ rồi|bye|tạm biệt|không cần)( ạ| nhé| đâu)?$/ui', $msgLower)) {
             return response()->json([
-                'intro' => 'Dạ vâng, cảm ơn bạn đã ghé thăm shop! 🥰',
+                'intro' => 'Dạ vâng, cảm ơn bạn đã ghé thăm shop!',
                 'products' => [],
                 'cta' => 'Khi nào thèm trái cây tươi ngon thì nhắn mình nhé!'
             ]);
@@ -262,10 +262,10 @@ class ChatBotController extends Controller
     {
         if(!Auth::check()) {
             return response()->json([
-                'intro' => "Đã thêm {$product->name} vào giỏ hàng!",
+                'intro' => "Vui lòng đăng nhập để thêm {$productName} vào giỏ hàng.",
                 'products' => [],
-                'cta' => "Bạn muốn thêm sản phẩm nào nữa không ạ?",
-]);
+                'cta' => "Bạn muốn đăng nhập hoặc tiếp tục xem sản phẩm khác?",
+            ], 401);
 
         }
 

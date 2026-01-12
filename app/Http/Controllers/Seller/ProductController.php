@@ -9,17 +9,42 @@ use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $products = Product::with(['category', 'origin'])->get();
+        $perPage = (int) $request->input('per_page', 5);
+        $search = $request->input('search', '');
+
+        $query = Product::with(['category', 'origin']);
+
+        // Search by name
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('short_desc', 'like', "%{$search}%");
+            });
+        }
+
+        // Order by created_at descending (newest first)
+        $query->orderBy('created_at', 'desc');
+
+        $products = $query->paginate($perPage);
 
         return response()->json([
             'success' => true,
             'message' => 'Products retrieved successfully',
             'data' => ProductResource::collection($products),
+            'pagination' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'from' => $products->firstItem(),
+                'to' => $products->lastItem(),
+            ]
         ]);
     }
 
@@ -40,14 +65,16 @@ class ProductController extends Controller
     {
         $validated = $request->validated();
 
-
+        // Generate unique UUID
         $uuid = $this->generateUniqueUuid();
 
+        // Handle image uploads
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
- 
+                // Generate unique filename
                 $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
+                // Store image in storage/app/public/products
                 $path = $image->storeAs('products', $filename, 'public');
                 $imagePaths[] = $path;
             }
@@ -65,10 +92,10 @@ class ProductController extends Controller
             'category_id' => $validated['category_id'],
             'unit' => $validated['unit'] ?? null,
             'status' => $validated['status'] ?? 'active',
-            'image' => json_encode($imagePaths),
+            'image' => json_encode($imagePaths), // Store as JSON
         ]);
 
-
+        // Load relationships for response
         $product->load(['category', 'origin']);
 
         return response()->json([
@@ -91,26 +118,27 @@ class ProductController extends Controller
 
         $validated = $request->validated();
 
-
+        // Handle image management
         $currentImages = $product->image ? json_decode($product->image, true) : [];
         
-
+        // Delete specific images if requested
         $deleteImages = $request->input('delete_images', []);
         if (!empty($deleteImages)) {
             foreach ($deleteImages as $imagePath) {
-        
+                // Find and remove from array
                 $key = array_search($imagePath, $currentImages);
-                if ($key !== false) {    
+                if ($key !== false) {
+                    // Delete file from storage
                     Storage::disk('public')->delete($imagePath);
-
+                    // Remove from array
                     unset($currentImages[$key]);
                 }
             }
-
+            // Re-index array
             $currentImages = array_values($currentImages);
         }
         
-
+        // Add new images if uploaded
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
@@ -119,11 +147,12 @@ class ProductController extends Controller
             }
         }
 
+        // Build update data
         $updateData = [
             'image' => json_encode($currentImages),
         ];
 
-
+        // Only update fields that are provided
         if (isset($validated['name'])) {
             $updateData['name'] = $validated['name'];
         }
@@ -202,4 +231,3 @@ class ProductController extends Controller
         return $uuid;
     }
 }
-

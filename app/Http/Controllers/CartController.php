@@ -1,17 +1,28 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Http\Requests\Cart\CreateRequest;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\CartResource;
 use App\Models\Cart;
 use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
-    function show(Cart $cart)
+    public function __construct()
     {
-        $cart = Cart::where('id', $cart->id)
+        $this->middleware('auth:sanctum');
+    }
+
+    public function show()
+    {
+        if(!Auth::check()){
+            return response([
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+ 
+ 
+        $cart = Cart::where('user_id', Auth::id())
         ->with('cartItems.product')
         ->withCount('cartItems')
         ->first();
@@ -20,20 +31,34 @@ class CartController extends Controller
         }
         return $cart;
     }
-
-    public function store(CreateRequest $request)
+ 
+    public function store()
     {
-        $data = $request->validated();
-        $data['id'] = (string) Str::uuid();
+        if(!Auth::check()){
+            return response()->json([
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+ 
+        $data = [
+            'id' => (string) Str::uuid(),
+            'user_id'=> Auth::id()
+        ];
         $cart = Cart::create($data);
-
+ 
         return new CartResource($cart);
     }
 
     public function destroy(Cart $cart)
     {
-        $cart->delete();
-        return response()->json(['message' => 'Cart deleted successfully.'], 200);
-    }
+        if ($cart->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
 
+        $cart->delete();
+
+        return response()->json([
+            'message' => 'Cart deleted successfully'
+        ]);
+    }
 }
