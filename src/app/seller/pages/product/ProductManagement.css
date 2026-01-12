@@ -1,0 +1,728 @@
+/* Product Management Styles */
+.product-management {
+    padding: 0;
+}
+
+.product-management .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.product-management .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--surface-2, #f8f9fa);
+    padding: 12px 20px;
+    border-radius: 25px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 500px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.product-management .search-box:focus-within {
+    border-color: var(--primary, #f47c4b);
+    background: var(--surface, #ffffff);
+    box-shadow: 0 0 0 3px rgba(244, 124, 75, 0.15);
+}
+
+.product-management .search-box svg {
+    color: #999;
+    margin-right: 10px;
+}
+
+.product-management .search-box input {
+    border: none;
+    background: none;
+    flex: 1;
+    font-size: 15px;
+    outline: none;
+}
+
+.product-management .btn-create {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--primary, #f47c4b);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(244, 124, 75, 0.35);
+}
+
+.product-management .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(244, 124, 75, 0.45);
+}
+
+/* Table Styles */
+.product-management .product-table {
+    overflow-x: auto;
+}
+
+.product-management table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface, #ffffff);
+}
+
+.product-management thead {
+    background: var(--primary, #f47c4b);
+}
+
+.product-management thead th {
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.product-management tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.product-management tbody tr:hover {
+    background: #fff8f0;
+}
+
+.product-management tbody td {
+    padding: 14px 12px;
+    font-size: 14px;
+    color: var(--text, #333);
+    vertical-align: middle;
+}
+
+.product-management .table-status {
+    text-align: center;
+    padding: 2rem !important;
+    color: var(--muted, #666);
+    font-weight: 500;
+}
+
+.product-management .product-stt {
+    font-weight: 700;
+    color: var(--primary, #f47c4b);
+    font-size: 14px;
+    text-align: center;
+    width: 50px;
+}
+
+.product-management .product-image {
+    width: 60px;
+}
+
+.product-management .product-image img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.product-management .no-image {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    border-radius: 8px;
+    font-size: 10px;
+    color: #999;
+}
+
+.product-management .product-name {
+    font-weight: 600;
+    color: var(--text, #333);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-management .product-price {
+    font-weight: 700;
+    color: #27ae60;
+}
+
+.product-management .product-stock {
+    color: var(--muted, #666);
+}
+
+.product-management .product-category,
+.product-management .product-origin {
+    color: var(--muted, #666);
+    font-size: 13px;
+}
+
+.product-management .product-status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.product-management .action-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.product-management .btn-view,
+.product-management .btn-edit,
+.product-management .btn-delete {
+    padding: 7px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-management .btn-view {
+    background: #17a2b8;
+    color: white;
+}
+
+.product-management .btn-view:hover {
+    background: #138496;
+    transform: scale(1.1);
+}
+
+.product-management .btn-edit {
+    background: var(--edit, #3498db);
+    color: white;
+}
+
+.product-management .btn-edit:hover {
+    background: var(--edit-hover, #2980b9);
+    transform: scale(1.1);
+}
+
+.product-management .btn-delete {
+    background: var(--danger, #e74c3c);
+    color: white;
+}
+
+.product-management .btn-delete:hover {
+    background: var(--danger-hover, #c0392b);
+    transform: scale(1.1);
+}
+
+/* Modal Styles */
+.product-management .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.product-management .modal-content {
+    background: var(--surface, #ffffff);
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.product-management .product-modal {
+    max-width: 800px;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.product-management .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px;
+    border-bottom: 2px solid #f0f0f0;
+    background: var(--primary, #f47c4b);
+    color: white;
+    border-radius: 15px 15px 0 0;
+}
+
+.product-management .modal-header h2 {
+    font-size: 1.4em;
+}
+
+.product-management .modal-header.delete {
+    background: var(--primary, #f47c4b);
+}
+
+.product-management .btn-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.product-management .btn-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.product-management .modal-body {
+    padding: 25px;
+}
+
+.product-management .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px 25px;
+    border-top: 2px solid #f0f0f0;
+    background: var(--surface-2, #f8f9fa);
+    border-radius: 0 0 15px 15px;
+}
+
+/* Form Styles */
+.product-management .form-error {
+    background: #fce4ec;
+    color: #c62828;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.product-management .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.product-management .form-row.single {
+    grid-template-columns: 1fr;
+}
+
+.product-management .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-management .form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text, #333);
+}
+
+.product-management .form-group input,
+.product-management .form-group select,
+.product-management .form-group textarea {
+    padding: 12px 14px;
+    border: 2px solid var(--border, #e0e0e0);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.product-management .form-group input:focus,
+.product-management .form-group select:focus,
+.product-management .form-group textarea:focus {
+    border-color: var(--primary, #f47c4b);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(244, 124, 75, 0.15);
+}
+
+.product-management .form-group input:disabled {
+    background: var(--surface-2, #f8f9fa);
+    color: var(--muted, #666);
+}
+
+.product-management .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Image Upload Styles */
+.product-management .existing-images,
+.product-management .new-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.product-management .image-preview {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.product-management .image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.product-management .remove-image {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    background: var(--danger, #e74c3c);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.product-management .remove-image:hover {
+    transform: scale(1.1);
+}
+
+.product-management .upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--surface-2, #f8f9fa);
+    border: 2px dashed var(--border, #e0e0e0);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--muted, #666);
+}
+
+.product-management .upload-btn:hover {
+    border-color: var(--primary, #f47c4b);
+    color: var(--primary, #f47c4b);
+}
+
+/* Product Detail Styles */
+.product-management .product-detail {
+    background: var(--surface-2, #f8f9fa);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.product-management .detail-images {
+    margin-bottom: 20px;
+}
+
+.product-management .images-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.product-management .images-grid img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+.product-management .no-images {
+    text-align: center;
+    padding: 30px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    color: var(--muted, #666);
+}
+
+.product-management .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border, #e0e0e0);
+}
+
+.product-management .detail-row:last-child {
+    border-bottom: none;
+}
+
+.product-management .detail-row.full {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.product-management .detail-row .label {
+    font-weight: 600;
+    color: var(--muted, #666);
+    white-space: nowrap;
+}
+
+.product-management .detail-row .value {
+    color: var(--text, #333);
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.product-management .detail-row.full .value {
+    text-align: left;
+    margin-top: 8px;
+}
+
+.product-management .detail-row .value.highlight {
+    color: #27ae60;
+    font-size: 1.1em;
+}
+
+/* Button Styles */
+.product-management .btn-cancel,
+.product-management .btn-save,
+.product-management .btn-delete-confirm {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.product-management .btn-cancel {
+    background: #e0e0e0;
+    color: #555;
+}
+
+.product-management .btn-cancel:hover {
+    background: #d0d0d0;
+}
+
+.product-management .btn-save {
+    background: var(--primary, #f47c4b);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(244, 124, 75, 0.35);
+}
+
+.product-management .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(244, 124, 75, 0.45);
+}
+
+.product-management .btn-delete-confirm {
+    background: var(--primary, #f47c4b);
+    color: white;
+}
+
+.product-management .btn-delete-confirm:hover {
+    background: var(--primary-hover, #e96f3f);
+}
+
+/* Delete Modal Styles */
+.product-management .delete-modal {
+    max-width: 420px;
+}
+
+.product-management .delete-subtitle {
+    margin-top: 8px;
+    color: #555;
+    font-size: 14px;
+}
+
+.product-management .delete-warning {
+    margin-top: 10px;
+    color: var(--danger-hover, #c0392b);
+    font-size: 14px;
+}
+
+/* Pagination Styles */
+.product-management .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 15px 0;
+    border-top: 1px solid var(--border, #e0e0e0);
+}
+
+.product-management .pagination-info {
+    color: var(--muted, #666);
+    font-size: 14px;
+}
+
+.product-management .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.product-management .pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border, #e0e0e0);
+    background: var(--surface, #ffffff);
+    color: var(--text, #333);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.product-management .pagination-btn:hover:not(:disabled) {
+    background: var(--primary, #f47c4b);
+    color: white;
+    border-color: var(--primary, #f47c4b);
+}
+
+.product-management .pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.product-management .pagination-btn.active {
+    background: var(--primary, #f47c4b);
+    color: white;
+    border-color: var(--primary, #f47c4b);
+}
+
+.product-management .pagination-ellipsis {
+    padding: 0 8px;
+    color: var(--muted, #666);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .product-management .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .product-management .search-box {
+        max-width: 100%;
+    }
+
+    .product-management .btn-create {
+        justify-content: center;
+    }
+
+    .product-management table {
+        min-width: 900px;
+    }
+
+    .product-management .modal-content {
+        width: 95%;
+    }
+
+    .product-management .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .product-management .pagination {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-management .action-buttons {
+        flex-direction: column;
+    }
+
+    .product-management .pagination-info {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .product-management .pagination-btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+}
+
+/* Loading Spinner */
+.product-management .loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Disabled button styles */
+.product-management .btn-save:disabled,
+.product-management .btn-delete-confirm:disabled,
+.product-management .btn-cancel:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
