@@ -1,0 +1,300 @@
+$primary: #f36f40;
+:global(main) {
+  background: #fff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mainContent {
+  display: flex;
+  gap: 30px;
+}
+
+.leftCol {
+  flex: 2;
+}
+
+.title {
+  color: $primary;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.subTitle {
+  margin-bottom: 25px;
+  font-size: 15px;
+  color: #666;
+}
+
+.readableText {
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  color: #666;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.readableNote {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  background: #fff9f6;
+  padding: 10px;
+  border-left: 3px solid $primary;
+}
+
+.itemCard {
+  display: flex;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 15px;
+  gap: 20px;
+  align-items: center;
+}
+
+.imgWrapper {
+  position: relative;
+}
+
+.imgWrapper img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.badgeRemove {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  background: #bbb;
+  color: #fff;
+  border: none;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.itemDetails {
+  flex: 1;
+}
+
+.itemDetails h3 {
+  font-size: 17px;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.price {
+  font-size: 14px;
+  font-weight: 500;
+  color: $primary;
+}
+
+.rightInfo {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.itemTotal {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.quantityGroup {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.quantityGroup button {
+  padding: 5px 12px;
+  background: #f9f9f9;
+  border: none;
+  cursor: pointer;
+}
+
+.quantityGroup button:hover {
+  background: #eee;
+}
+
+.quantityGroup input {
+  width: 45px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-size: 14px;
+  color: #000;
+  outline: none;
+}
+
+.noteSection {
+  margin-top: 30px;
+}
+
+.noteSection h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.noteSection textarea {
+  width: 100%;
+  height: 120px;
+  margin-top: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  outline: none;
+  font-family: inherit;
+}
+
+.noteSection textarea:focus {
+  border-color: $primary;
+}
+
+.rightCol {
+  flex: 1;
+}
+
+.infoBox {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.infoBox h3 {
+  color: $primary;
+  font-size: 20px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #f5f5f5;
+  padding-bottom: 15px;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.radioGroup label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+
+.confirmedDisplay {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: #fff4f0;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.clockIcon {
+  color: $primary;
+}
+
+.selectGroup {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.selectGroup select {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.confirmTimeBtn {
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid $primary;
+  color: $primary;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.confirmTimeBtn:hover {
+  background: $primary;
+  color: #fff;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0;
+  padding-top: 20px;
+  border-top: 1px dotted #ddd;
+}
+
+.finalPrice {
+  color: $primary;
+  font-weight: 800;
+  font-size: 26px;
+}
+
+.checkoutBtn {
+  width: 100%;
+  padding: 16px;
+  background: $primary;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 17px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(243, 111, 64, 0.25);
+}
+
+.checkoutBtn:hover {
+  opacity: 0.95;
+}
+
+.policyBox {
+  margin-top: 30px;
+  background: #f0f9ff;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: #444;
+}
+
+.policyBox p {
+  margin-bottom: 5px;
+}

@@ -1,0 +1,388 @@
+@use "sass:color";
+
+$primary: #f36f40;
+$error: #d93025;
+$blue: #1890ff;
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+.wrapper {
+  display: flex;
+  width: 100%;
+  max-width: 1100px;
+  border: 2px solid $primary;
+  border-radius: 15px;
+  padding: 40px;
+  background-color: #fff;
+}
+
+.left {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  h1 {
+    color: #333;
+    margin: 0;
+    font-size: 32px;
+  }
+  p {
+    color: $primary;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+}
+
+.banner {
+  margin-top: auto;
+  img {
+    max-width: 400px;
+    display: block;
+    border-radius: 10px;
+  }
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background: #fff;
+  width: 100%;
+  max-width: 420px;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  h2 {
+    color: #000000;
+    font-weight: bold;
+    margin: 0 auto;
+    font-size: 18px;
+    padding-bottom: 20px;
+  }
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 25px;
+  button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #888;
+    font-size: 13px;
+    outline: none !important;
+    &.active {
+      color: $primary;
+      border-bottom: 2px solid $primary;
+    }
+  }
+}
+
+.form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup {
+  margin-bottom: 18px;
+  label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 600;
+    span {
+      color: $error;
+    }
+  }
+  .inputWrapper {
+    position: relative;
+    width: 100%;
+    .iconLeft {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      display: flex;
+      align-items: center;
+    }
+    input {
+      width: 100%;
+      padding: 12px 40px 12px 38px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      background-color: #ffffff;
+      color: #000000 !important;
+      outline: none !important;
+      transition: all 0.2s;
+      &::placeholder {
+        color: #bbb;
+      }
+      &:focus {
+        border-color: $blue;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+      }
+      &.errorInput {
+        border-color: $error;
+      }
+    }
+    .toggleIcon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #999;
+      background: none;
+      border: none;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.errorMsg {
+  color: $error;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.mainBtn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(to right, #f38258, $primary);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  outline: none !important;
+}
+
+.forgotPass {
+  display: block;
+  text-align: right;
+  margin: 10px 0;
+  color: $primary;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  margin-top: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  outline: none !important;
+  img {
+    width: 20px;
+    height: 20px;
+  }
+  span {
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  width: 95%;
+  max-width: 480px;
+  border-radius: 16px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+    font-weight: 700;
+  }
+  .close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #999;
+  }
+}
+
+.stepsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  padding: 0 10px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #bfbfbf;
+  font-size: 14px;
+  .stepNum {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #999;
+  }
+  &.active {
+    color: #333;
+    .stepNum {
+      background: $blue;
+      color: white;
+    }
+  }
+}
+
+.stepLine {
+  flex: 1;
+  height: 1px;
+  background: #f0f0f0;
+  margin: 0 10px;
+}
+
+.modalBody {
+  .infoText {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    strong {
+      color: $primary;
+    }
+  }
+}
+
+.otpInputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  .resendBtn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: $blue;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+    &:disabled {
+      color: #bfbfbf;
+      text-decoration: none;
+      cursor: not-allowed;
+    }
+  }
+  .timer {
+    font-size: 13px;
+    color: #999;
+  }
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 35px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+  .btnCancel {
+    padding: 10px 24px;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    background: #fff;
+    cursor: pointer;
+    color: #666;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    &:hover {
+      background: #f5f5f5;
+    }
+  }
+  .btnSubmit {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 25px;
+    background: $primary;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(243, 111, 64, 0.2);
+    &:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+  }
+}

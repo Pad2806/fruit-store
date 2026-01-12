@@ -1,0 +1,405 @@
+$primary: #f36f40;
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #fff;
+}
+
+.checkoutWrapper {
+  display: flex;
+  gap: 50px;
+}
+
+.leftCol {
+  flex: 1.5;
+}
+
+.brandTitle {
+  font-size: 22px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 30px;
+
+  a {
+    color: #2a9d8f;
+    text-decoration: none;
+  }
+
+  .separator {
+    color: #ccc;
+  }
+
+  .activeStep {
+    color: #333;
+    font-weight: 500;
+  }
+}
+
+.section {
+  margin-bottom: 40px;
+
+  h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+
+  .loginText {
+    font-size: 14px;
+    color: #666;
+
+    a {
+      color: #2a9d8f;
+    }
+  }
+}
+
+.formArea {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formGroup {
+  input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+
+    &:focus {
+      border-color: $primary;
+      outline: none;
+    }
+  }
+}
+
+.inputGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.shippingBox {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+
+  input {
+    accent-color: $primary;
+  }
+}
+
+.paymentContainer {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #d9d9d9;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  input {
+    margin-right: 15px;
+    accent-color: $primary;
+  }
+
+  .methodName {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  .methodIcon {
+    color: #666;
+  }
+}
+
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+
+  .returnCart {
+    color: #2a9d8f;
+    text-decoration: none;
+    font-size: 14px;
+  }
+}
+
+.submitOrderBtn {
+  background: $primary;
+  color: #fff;
+  border: none;
+  padding: 16px 25px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.rightCol {
+  flex: 1;
+  background: #fafafa;
+  padding: 30px;
+  border-radius: 8px;
+  height: fit-content;
+}
+
+.productCard {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.imgContainer {
+  position: relative;
+
+  img {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+
+  .qtyBadge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: rgba(153, 153, 153, 0.9);
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+  }
+}
+
+.productMeta {
+  flex: 1;
+
+  .name {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .unit {
+    font-size: 12px;
+    color: #888;
+  }
+}
+
+.price {
+  font-size: 14px;
+  color: #444;
+}
+
+.priceBreakdown {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  margin-top: 20px;
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #666;
+  }
+}
+
+.grandTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+
+  .totalLabel {
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .totalAmount {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modalContent {
+  background: #fff;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 12px;
+  padding: 30px;
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #999;
+}
+
+.modalHeader {
+  text-align: center;
+  margin-bottom: 25px;
+
+  h3 {
+    margin-top: 10px;
+    font-size: 20px;
+  }
+}
+
+.modalBody {
+  .infoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fdfaf9;
+    border-radius: 8px;
+  }
+
+  .infoGroup,
+  .infoGroupFull {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 12px;
+      color: #888;
+    }
+
+    span {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+
+  .infoGroupFull {
+    grid-column: span 2;
+  }
+
+  .orderTable {
+    margin-bottom: 20px;
+
+    .tableHeader,
+    .tableRow {
+      display: grid;
+      grid-template-columns: 2fr 1fr 0.8fr 1.5fr;
+      padding: 10px 0;
+      font-size: 14px;
+    }
+
+    .tableHeader {
+      font-weight: bold;
+      border-bottom: 2px solid #eee;
+    }
+
+    .tableRow {
+      border-bottom: 1px solid #f5f5f5;
+    }
+  }
+}
+
+.modalSummary {
+  text-align: right;
+
+  p {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .modalTotal {
+    color: $primary;
+    font-size: 18px;
+    margin-top: 10px;
+  }
+}
+
+.modalFooter {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+
+  button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .cancelBtn {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #666;
+  }
+
+  .confirmBtn {
+    background: $primary;
+    border: none;
+    color: #fff;
+  }
+}
