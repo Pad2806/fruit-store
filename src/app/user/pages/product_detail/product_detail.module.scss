@@ -1,0 +1,284 @@
+.productDetail {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.productDetailImage {
+  display: flex;
+  flex-direction: column;
+
+  img {
+    width: 100%;
+    border-radius: 12px;
+    background: #f7f7f7;
+    object-fit: cover;
+  }
+}
+
+.thumbList {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.thumbList img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #f7f7f7;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.thumbList img:hover {
+  border-color: #f47c4b;
+  transform: translateY(-2px);
+}
+
+.activeThumb {
+  border-color: #f47c4b;
+  box-shadow: 0 0 0 3px rgba(244, 123, 75, 0.685);
+}
+
+.imageWrapper {
+  position: relative;
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #f47c4b;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.navBtn:hover {
+  background: #f47c4b;
+  color: #fff;
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+.productDetailInfo {
+  .title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+}
+
+.meta {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.status {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f47c4b;
+  margin-bottom: 20px;
+}
+
+.quantity {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+
+  button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #f7f7f7;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  span {
+    width: 50px;
+    text-align: center;
+    font-weight: 600;
+  }
+}
+
+.addCart {
+  width: 100%;
+  padding: 14px;
+  background: #f47c4b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: #ee6f3e;
+  }
+}
+
+.quantityRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.unit {
+  font-size: 19px;
+  color: #666;
+  font-weight: 500;
+}
+
+.shortDesc {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.shortDescBox {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: #fff3ec;
+  border-left: 4px solid #f47c4b;
+  border-radius: 6px;
+}
+
+.shortDescTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f47c4b;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.shortDesc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.productExtra {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.productDesc {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #eee;
+
+  h3 {
+    margin-bottom: 12px;
+    font-size: 20px;
+    color: #333;
+  }
+
+  p {
+    color: #555;
+    line-height: 1.7;
+    font-size: 14px;
+  }
+}
+
+.deliveryBox {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #eee;
+
+  h3 {
+    margin-bottom: 12px;
+    font-size: 18px;
+    color: #f47c4b;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: #444;
+    font-size: 14px;
+
+    svg {
+      color: #f47c4b;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.relatedProducts {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 16px;
+  font-family: "Montserrat", sans-serif;
+
+  h2 {
+    text-align: center;
+    color: #f47c4b;
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 700;
+  }
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .productDetail {
+    grid-template-columns: 1fr;
+  }
+
+  .productExtra {
+    grid-template-columns: 1fr;
+  }
+}

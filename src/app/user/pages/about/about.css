@@ -1,0 +1,109 @@
+.about-page {
+  font-family: 'Montserrat', sans-serif;
+  background: #fff;
+}
+
+.about-hero {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.about-hero h1 {
+  font-size: 34px;
+  font-weight: 800;
+  color: #f47c4b;
+  margin-bottom: 16px;
+}
+
+.about-hero p {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.about-section {
+  max-width: 1100px;
+  margin: auto;
+  padding: 40px 16px;
+}
+
+.about-section h2 {
+  font-size: 26px;
+  color: #f47c4b;
+  margin-bottom: 20px;
+}
+
+.about-section p {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+
+.about-section.highlight {
+  background: #fff6f0;
+  padding: 50px 0;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.about-grid h3 {
+  color: #222;
+  margin-bottom: 10px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.about-grid p,
+.about-grid li {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+  margin-left: 50px;
+}
+
+.about-grid ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.about-grid li {
+  margin-bottom: 6px;
+}
+
+.about-commit {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.about-commit div {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-commit {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .about-commit {
+    grid-template-columns: 1fr;
+  }
+}

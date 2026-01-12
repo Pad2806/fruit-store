@@ -1,0 +1,285 @@
+
+$page-bg: #fef5e7;
+$accent: #ff7f50;
+
+.page {
+  min-height: 100%;
+  background: $page-bg;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.breadcrumb {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.active {
+  color: $accent;
+  font-weight: 600;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.section {
+  background: white;
+  padding: 50px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.pageTitle {
+  color: $accent;
+  font-size: 36px;
+  margin-bottom: 40px;
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 3px solid $accent;
+}
+
+.card {
+  margin-bottom: 40px;
+  padding: 30px;
+  background: #fefefe;
+  border-left: 4px solid $accent;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #fff5f0;
+    transform: translateX(5px);
+    box-shadow: 0 2px 15px rgba(255, 127, 80, 0.1);
+  }
+
+  p {
+    color: #555;
+    line-height: 1.8;
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+
+  strong {
+    color: $accent;
+  }
+}
+
+.h2 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.h3 {
+  color: #555;
+  font-size: 18px;
+  margin: 20px 0 15px;
+  font-weight: 600;
+}
+
+.h3Accent {
+  color: $accent;
+  font-size: 18px;
+  margin: 15px 0 10px;
+}
+
+.ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 15px 0;
+
+  li {
+    color: #555;
+    line-height: 2;
+    font-size: 16px;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 10px;
+
+    &::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: $accent;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  }
+}
+
+/* Table */
+.table {
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid #e0e0e0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:not(.tableHeader):hover {
+    background: #fff5f0;
+  }
+}
+
+.tableHeader {
+  background: $accent;
+  color: white;
+  font-weight: 600;
+}
+
+.cell {
+  color: black;
+  padding: 15px;
+  text-align: center;
+  background: white;
+}
+
+.free {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* Grid (quality cards) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+  margin-top: 25px;
+}
+
+.gridCard {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid #f0f0f0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $accent;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255, 127, 80, 0.15);
+  }
+
+  p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+.icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+/* Contact */
+.contact {
+  margin-top: 20px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+
+  strong {
+    min-width: 150px;
+    color: $accent;
+  }
+
+  span {
+    color: #555;
+  }
+}
+
+/* Highlight */
+.highlight {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 15px 20px;
+  margin: 20px 0;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section {
+    padding: 30px 20px;
+  }
+
+  .pageTitle {
+    font-size: 28px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .h2 {
+    font-size: 20px;
+  }
+
+  .h3 {
+    font-size: 16px;
+  }
+
+  .card p,
+  .ul li {
+    font-size: 14px;
+  }
+
+  .tableRow {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 20px 15px;
+  }
+
+  .pageTitle {
+    font-size: 24px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .contactRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    strong {
+      min-width: auto;
+    }
+  }
+}
