@@ -3,6 +3,46 @@ import { UserPlus, Edit2, Trash2, Search, X, Save, LogOut, Eye, EyeOff, ChevronL
 import './adminpanel.css';
 import { getUsers, createUser, updateUser, deleteUser } from '../services/userService';
 
+// Skeleton Row Component
+const SkeletonRow = () => (
+  <tr className="skeleton-row">
+    <td>
+      <div className="skeleton skeleton-text short"></div>
+    </td>
+    <td>
+      <div className="skeleton skeleton-text medium"></div>
+    </td>
+    <td>
+      <div className="skeleton skeleton-text long"></div>
+    </td>
+    <td>
+      <div className="skeleton skeleton-badge"></div>
+    </td>
+    <td>
+      <div className="skeleton-action-buttons">
+        <div className="skeleton skeleton-button"></div>
+        <div className="skeleton skeleton-button"></div>
+      </div>
+    </td>
+  </tr>
+);
+
+// Skeleton Pagination Component
+const SkeletonPagination = () => (
+  <div className="skeleton-pagination">
+    <div className="skeleton-pagination-info">
+      <div className="skeleton skeleton-select"></div>
+      <div className="skeleton skeleton-pagination-text"></div>
+    </div>
+    <div className="skeleton-pagination-buttons">
+      <div className="skeleton skeleton-page-btn"></div>
+      <div className="skeleton skeleton-page-btn"></div>
+      <div className="skeleton skeleton-page-btn"></div>
+      <div className="skeleton skeleton-page-btn"></div>
+    </div>
+  </div>
+);
+
 const AdminPanel = () => {
   const roles = [
     { value: 'seller', label: 'Chủ cửa hàng', color: '#f4e94bff' },
@@ -15,6 +55,7 @@ const AdminPanel = () => {
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Pagination State
   const [pagination, setPagination] = useState({
@@ -78,6 +119,7 @@ const AdminPanel = () => {
       console.error("Failed to fetch users", error);
     } finally {
       setLoading(false);
+      setIsInitialLoad(false);
     }
   };
 
@@ -348,125 +390,141 @@ const AdminPanel = () => {
           </button>
         </div>
 
-        <div className="users-table">
-          {loading ? (
-            <div className="loading-state">Đang tải dữ liệu...</div>
-          ) : (
-            <>
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Họ tên</th>
-                    <th>Email</th>
-                    <th>Vai trò</th>
-                    <th>Thao tác</th>
+        <div className={`users-table ${loading && !isInitialLoad ? 'table-loading-overlay' : ''}`}>
+          {/* Loading spinner for refresh */}
+          {loading && !isInitialLoad && (
+            <div className="loading-spinner-container">
+              <div className="loading-spinner"></div>
+              <span className="loading-text">Đang tải...</span>
+            </div>
+          )}
+
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {/* Initial Loading - Show Skeleton */}
+              {loading && isInitialLoad ? (
+                <>
+                  {[...Array(5)].map((_, index) => (
+                    <SkeletonRow key={`skeleton-${index}`} />
+                  ))}
+                </>
+              ) : filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr
+                    key={user.id}
+                    onClick={() => handleView(user)}
+                    style={{ cursor: 'pointer' }}
+                    title="Bấm để xem chi tiết"
+                  >
+                    <td className="col-id" title={user.id}>{String(user.id).substring(0, 8)}...</td>
+                    <td>{user.name}</td>
+                    <td title={user.email}>{user.email}</td>
+                    <td>
+                      <span className="role-badge" style={{ backgroundColor: getRoleColor(user.role) }}>
+                        {getRoleLabel(user.role)}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          className="btn-edit"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(user);
+                          }}
+                          aria-label="Edit"
+                          title="Sửa"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          className="btn-delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(user);
+                          }}
+                          aria-label="Delete"
+                          title="Xoá"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user) => (
-                      <tr
-                        key={user.id}
-                        onClick={() => handleView(user)}
-                        style={{ cursor: 'pointer' }}
-                        title="Bấm để xem chi tiết"
-                      >
-                        <td className="col-id" title={user.id}>{String(user.id).substring(0, 8)}...</td>
-                        <td>{user.name}</td>
-                        <td title={user.email}>{user.email}</td>
-                        <td>
-                          <span className="role-badge" style={{ backgroundColor: getRoleColor(user.role) }}>
-                            {getRoleLabel(user.role)}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="action-buttons">
-                            <button
-                              className="btn-edit"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEdit(user);
-                              }}
-                              aria-label="Edit"
-                              title="Sửa"
-                            >
-                              <Edit2 size={16} />
-                            </button>
-                            <button
-                              className="btn-delete"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteClick(user);
-                              }}
-                              aria-label="Delete"
-                              title="Xoá"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>
-                        Không tìm thấy người dùng nào.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-
-              {pagination.last_page >= 1 && (
-                <div className="pagination-controls">
-                  <div className="pagination-info">
-                    <select
-                      value={pagination.per_page}
-                      onChange={handlePageSizeChange}
-                      className="page-size-select"
-                      title="Số dòng trên mỗi trang"
-                    >
-                      <option value="5">5 dòng/trang</option>
-                      <option value="10">10 dòng/trang</option>
-                      <option value="20">20 dòng/trang</option>
-                      <option value="50">50 dòng/trang</option>
-                    </select>
-                    <span style={{ marginLeft: '10px' }}>
-                      Hiển thị {users.length} trên tổng số {pagination.total} người dùng
-                    </span>
-                  </div>
-                  <div className="pagination-buttons">
-                    <button
-                      className="btn-page"
-                      onClick={() => handlePageChange(pagination.current_page - 1)}
-                      disabled={pagination.current_page === 1}
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-
-                    {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map(page => (
-                      <button
-                        key={page}
-                        className={`btn-page ${page === pagination.current_page ? 'active' : ''}`}
-                        onClick={() => handlePageChange(page)}
-                      >
-                        {page}
-                      </button>
-                    ))}
-
-                    <button
-                      className="btn-page"
-                      onClick={() => handlePageChange(pagination.current_page + 1)}
-                      disabled={pagination.current_page === pagination.last_page}
-                    >
-                      <ChevronRight size={16} />
-                    </button>
-                  </div>
-                </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>
+                    Không tìm thấy người dùng nào.
+                  </td>
+                </tr>
               )}
-            </>
+            </tbody>
+          </table>
+
+          {/* Pagination - Show Skeleton when initial loading */}
+          {loading && isInitialLoad ? (
+            <SkeletonPagination />
+          ) : (
+            pagination.last_page >= 1 && (
+              <div className="pagination-controls">
+                <div className="pagination-info">
+                  <select
+                    value={pagination.per_page}
+                    onChange={handlePageSizeChange}
+                    className="page-size-select"
+                    title="Số dòng trên mỗi trang"
+                    disabled={loading}
+                  >
+                    <option value="5">5 dòng/trang</option>
+                    <option value="10">10 dòng/trang</option>
+                    <option value="20">20 dòng/trang</option>
+                    <option value="50">50 dòng/trang</option>
+                  </select>
+                  <span style={{ marginLeft: '10px' }}>
+                    Hiển thị {users.length} trên tổng số {pagination.total} người dùng
+                  </span>
+                </div>
+                <div className="pagination-buttons">
+                  <button
+                    className="btn-page"
+                    onClick={() => handlePageChange(pagination.current_page - 1)}
+                    disabled={pagination.current_page === 1 || loading}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      className={`btn-page ${page === pagination.current_page ? 'active' : ''}`}
+                      onClick={() => handlePageChange(page)}
+                      disabled={loading}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    className="btn-page"
+                    onClick={() => handlePageChange(pagination.current_page + 1)}
+                    disabled={pagination.current_page === pagination.last_page || loading}
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )
           )}
         </div>
       </div>
