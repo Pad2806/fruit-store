@@ -38,7 +38,7 @@ function ChatBox() {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: "Bearer 19|CWhxy9RCDu255HBfARE6YNQTnjfdL89pWULng90G",
+          Authorization: localStorage.getItem("access_token") ? `Bearer ${localStorage.getItem("access_token")}` : "",
         },
         credentials: "include",
         body: JSON.stringify({ message: userText }),

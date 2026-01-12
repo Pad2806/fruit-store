@@ -1,4 +1,4 @@
-import api from "../../../axios";
+import api from "../../../services/axios";
 
 export const getUsers = async (params) => {
     const response = await api.get("/admin/users", { params });

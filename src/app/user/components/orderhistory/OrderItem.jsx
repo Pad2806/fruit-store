@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import styles from "./OrderHistory.module.scss";
-import api from "../../../../axios";
+import api from "../../../../services/axios";
 import { message, Modal } from "antd";
 
 export default function OrderItem({ order, onRefresh }) {

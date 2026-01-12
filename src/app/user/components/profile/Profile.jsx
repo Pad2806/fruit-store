@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./Profile.module.scss";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../../../axios";
+import api from "../../../../services/axios";
 import { message } from "antd";
 
 export default function Profile() {

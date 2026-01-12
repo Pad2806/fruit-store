@@ -18,6 +18,7 @@ import PurchasePolicy from "../pages/policies/purchase_policy";
 import PaymentPolicy from "../pages/policies/payment_policy";
 import GoogleCallback from "../pages/GoogleCallback";
 import PaymentVisa from "../pages/payment_visa/payment_visa";
+import RequireRole from "../../shared/components/RequireRole";
 
 
 const userRoutes = [
@@ -30,19 +31,19 @@ const userRoutes = [
       { path: "/about", element: <About /> },
       { path: "/contact", element: <Contact /> }, 
       {path: "/login", element: <Login />},
-      {path: "/cart", element: <Cart />},
-      {path: "/checkouts", element: <Checkout />},
-      {path: "/user", element: <User />},
+      {path: "/cart", element: <RequireRole allowedRoles="user"><Cart /></RequireRole>},
+      {path: "/checkouts", element: <RequireRole allowedRoles="user"><Checkout /></RequireRole>},
+      {path: "/user", element: <RequireRole allowedRoles="user"><User /></RequireRole>},
      
       { path: "/policy", element: <PrivacyPolicy /> },
       {path: "/guide", element: <OnlineShoppingGuide />},
-      {path: "/order-success", element: <OrderSuccess />},
+      {path: "/order-success", element: <RequireRole allowedRoles="user"><OrderSuccess /></RequireRole>},
       { path: "/policy-warranty", element: <WarrantyPolicy /> },
       { path: "/policy-inspection", element: <InspectionPolicy /> },
       { path: "/purchase-policy", element: <PurchasePolicy /> },
       { path: "/payment-policy", element: <PaymentPolicy /> },
       { path: "/google-callback", element: <GoogleCallback /> },
-      { path: "/payment-visa", element: <PaymentVisa /> }
+      { path: "/payment-visa", element: <RequireRole allowedRoles="user"><PaymentVisa /></RequireRole> }
     ],
   },
 ];

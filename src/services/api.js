@@ -4,26 +4,30 @@ const API_BASE_URL = 'http://localhost:8000/api';
  * Generic fetch wrapper for API calls
  */
 async function request(endpoint, options = {}) {
+  const token = localStorage.getItem("access_token");
+
   const url = `${API_BASE_URL}${endpoint}`;
   
   const config = {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
     ...options,
   };
 
   const response = await fetch(url, config);
-  
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    throw new Error(error.message || 'Unauthenticated');
   }
-  
+
   return response.json();
 }
+
 
 // Category APIs
 export const categoryApi = {
@@ -34,17 +38,17 @@ export const categoryApi = {
     if (params.search) queryParams.append('search', params.search);
     
     const queryString = queryParams.toString();
-    return request(`/categories${queryString ? `?${queryString}` : ''}`);
+    return request(`/seller/categories${queryString ? `?${queryString}` : ''}`);
   },
-  create: (data) => request('/categories', {
+  create: (data) => request('/seller/categories', {
     method: 'POST',
     body: JSON.stringify(data),
   }),
-  update: (id, data) => request(`/categories/${id}`, {
+  update: (id, data) => request(`/seller/categories/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   }),
-  delete: (id) => request(`/categories/${id}`, {
+  delete: (id) => request(`/seller/categories/${id}`, {
     method: 'DELETE',
   }),
 };
@@ -58,17 +62,17 @@ export const originApi = {
     if (params.search) queryParams.append('search', params.search);
     
     const queryString = queryParams.toString();
-    return request(`/origins${queryString ? `?${queryString}` : ''}`);
+    return request(`/seller/origins${queryString ? `?${queryString}` : ''}`);
   },
-  create: (data) => request('/origins', {
+  create: (data) => request('/seller/origins', {
     method: 'POST',
     body: JSON.stringify(data),
   }),
-  update: (id, data) => request(`/origins/${id}`, {
+  update: (id, data) => request(`/seller/origins/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   }),
-  delete: (id) => request(`/origins/${id}`, {
+  delete: (id) => request(`/seller/origins/${id}`, {
     method: 'DELETE',
   }),
 };
@@ -82,18 +86,18 @@ export const productApi = {
     if (params.search) queryParams.append('search', params.search);
     
     const queryString = queryParams.toString();
-    return request(`/products${queryString ? `?${queryString}` : ''}`);
+    return request(`/seller/products${queryString ? `?${queryString}` : ''}`);
   },
-  getByCategory: (categoryId) => request(`/products/category/${categoryId}`),
-  create: (formData) => fetch(`${API_BASE_URL}/products`, {
+  getByCategory: (categoryId) => request(`/seller/products/category/${categoryId}`),
+  create: (formData) => fetch(`${API_BASE_URL}/seller/products`, {
     method: 'POST',
     body: formData,
   }).then((res) => res.json()),
-  update: (id, formData) => fetch(`${API_BASE_URL}/products/${id}`, {
+  update: (id, formData) => fetch(`${API_BASE_URL}/seller/products/${id}`, {
     method: 'POST',
     body: formData,
   }).then((res) => res.json()),
-  delete: (id) => request(`/products/${id}`, {
+  delete: (id) => request(`/seller/products/${id}`, {
     method: 'DELETE',
   }),
 };
@@ -107,10 +111,10 @@ export const orderApi = {
     if (params.search) queryParams.append('search', params.search);
     
     const queryString = queryParams.toString();
-    return request(`/orders${queryString ? `?${queryString}` : ''}`);
+    return request(`/seller/orders${queryString ? `?${queryString}` : ''}`);
   },
-  getById: (id) => request(`/orders/${id}`),
-  updateStatus: (id, status) => request(`/orders/${id}/status`, {
+  getById: (id) => request(`/seller/orders/${id}`),
+  updateStatus: (id, status) => request(`/seller/orders/${id}/status`, {
     method: 'PATCH',
     body: JSON.stringify({ status }),
   }),

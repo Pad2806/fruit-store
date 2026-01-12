@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./OrderHistory.module.scss";
 import OrderItem from "./OrderItem";
-import api from "../../../../axios";
+import api from "../../../../services/axios";
 import { message } from "antd";
 
 export default function OrderHistory() {

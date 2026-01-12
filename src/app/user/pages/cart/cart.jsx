@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import styles from "./cart.module.scss";
 import { FaClock } from "react-icons/fa";
 import { getCartDetails } from "../../../../api/cart";
+import { createCart } from "../../../../api/cart";
+import { useAuth } from "../../context/AuthContext";
 import { updateItemQuantity, removeCartItem } from "../../../../api/cart_items";
 import { ToastService } from "../../components/toast/Toast";
 
@@ -10,11 +12,32 @@ export default function Cart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const cartId = "327c4288-8b80-45ac-9027-392acf36b7fd";
+
+  const { user } = useAuth();
 
   const fetchCartData = async () => {
+    if (!user) {
+      setCartItems([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
+      let cartId = localStorage.getItem("cart_id");
+      if (!cartId) {
+        // create cart for user if not exists
+        const cartResp = await createCart(user.id);
+        cartId = cartResp.id || cartResp.data?.id;
+        if (cartId) localStorage.setItem("cart_id", cartId);
+      }
+
+      if (!cartId) {
+        ToastService.error("Không tìm thấy giỏ hàng");
+        setCartItems([]);
+        return;
+      }
+
       const data = await getCartDetails(cartId);
       setCartItems(data.cart_items || []);
     } catch (error) {
@@ -58,21 +81,21 @@ export default function Cart() {
       }
     );
   };
-  const userId = "e2a0e0e5-b8a0-4f43-9798-269557bb75ca";
+  const userId = user?.id || null;
   const handleCheckout = () => {
   if (cartItems.length === 0) {
     ToastService.error("Giỏ hàng trống");
     return;
   }
 
-  navigate("/checkouts", {
-    state: {
-      cartItems,
-      totalPrice,
-      deliveryTime: isConfirmed ? confirmedTime : null,
-      userId
-    }
-  });
+    navigate("/checkouts", {
+      state: {
+        cartItems,
+        totalPrice,
+        deliveryTime: isConfirmed ? confirmedTime : null,
+        userId
+      }
+    });
 };
 
 
