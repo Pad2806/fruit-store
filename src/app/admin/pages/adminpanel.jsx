@@ -1,48 +1,28 @@
-import React, { useMemo, useState } from 'react';
-import { UserPlus, Edit2, Trash2, Search, X, Save, LogOut, Eye, EyeOff } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { UserPlus, Edit2, Trash2, Search, X, Save, LogOut, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react';
 import './adminpanel.css';
+import { getUsers, createUser, updateUser, deleteUser } from '../services/userService';
 
 const AdminPanel = () => {
   const roles = [
-    { value: 'manager', label: 'Manager', color: '#f4e94bff' },
-    { value: 'user', label: 'User', color: '#27ae60' },
+    { value: 'seller', label: 'Chủ cửa hàng', color: '#f4e94bff' },
+    { value: 'user', label: 'Người dùng', color: '#27ae60' },
+    { value: 'admin', label: 'Quản trị viên', color: '#e74c3c' },
   ];
 
   const validRoleValues = new Set(roles.map((r) => r.value));
   const normalizeRole = (role) => (validRoleValues.has(role) ? role : 'user');
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@example.com',
-      phone_number: '0901234567',
-      address: 'TP.HCM',
-      dob: '2000-01-01',
-      role: 'user',
-      status: 'active',
-    },
-    {
-      id: 2,
-      name: 'Trần Thị B',
-      email: 'tranthib@example.com',
-      phone_number: '0912345678',
-      address: 'Hà Nội',
-      dob: '1998-05-12',
-      role: 'manager',
-      status: 'active',
-    },
-    {
-      id: 3,
-      name: 'Lê Văn C',
-      email: 'levanc@example.com',
-      phone_number: '0923456789',
-      address: 'Đà Nẵng',
-      dob: '2001-09-20',
-      role: 'user',
-      status: 'inactive',
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Pagination State
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    per_page: 5
+  });
 
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create');
@@ -56,21 +36,66 @@ const AdminPanel = () => {
     address: '',
     dob: '',
     password: '',
+    password_confirmation: '',
     role: 'user',
     status: 'active',
   });
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  const [formError, setFormError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [generalError, setGeneralError] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
 
   const isView = modalMode === 'view';
 
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers(1, 5); // Default start with 5
+  }, []);
+
+  const fetchUsers = async (page = 1, pageSize = pagination.per_page) => {
+    setLoading(true);
+    try {
+      // Pass pagination params
+      const response = await getUsers({ page, page_size: pageSize });
+      const userList = response.data || [];
+      const meta = response.meta || {};
+
+      const mappedUsers = userList.map(u => ({
+        ...u,
+        role: u.role?.name || 'user'
+      }));
+      setUsers(mappedUsers);
+      setPagination({
+        current_page: meta.current_page || 1,
+        last_page: meta.last_page || 1,
+        total: meta.total || 0,
+        per_page: meta.per_page || pageSize
+      });
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= pagination.last_page) {
+      fetchUsers(newPage);
+    }
+  };
+
+  const handlePageSizeChange = (e) => {
+    const newSize = parseInt(e.target.value);
+    fetchUsers(1, newSize); // Return to page 1 when changing size
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
-    setFormError('');
+    setFieldErrors({});
+    setGeneralError('');
     setShowPassword(false);
   };
 
@@ -84,10 +109,12 @@ const AdminPanel = () => {
       address: '',
       dob: '',
       password: '',
+      password_confirmation: '',
       role: 'user',
       status: 'active',
     });
-    setFormError('');
+    setFieldErrors({});
+    setGeneralError('');
     setShowPassword(false);
     setShowModal(true);
   };
@@ -98,8 +125,10 @@ const AdminPanel = () => {
       ...user,
       role: normalizeRole(user.role),
       password: '',
+      password_confirmation: '',
     });
-    setFormError('');
+    setFieldErrors({});
+    setGeneralError('');
     setShowPassword(false);
     setShowModal(true);
   };
@@ -110,8 +139,10 @@ const AdminPanel = () => {
       ...user,
       role: normalizeRole(user.role),
       password: '',
+      password_confirmation: '',
     });
-    setFormError('');
+    setFieldErrors({});
+    setGeneralError('');
     setShowPassword(false);
     setShowModal(true);
   };
@@ -121,11 +152,17 @@ const AdminPanel = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!userToDelete) return;
-    setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
-    setShowDeleteModal(false);
-    setUserToDelete(null);
+    try {
+      await deleteUser(userToDelete.id);
+      await fetchUsers(pagination.current_page);
+      setShowDeleteModal(false);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete user", error);
+      alert("Xoá thất bại! Có thể do lỗi kết nối hoặc quyền truy cập.");
+    }
   };
 
   const cancelDelete = () => {
@@ -139,48 +176,123 @@ const AdminPanel = () => {
     return /^[0-9]{9,11}$/.test(t);
   };
 
-  const handleSave = () => {
-    const nameOk = currentUser.name.trim().length > 0;
-    const emailOk = currentUser.email.trim().length > 0;
+  const translateError = (msg) => {
+    if (!msg) return "";
+    if (Array.isArray(msg)) msg = msg[0];
 
-    if (!nameOk || !emailOk) {
-      setFormError('Vui lòng điền đầy đủ Họ tên và Email.');
-      return;
+    const lower = String(msg).toLowerCase();
+    if (lower.includes('required')) return 'Trường này là bắt buộc.';
+    if (lower.includes('email has already been taken')) return 'Email này đã được sử dụng.';
+    if (lower.includes('email is invalid') || lower.includes('valid email')) return 'Email không hợp lệ.';
+    if (lower.includes('password must be at least')) return 'Mật khẩu quá ngắn (tối thiểu 8 ký tự).';
+    if (lower.includes('verification code')) return 'Mã xác thực không đúng.';
+    if (lower.includes('phone number')) return 'Số điện thoại không hợp lệ.';
+    if (lower.includes('password confirmation does not match')) return 'Mật khẩu xác nhận không khớp.';
+
+    return msg;
+  };
+
+  const handleSave = async () => {
+    let errors = {};
+    const nameOk = currentUser.name.trim().length > 0;
+
+    if (!nameOk) {
+      errors.name = 'Vui lòng điền Họ tên.';
+    }
+
+    if (modalMode === 'create' && !currentUser.email.trim()) {
+      errors.email = 'Vui lòng điền Email.';
+    }
+
+    if (!currentUser.dob) {
+      errors.dob = 'Vui lòng chọn ngày sinh.';
+    } else {
+      const birthDate = new Date(currentUser.dob);
+
+      if (isNaN(birthDate.getTime())) {
+        errors.dob = 'Ngày sinh không hợp lệ';
+      } else {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+
+        if (age < 18) {
+          errors.dob = 'Người dùng phải từ 18 tuổi trở lên.';
+        }
+      }
     }
 
     if (!validatePhone(currentUser.phone_number)) {
-      setFormError('Số điện thoại không hợp lệ (nên là 9-11 chữ số).');
-      return;
+      errors.phone_number = 'Số điện thoại không hợp lệ (9-11 chữ số).';
     }
-
-    if (modalMode === 'create' && String(currentUser.password).trim().length < 6) {
-      setFormError('Mật khẩu tối thiểu 6 ký tự.');
-      return;
-    }
-
-    setFormError('');
-
-    const payload = {
-      ...currentUser,
-      role: normalizeRole(currentUser.role),
-    };
 
     if (modalMode === 'create') {
-      const newUser = {
-        ...payload,
-        id: Math.max(...users.map((u) => u.id), 0) + 1,
-      };
-      setUsers([...users, newUser]);
-    } else {
-      // giữ nguyên email khi edit (như yêu cầu)
-      setUsers(users.map((u) => (u.id === payload.id ? { ...u, ...payload, email: u.email } : u)));
+      if (String(currentUser.password).trim().length < 8) {
+        errors.password = 'Mật khẩu tối thiểu 8 ký tự.';
+      }
+      if (currentUser.password !== currentUser.password_confirmation) {
+        errors.password_confirmation = 'Mật khẩu xác nhận không khớp.';
+      }
     }
 
-    handleCloseModal();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setFieldErrors({});
+    setGeneralError('');
+
+    try {
+      if (modalMode === 'create') {
+        const payload = {
+          name: currentUser.name,
+          email: currentUser.email,
+          password: currentUser.password,
+          password_confirmation: currentUser.password_confirmation,
+          phone_number: currentUser.phone_number,
+          address: currentUser.address,
+          dob: currentUser.dob,
+          role: currentUser.role,
+        };
+        await createUser(payload);
+        fetchUsers(1);
+      } else {
+        const payload = {
+          name: currentUser.name,
+          phone_number: currentUser.phone_number,
+          address: currentUser.address,
+          dob: currentUser.dob,
+          role: currentUser.role,
+        };
+        await updateUser(currentUser.id, payload);
+        fetchUsers(pagination.current_page);
+      }
+
+      handleCloseModal();
+    } catch (error) {
+      console.error("Save failed", error);
+      if (error.response?.data?.errors) {
+        const apiErrors = error.response.data.errors;
+        const mappedErrors = {};
+        Object.keys(apiErrors).forEach(key => {
+          mappedErrors[key] = translateError(apiErrors[key]);
+        });
+        setFieldErrors(mappedErrors);
+      } else if (error.response?.data?.message) {
+        setGeneralError(translateError(error.response.data.message));
+      } else {
+        setGeneralError('Có lỗi xảy ra, vui lòng thử lại.');
+      }
+    }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
     window.location.href = '/login';
   };
 
@@ -188,8 +300,8 @@ const AdminPanel = () => {
     const t = searchTerm.toLowerCase().trim();
     return users.filter(
       (u) =>
-        u.name.toLowerCase().includes(t) ||
-        u.email.toLowerCase().includes(t) ||
+        u.name?.toLowerCase().includes(t) ||
+        u.email?.toLowerCase().includes(t) ||
         String(u.id).includes(t) ||
         String(u.phone_number || '').includes(t)
     );
@@ -237,69 +349,125 @@ const AdminPanel = () => {
         </div>
 
         <div className="users-table">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Họ tên</th>
-                <th>Email</th>
-                <th>Vai trò</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
+          {loading ? (
+            <div className="loading-state">Đang tải dữ liệu...</div>
+          ) : (
+            <>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Vai trò</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
 
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  onClick={() => handleView(user)}
-                  style={{ cursor: 'pointer' }}
-                  title="Bấm để xem chi tiết"
-                >
-                  <td>{user.id}</td>
-                  <td>{user.name}</td>
-                  <td title={user.email}>{user.email}</td>
-                  <td>
-                    <span className="role-badge" style={{ backgroundColor: getRoleColor(user.role) }}>
-                      {getRoleLabel(user.role)}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${user.status}`}>
-                      {user.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button
-                        className="btn-edit"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(user);
-                        }}
-                        aria-label="Edit"
-                        title="Sửa"
+                <tbody>
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <tr
+                        key={user.id}
+                        onClick={() => handleView(user)}
+                        style={{ cursor: 'pointer' }}
+                        title="Bấm để xem chi tiết"
                       >
-                        <Edit2 size={16} />
-                      </button>
+                        <td className="col-id" title={user.id}>{String(user.id).substring(0, 8)}...</td>
+                        <td>{user.name}</td>
+                        <td title={user.email}>{user.email}</td>
+                        <td>
+                          <span className="role-badge" style={{ backgroundColor: getRoleColor(user.role) }}>
+                            {getRoleLabel(user.role)}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-edit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(user);
+                              }}
+                              aria-label="Edit"
+                              title="Sửa"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              className="btn-delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(user);
+                              }}
+                              aria-label="Delete"
+                              title="Xoá"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>
+                        Không tìm thấy người dùng nào.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+
+              {pagination.last_page >= 1 && (
+                <div className="pagination-controls">
+                  <div className="pagination-info">
+                    <select
+                      value={pagination.per_page}
+                      onChange={handlePageSizeChange}
+                      className="page-size-select"
+                      title="Số dòng trên mỗi trang"
+                    >
+                      <option value="5">5 dòng/trang</option>
+                      <option value="10">10 dòng/trang</option>
+                      <option value="20">20 dòng/trang</option>
+                      <option value="50">50 dòng/trang</option>
+                    </select>
+                    <span style={{ marginLeft: '10px' }}>
+                      Hiển thị {users.length} trên tổng số {pagination.total} người dùng
+                    </span>
+                  </div>
+                  <div className="pagination-buttons">
+                    <button
+                      className="btn-page"
+                      onClick={() => handlePageChange(pagination.current_page - 1)}
+                      disabled={pagination.current_page === 1}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+
+                    {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map(page => (
                       <button
-                        className="btn-delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(user);
-                        }}
-                        aria-label="Delete"
-                        title="Xoá"
+                        key={page}
+                        className={`btn-page ${page === pagination.current_page ? 'active' : ''}`}
+                        onClick={() => handlePageChange(page)}
                       >
-                        <Trash2 size={16} />
+                        {page}
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    ))}
+
+                    <button
+                      className="btn-page"
+                      onClick={() => handlePageChange(pagination.current_page + 1)}
+                      disabled={pagination.current_page === pagination.last_page}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -311,8 +479,8 @@ const AdminPanel = () => {
                 {modalMode === 'create'
                   ? 'Thêm người dùng mới'
                   : modalMode === 'edit'
-                  ? 'Chỉnh sửa người dùng'
-                  : 'Chi tiết người dùng'}
+                    ? 'Chỉnh sửa người dùng'
+                    : 'Chi tiết người dùng'}
               </h2>
               <button className="btn-close" onClick={handleCloseModal} aria-label="Close" title="Đóng">
                 <X size={24} />
@@ -320,7 +488,7 @@ const AdminPanel = () => {
             </div>
 
             <div className="modal-body">
-              {formError && <div className="form-error">{formError}</div>}
+              {generalError && <div className="form-error">{generalError}</div>}
 
               <div className="form-group">
                 <label>Họ tên *</label>
@@ -328,9 +496,14 @@ const AdminPanel = () => {
                   type="text"
                   value={currentUser.name}
                   disabled={isView}
-                  onChange={(e) => setCurrentUser({ ...currentUser, name: e.target.value })}
+                  onChange={(e) => {
+                    setCurrentUser({ ...currentUser, name: e.target.value });
+                    setFieldErrors({ ...fieldErrors, name: '' });
+                  }}
                   placeholder="Nhập họ tên"
+                  className={fieldErrors.name ? 'input-error' : ''}
                 />
+                {fieldErrors.name && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.name}</span>}
               </div>
 
               <div className="form-group">
@@ -339,80 +512,113 @@ const AdminPanel = () => {
                   type="email"
                   value={currentUser.email}
                   disabled={modalMode === 'edit' || isView}
-                  onChange={(e) => setCurrentUser({ ...currentUser, email: e.target.value })}
+                  onChange={(e) => {
+                    setCurrentUser({ ...currentUser, email: e.target.value });
+                    setFieldErrors({ ...fieldErrors, email: '' });
+                  }}
                   placeholder="Nhập email"
                   title={modalMode === 'edit' ? 'Email không thể chỉnh sửa' : undefined}
                   autoComplete="off"
+                  className={fieldErrors.email ? 'input-error' : ''}
                 />
+                {fieldErrors.email && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.email}</span>}
               </div>
 
               <div className="form-group">
-                <label>Số điện thoại</label>
+                <label>Số điện thoại *</label>
                 <input
                   type="tel"
                   value={currentUser.phone_number}
                   disabled={isView}
-                  onChange={(e) => setCurrentUser({ ...currentUser, phone_number: e.target.value })}
+                  onChange={(e) => {
+                    setCurrentUser({ ...currentUser, phone_number: e.target.value });
+                    setFieldErrors({ ...fieldErrors, phone_number: '' });
+                  }}
                   placeholder="VD: 0901234567"
                   autoComplete="off"
+                  className={fieldErrors.phone_number ? 'input-error' : ''}
                 />
+                {fieldErrors.phone_number && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.phone_number}</span>}
               </div>
 
               <div className="form-group">
-                <label>Địa chỉ</label>
+                <label>Địa chỉ *</label>
                 <input
                   type="text"
                   value={currentUser.address}
                   disabled={isView}
-                  onChange={(e) => setCurrentUser({ ...currentUser, address: e.target.value })}
+                  onChange={(e) => {
+                    setCurrentUser({ ...currentUser, address: e.target.value });
+                    setFieldErrors({ ...fieldErrors, address: '' });
+                  }}
                   placeholder="Nhập địa chỉ"
                   autoComplete="off"
+                  className={fieldErrors.address ? 'input-error' : ''}
                 />
+                {fieldErrors.address && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.address}</span>}
               </div>
 
               <div className="form-group">
                 <label>Ngày sinh</label>
                 <input
                   type="date"
-                  value={currentUser.dob}
+                  value={currentUser.dob ? currentUser.dob.split('T')[0] : ''}
                   disabled={isView}
-                  onChange={(e) => setCurrentUser({ ...currentUser, dob: e.target.value })}
+                  onChange={(e) => {
+                    setCurrentUser({ ...currentUser, dob: e.target.value });
+                    setFieldErrors({ ...fieldErrors, dob: '' });
+                  }}
                   autoComplete="off"
+                  className={fieldErrors.dob ? 'input-error' : ''}
                 />
+                {fieldErrors.dob && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.dob}</span>}
               </div>
 
-              <div className="form-group">
-                <label>Mật khẩu {modalMode === 'create' ? '*' : '(tùy chọn)'}</label>
-
-                <div className="password-field">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={currentUser.password}
-                    disabled={isView}
-                    onChange={(e) => setCurrentUser({ ...currentUser, password: e.target.value })}
-                    placeholder={
-                      isView
-                        ? '********'
-                        : modalMode === 'create'
-                        ? 'Tối thiểu 6 ký tự'
-                        : 'Để trống nếu không đổi'
-                    }
-                    autoComplete="new-password"
-                  />
-
-                  {!isView && (
-                    <button
-                      type="button"
-                      className="btn-toggle-password"
-                      onClick={() => setShowPassword((v) => !v)}
-                      aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                      title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  )}
-                </div>
-              </div>
+              {/* Password field only for CREATE mode */}
+              {modalMode === 'create' && (
+                <>
+                  <div className="form-group">
+                    <label>Mật khẩu *</label>
+                    <div className="password-field">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={currentUser.password}
+                        disabled={isView}
+                        onChange={(e) => {
+                          setCurrentUser({ ...currentUser, password: e.target.value });
+                          setFieldErrors({ ...fieldErrors, password: '' });
+                        }}
+                        placeholder="Tối thiểu 8 ký tự"
+                        autoComplete="new-password"
+                        className={fieldErrors.password ? 'input-error' : ''}
+                      />
+                      <button
+                        type="button"
+                        className="btn-toggle-password"
+                        onClick={() => setShowPassword((v) => !v)}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    {fieldErrors.password && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.password}</span>}
+                  </div>
+                  <div className="form-group">
+                    <label>Xác nhận mật khẩu *</label>
+                    <input
+                      type="password"
+                      value={currentUser.password_confirmation}
+                      disabled={isView}
+                      onChange={(e) => {
+                        setCurrentUser({ ...currentUser, password_confirmation: e.target.value });
+                        setFieldErrors({ ...fieldErrors, password_confirmation: '' });
+                      }}
+                      placeholder="Nhập lại mật khẩu"
+                      className={fieldErrors.password_confirmation ? 'input-error' : ''}
+                    />
+                    {fieldErrors.password_confirmation && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.password_confirmation}</span>}
+                  </div>
+                </>
+              )}
 
               <div className="form-group">
                 <label>Vai trò</label>
@@ -427,18 +633,7 @@ const AdminPanel = () => {
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div className="form-group">
-                <label>Trạng thái</label>
-                <select
-                  value={currentUser.status}
-                  disabled={isView}
-                  onChange={(e) => setCurrentUser({ ...currentUser, status: e.target.value })}
-                >
-                  <option value="active">Hoạt động</option>
-                  <option value="inactive">Không hoạt động</option>
-                </select>
+                {fieldErrors.role && <span className="field-error-msg" style={{ color: 'red', fontSize: '12px', marginTop: '4px', display: 'block' }}>{fieldErrors.role}</span>}
               </div>
             </div>
 

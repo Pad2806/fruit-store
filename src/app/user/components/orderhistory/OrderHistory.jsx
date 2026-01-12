@@ -1,61 +1,43 @@
+import { useState, useEffect } from "react";
 import styles from "./OrderHistory.module.scss";
 import OrderItem from "./OrderItem";
-import appleImg from "../../assets/images/apple.png";
-import grapesImg from "../../assets/images/peonygrapes.png";
+import api from "../../../../axios";
+import { message } from "antd";
 
 export default function OrderHistory() {
-  const orders = [
-    {
-      id: "DH1001",
-      deliveryDate: "27/12/2025",
-      status: "delivered",
-      statusLabel: "Đã giao hàng",
-      total: 650000,
-      items: [
-        {
-          name: "Táo Mỹ",
-          unit: "kg",
-          quantity: 2,
-          description: "Size lớn / Nhập khẩu Mỹ",
-          price: 150000,
-          image: appleImg
-        },
-        {
-          name: "Nho Mẫu Đơn",
-          unit: "chùm",
-          quantity: 1,
-          description: "Chùm 500g / Giòn ngọt",
-          price: 350000,
-          image: grapesImg
-        }
-      ]
-    },
-    {
-      id: "DH1002",
-      deliveryDate: "30/12/2025",
-      status: "processing",
-      statusLabel: "Đang xử lý",
-      total: 240000,
-      items: [
-        {
-          name: "Cherry đỏ Mỹ",
-          unit: "500g",
-          quantity: 1,
-          description: "Size 9 / Tươi ngon",
-          price: 240000,
-          image: appleImg
-        }
-      ]
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/user/orders"); // Based on route group
+      setOrders(response.data.data); // Assuming paginated resource returns data in .data
+    } catch (error) {
+      console.error("Failed to fetch orders", error);
+      message.error("Không thể tải lịch sử đơn hàng");
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  if (loading) return <p>Đang tải đơn hàng...</p>;
 
   return (
     <div className={styles.historyWrapper}>
       <h3 className={styles.title}>Lịch sử mua hàng</h3>
       <div className={styles.listContainer}>
-        {orders.map((order) => (
-          <OrderItem key={order.id} order={order} />
-        ))}
+        {orders.length > 0 ? (
+          orders.map((order) => (
+            <OrderItem key={order.id} order={order} onRefresh={fetchOrders} />
+          ))
+        ) : (
+          <p>Bạn chưa có đơn hàng nào.</p>
+        )}
       </div>
     </div>
   );

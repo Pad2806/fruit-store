@@ -2,6 +2,12 @@ import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaHome, FaEnvelope } from "react-icons/fa";
 import { getCartDetails } from "../../../../api/cart";
+
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import { Dropdown } from "antd";
+
+
 import SearchBar from "../search/SearchBar";
 import "./Header.css";
 
@@ -9,6 +15,8 @@ function Header() {
   const [openMenu, setOpenMenu] = useState(false);
   const [menuTop, setMenuTop] = useState(0);
   const headerRef = useRef(null);
+
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const cartId = "327c4288-8b80-45ac-9027-392acf36b7fd";
@@ -33,7 +41,6 @@ function Header() {
 
     fetchCount();
   }, []);
-
   useLayoutEffect(() => {
     if (openMenu && headerRef.current) {
       const rect = headerRef.current.getBoundingClientRect();
@@ -70,10 +77,34 @@ function Header() {
               <span className="icon"><FaPhoneAlt size={16} /></span>
               <span>Hotline 0865666666</span>
             </div>
-            <div className="action" onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
-              <span className="icon"><FaUser size={18} /></span>
-              <span>Tài khoản</span>
-            </div>
+            {user ? (
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'profile',
+                      label: 'Hồ sơ',
+                      onClick: () => navigate('/user'),
+                    },
+                    {
+                      key: 'logout',
+                      label: 'Đăng xuất',
+                      onClick: logout,
+                    },
+                  ],
+                }}
+              >
+                <div className="action" style={{ cursor: "pointer" }}>
+                  <span className="icon"><FaUser size={18} /></span>
+                  <span>{user.name || "Tài khoản"}</span>
+                </div>
+              </Dropdown>
+            ) : (
+              <div className="action" onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
+                <span className="icon"><FaUser size={18} /></span>
+                <span>Tài khoản</span>
+              </div>
+            )}
             <div className="action cart" onClick={() => navigate("/cart")} style={{ cursor: "pointer" }}>
               <span className="icon"><FaShoppingCart size={18} /></span>
               <span>Giỏ hàng</span>
@@ -85,7 +116,10 @@ function Header() {
 
       {openMenu && (
         <>
-          <div className="menu-overlay" onClick={() => setOpenMenu(false)} />
+          <div
+            className="menu-overlay"
+            onClick={() => setOpenMenu(false)}
+          />
           <div
             className="menu-dropdown"
             style={{ top: `${menuTop}px` }}
