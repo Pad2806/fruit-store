@@ -31,7 +31,7 @@ class AuthController extends Controller
         $userRequest['verify_code'] = $code;
         $userRequest['expired_code_at'] = $expiredCodeAt;
         $userRequest['status'] = 'pending';
-        
+
         $role = Role::where('name', 'user')->first();
         $userRequest['role_id'] = $role->id;
 
@@ -48,7 +48,7 @@ class AuthController extends Controller
     {
         $userRequest = $request->validated();
         $user = User::where('email', $userRequest['email'])->first();
-        
+
         if (!$user) {
             return response()->json([
                 'message' => 'Không tìm thấy người dùng',
@@ -67,7 +67,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $user->status = 'active'; 
+        $user->status = 'active';
         $user->expired_code_at = null;
         $user->verify_code = null;
         $user->save();
@@ -122,7 +122,7 @@ class AuthController extends Controller
         }
 
         $accessToken = $user->createToken('auth_token')->plainTextToken;
-        
+
         return response()->json([
             'user' => new UserResource($user),
             'message' => 'Đăng nhập thành công',
@@ -150,9 +150,9 @@ class AuthController extends Controller
     {
         $user = auth()->user();
         $data = $request->validated();
-        
+
         $user->update($data);
-        
+
         return response()->json([
             'user' => new UserResource($user),
             'message' => 'Update profile successful',
