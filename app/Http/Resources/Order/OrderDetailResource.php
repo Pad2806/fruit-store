@@ -13,6 +13,7 @@ class OrderDetailResource extends JsonResource
             'product_id' => $this->product_id,
             'product_name' => $this->product_name,
             'product_price' => $this->product_price,
+            'product_image' => $this->product ? $this->product->image : null,
             'quantity' => $this->quantity,
             'unit' => $this->unit,
             'total_price' => $this->total_price,

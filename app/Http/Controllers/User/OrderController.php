@@ -12,7 +12,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $limit = $request->input('limit', 10);
-        $orders = Order::with('details')
+        $orders = Order::with(['details.product'])
             ->where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
             ->paginate($limit);
@@ -22,7 +22,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::with('details')
+        $order = Order::with(['details.product'])
             ->where('user_id', auth()->id())
             ->where('id', $id)
             ->firstOrFail();

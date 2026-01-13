@@ -27,6 +27,26 @@ class Product extends Model
         'short_desc',
     ];
 
+    protected $casts = [
+        'image' => 'array',
+    ];
+
+    // Accessor to get the first image from the array
+    public function getImageAttribute($value)
+    {
+        if (is_null($value)) {
+            return null;
+        }
+        
+        $decoded = json_decode($value, true);
+        
+        if (is_array($decoded) && count($decoded) > 0) {
+            return $decoded[0];
+        }
+        
+        return $value;
+    }
+
     public function cartItems()
     {
         return $this->hasMany(CartItem::class, 'product_id', 'id');

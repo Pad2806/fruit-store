@@ -41,10 +41,12 @@ class HomeController extends Controller
             ->get();
 
         $data = $products->map(function ($product) {
-            // Parse images from JSON string
+            // Parse images from JSON string using raw attribute to bypass accessor
             $images = [];
-            if ($product->image) {
-                $decoded = json_decode($product->image, true);
+            $rawImage = $product->getRawOriginal('image');
+            
+            if ($rawImage) {
+                $decoded = json_decode($rawImage, true);
                 if (is_array($decoded)) {
                     $images = array_map(fn($img) => asset('storage/' . $img), $decoded);
                 }
@@ -72,13 +74,14 @@ class HomeController extends Controller
             ->firstOrFail();
 
         $images = [];
+        $rawImage = $product->getRawOriginal('image');
 
-        if ($product->image) {
-            $decoded = json_decode($product->image, true);
+        if ($rawImage) {
+            $decoded = json_decode($rawImage, true);
             if (is_array($decoded)) {
                 $images = $decoded;
             } else {
-                $images = explode(',', $product->image);
+                $images = explode(',', $rawImage);
             }
 
             $images = array_slice($images, 0, 5);
@@ -115,10 +118,12 @@ class HomeController extends Controller
             ->limit(6)
             ->get()
             ->map(function ($p) {
-                // Get first image from JSON array
+                // Get first image from JSON array using raw attribute
                 $firstImage = null;
-                if ($p->image) {
-                    $decoded = json_decode($p->image, true);
+                $rawImage = $p->getRawOriginal('image');
+                
+                if ($rawImage) {
+                    $decoded = json_decode($rawImage, true);
                     if (is_array($decoded) && count($decoded) > 0) {
                         $firstImage = asset('storage/' . $decoded[0]);
                     }
