@@ -1,12 +1,10 @@
 import { useState, useRef, useLayoutEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaHome, FaEnvelope } from "react-icons/fa";
+import { Dropdown } from "antd";
 
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
-import { Dropdown } from "antd";
-
-
 import SearchBar from "../search/SearchBar";
 import "./Header.css";
 
@@ -17,9 +15,8 @@ function Header() {
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  // Sử dụng cartCount từ CartContext thay vì local state
   const { cartCount } = useCart();
+
   useLayoutEffect(() => {
     if (openMenu && headerRef.current) {
       const rect = headerRef.current.getBoundingClientRect();
@@ -53,39 +50,41 @@ function Header() {
 
           <div className="header-actions">
             <div className="action" onClick={() => navigate("/contact")} style={{ cursor: "pointer" }}>
-              <span className="icon"><FaPhoneAlt size={16} /></span>
+              <span className="icon">
+                <FaPhoneAlt size={16} />
+              </span>
               <span>Hotline 0865666666</span>
             </div>
+
             {user ? (
               <Dropdown
                 menu={{
                   items: [
-                    {
-                      key: 'profile',
-                      label: 'Hồ sơ',
-                      onClick: () => navigate('/user'),
-                    },
-                    {
-                      key: 'logout',
-                      label: 'Đăng xuất',
-                      onClick: logout,
-                    },
+                    { key: "profile", label: "Hồ sơ", onClick: () => navigate("/user") },
+                    { key: "logout", label: "Đăng xuất", onClick: logout },
                   ],
                 }}
               >
                 <div className="action" style={{ cursor: "pointer" }}>
-                  <span className="icon"><FaUser size={18} /></span>
+                  <span className="icon">
+                    <FaUser size={18} />
+                  </span>
                   <span>{user.name || "Tài khoản"}</span>
                 </div>
               </Dropdown>
             ) : (
               <div className="action" onClick={() => navigate("/login")} style={{ cursor: "pointer" }}>
-                <span className="icon"><FaUser size={18} /></span>
+                <span className="icon">
+                  <FaUser size={18} />
+                </span>
                 <span>Tài khoản</span>
               </div>
             )}
+
             <div className="action cart" onClick={() => navigate("/cart")} style={{ cursor: "pointer" }}>
-              <span className="icon"><FaShoppingCart size={18} /></span>
+              <span className="icon">
+                <FaShoppingCart size={18} />
+              </span>
               <span>Giỏ hàng</span>
               <span className="badge">{cartCount}</span>
             </div>
@@ -95,10 +94,7 @@ function Header() {
 
       {openMenu && (
         <>
-          <div
-            className="menu-overlay"
-            onClick={() => setOpenMenu(false)}
-          />
+          <div className="menu-overlay" onClick={() => setOpenMenu(false)} />
           <div
             className="menu-dropdown"
             style={{ top: `${menuTop}px` }}
