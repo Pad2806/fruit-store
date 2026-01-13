@@ -34,6 +34,7 @@ class OrderController extends Controller
 
        if($data['payment_method'] === 'cod') {
            $data['status'] = 'pending';
+           $data['datetime_order'] = no;
            $data['payment_status'] = 'pending';
            $order = Order::create($data);
            $this->createOrderDetailsFromCart($order, $cart);
