@@ -58,8 +58,8 @@ export default function Cart() {
     if (newQty < 1) return;
     try {
       await updateItemQuantity(cartItemId, newQty);
-      setCartItems(prev =>
-        prev.map(item =>
+      setCartItems((prev) =>
+        prev.map((item) =>
           item.id === cartItemId ? { ...item, quantity: newQty } : item
         )
       );
@@ -76,7 +76,7 @@ export default function Cart() {
       async () => {
         try {
           await removeCartItem(cartItemId);
-          setCartItems(prev => prev.filter(item => item.id !== cartItemId));
+          setCartItems((prev) => prev.filter((item) => item.id !== cartItemId));
           // Cập nhật cart count trên header
           await refreshCartCount();
           ToastService.success("Đã xóa sản phẩm thành công");
@@ -99,11 +99,10 @@ export default function Cart() {
         cartItems,
         totalPrice,
         deliveryTime: isConfirmed ? confirmedTime : null,
-        userId
-      }
+        userId,
+      },
     });
   };
-
 
   const totalPrice = cartItems.reduce((sum, item) => {
     return sum + parseFloat(item.product_price) * item.quantity;
@@ -124,11 +123,25 @@ export default function Cart() {
 
   const dateOptions = [
     { label: "Hôm nay", value: formatDate(today) },
-    { label: `Ngày mai (${formatDate(tomorrow)})`, value: formatDate(tomorrow) },
-    { label: `Ngày kia (${formatDate(dayAfter)})`, value: formatDate(dayAfter) }
+    {
+      label: `Ngày mai (${formatDate(tomorrow)})`,
+      value: formatDate(tomorrow),
+    },
+    {
+      label: `Ngày kia (${formatDate(dayAfter)})`,
+      value: formatDate(dayAfter),
+    },
   ];
 
-  const timeOptions = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
+  const timeOptions = [
+    "09:00",
+    "10:00",
+    "11:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+  ];
 
   const [deliveryOption, setDeliveryOption] = useState("available");
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -147,7 +160,7 @@ export default function Cart() {
     if (!isToday) return timeOptions;
     const now = new Date();
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
-    return timeOptions.filter(t => parseTimeToMinutes(t) > nowMinutes);
+    return timeOptions.filter((t) => parseTimeToMinutes(t) > nowMinutes);
   };
 
   const validTimes = getValidTimes();
@@ -179,11 +192,12 @@ export default function Cart() {
     setIsConfirmed(true);
   };
 
-  if (loading) return (
-    <div className={styles.container}>
-      <CartPageSkeleton />
-    </div>
-  );
+  if (loading)
+    return (
+      <div className={styles.container}>
+        <CartPageSkeleton />
+      </div>
+    );
 
   return (
     <div className={styles.container}>
@@ -191,15 +205,16 @@ export default function Cart() {
         <div className={styles.leftCol}>
           <h2 className={styles.title}>Giỏ hàng của bạn</h2>
           <p className={styles.subTitle}>
-            Bạn đang có <strong>{cartItems.length} sản phẩm</strong> trong giỏ hàng
+            Bạn đang có <strong>{cartItems.length} sản phẩm</strong> trong giỏ
+            hàng
           </p>
 
           <div className={styles.itemList}>
-            {cartItems.map(item => (
+            {cartItems.map((item) => (
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.imgWrapper}>
                   <img
-                    src={`http://127.0.0.1:8000/images/${item.product.image}`}
+                    src={`http://127.0.0.1:8000/images/${item?.product?.image}`}
                     alt={item.product_name}
                   />
                   <button
@@ -211,19 +226,37 @@ export default function Cart() {
                 </div>
                 <div className={styles.itemDetails}>
                   <h3>{item.product_name}</h3>
-                  <p className={styles.readableText}>{item.product.short_desc}</p>
+                  <p className={styles.readableText}>
+                    {item?.product?.short_desc}
+                  </p>
                   <span className={styles.price}>
-                    {parseFloat(item.product_price).toLocaleString()}đ / {item.unit}
+                    {parseFloat(item.product_price).toLocaleString()}đ /{" "}
+                    {item.unit}
                   </span>
                 </div>
                 <div className={styles.rightInfo}>
                   <span className={styles.itemTotal}>
-                    {(item.quantity * parseFloat(item.product_price)).toLocaleString()}đ
+                    {(
+                      item.quantity * parseFloat(item.product_price)
+                    ).toLocaleString()}
+                    đ
                   </span>
                   <div className={styles.quantityGroup}>
-                    <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}>-</button>
+                    <button
+                      onClick={() =>
+                        handleUpdateQuantity(item.id, item.quantity - 1)
+                      }
+                    >
+                      -
+                    </button>
                     <input type="text" value={item.quantity} readOnly />
-                    <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}>+</button>
+                    <button
+                      onClick={() =>
+                        handleUpdateQuantity(item.id, item.quantity + 1)
+                      }
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
               </div>
@@ -233,7 +266,9 @@ export default function Cart() {
           <div className={styles.noteSection}>
             <h3>Ghi chú đơn hàng</h3>
             <p className={styles.readableNote}>
-              <strong>Lưu ý:</strong> Khách hàng đặt quà tặng trái cây, vui lòng ghi rõ thông tin của người được tặng và người đặt để shop thuận tiện liên hệ.
+              <strong>Lưu ý:</strong> Khách hàng đặt quà tặng trái cây, vui lòng
+              ghi rõ thông tin của người được tặng và người đặt để shop thuận
+              tiện liên hệ.
             </p>
             <textarea placeholder="Nhập ghi chú của bạn..."></textarea>
           </div>
@@ -272,7 +307,9 @@ export default function Cart() {
 
               {isConfirmed && deliveryOption === "select" && (
                 <div className={styles.confirmedDisplay}>
-                  <span className={styles.clockIcon}><FaClock /></span>
+                  <span className={styles.clockIcon}>
+                    <FaClock />
+                  </span>
                   <strong>{confirmedTime}</strong>
                 </div>
               )}
@@ -280,29 +317,38 @@ export default function Cart() {
               {!isConfirmed && deliveryOption === "select" && (
                 <div className={styles.selectWrapper}>
                   <div className={styles.selectGroup}>
-                    <select value={tempDate} onChange={e => setTempDate(e.target.value)}>
-                      {dateOptions.map(opt => (
-                        <option key={opt.value} value={opt.label}>{opt.label}</option>
+                    <select
+                      value={tempDate}
+                      onChange={(e) => setTempDate(e.target.value)}
+                    >
+                      {dateOptions.map((opt) => (
+                        <option key={opt.value} value={opt.label}>
+                          {opt.label}
+                        </option>
                       ))}
                     </select>
 
                     <select
                       value={tempTime}
-                      onChange={e => setTempTime(e.target.value)}
+                      onChange={(e) => setTempTime(e.target.value)}
                       disabled={isToday && validTimes.length === 0}
                     >
-                      {timeOptions.map(time => {
+                      {timeOptions.map((time) => {
                         const disabled = isToday && !validTimes.includes(time);
                         return (
                           <option key={time} value={time} disabled={disabled}>
-                            {time}{disabled ? " (đã qua)" : ""}
+                            {time}
+                            {disabled ? " (đã qua)" : ""}
                           </option>
                         );
                       })}
                     </select>
                   </div>
 
-                  <button className={styles.confirmTimeBtn} onClick={handleConfirmTime}>
+                  <button
+                    className={styles.confirmTimeBtn}
+                    onClick={handleConfirmTime}
+                  >
                     XÁC NHẬN THỜI GIAN
                   </button>
                 </div>
@@ -311,7 +357,9 @@ export default function Cart() {
 
             <div className={styles.totalRow}>
               <span>Tổng tiền:</span>
-              <span className={styles.finalPrice}>{totalPrice.toLocaleString()}đ</span>
+              <span className={styles.finalPrice}>
+                {totalPrice.toLocaleString()}đ
+              </span>
             </div>
 
             <button className={styles.checkoutBtn} onClick={handleCheckout}>
