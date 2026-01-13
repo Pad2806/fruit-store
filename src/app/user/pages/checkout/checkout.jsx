@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Landmark, Banknote, X, ClipboardCheck } from "lucide-react";
 import styles from "./checkout.module.scss";
 import { createOrder } from "../../../../api/orders";
 import { ToastService } from "../../components/toast/Toast";
 import { useCart } from "../../context/CartContext";
+import { getUser } from "../../../../api/user";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -12,15 +13,46 @@ export default function Checkout() {
   const { refreshCartCount } = useCart();
 
   const [showModal, setShowModal] = useState(false);
-  const [orderId] = useState(`FS${Date.now().toString().slice(-6)}`);
+  const [orderId] = useState(() => `FS${Date.now().toString().slice(-6)}`);
+  const [customer, setCustomer] = useState({
+    fullName: "",
+    email: "user@example.com",
+    phone: "",
+    address: "",
+    shippingMethod: "0",
+    paymentMethod: "cod",
+    note: "",
+  });
 
-  const { cartItems = [], totalPrice = 0, deliveryTime = null, userId } = location.state || {};
+  const {
+    cartItems = [],
+    totalPrice = 0,
+    deliveryTime = null,
+    userId,
+  } = location.state || {};
+
+  const fetchUser = useCallback(async () => {
+    try {
+      const res = await getUser();
+      setCustomer((prev) => ({
+        ...prev,
+        fullName: res.user.name || "",
+        phone: res.user.phone_number || "",
+        email: res.user.email || "",
+        address: res.user.address || "",
+      }));
+    } catch (error) {
+      console.log("error", error);
+    }
+  }, []);
 
   useEffect(() => {
     if (!location.state || cartItems.length === 0 || !userId) {
       navigate("/cart", { replace: true });
+      return;
     }
-  }, [location.state, cartItems.length, userId, navigate]);
+    fetchUser();
+  }, [location.state, cartItems.length, userId, navigate, fetchUser]);
 
   const orderData = useMemo(() => {
     const items = cartItems.map((item) => ({
@@ -37,16 +69,6 @@ export default function Checkout() {
       subtotal: totalPrice,
     };
   }, [cartItems, totalPrice]);
-
-  const [customer, setCustomer] = useState({
-    fullName: "",
-    email: "user@example.com",
-    phone: "",
-    address: "",
-    shippingMethod: "0",
-    paymentMethod: "cod",
-    note: "",
-  });
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -70,7 +92,12 @@ export default function Checkout() {
   };
 
   const handleCompleteOrder = () => {
-    if (!customer.fullName || !customer.phone || !customer.address || customer.shippingMethod === "0") {
+    if (
+      !customer.fullName ||
+      !customer.phone ||
+      !customer.address ||
+      customer.shippingMethod === "0"
+    ) {
       alert("Vui lòng nhập đầy đủ thông tin và chọn đơn vị vận chuyển!");
       return;
     }
@@ -133,7 +160,9 @@ export default function Checkout() {
       <div className={styles.checkoutWrapper}>
         <div className={styles.leftCol}>
           <header className={styles.header}>
-            <h1 className={styles.brandTitle}>FRUIT SHOP - TRÁI CÂY CHẤT LƯỢNG CAO</h1>
+            <h1 className={styles.brandTitle}>
+              FRUIT SHOP - TRÁI CÂY CHẤT LƯỢNG CAO
+            </h1>
             <nav className={styles.breadcrumb}>
               <Link to="/cart">Giỏ hàng</Link>
               <span className={styles.separator}>&gt;</span>
@@ -150,18 +179,33 @@ export default function Checkout() {
             </div>
             <div className={styles.formArea}>
               <div className={styles.formGroup}>
-                <input name="fullName" placeholder="Họ và tên" onChange={handleInput} />
+                <input
+                  name="fullName"
+                  placeholder="Họ và tên"
+                  value={customer.fullName}
+                  onChange={handleInput}
+                />
               </div>
               <div className={styles.inputGrid2}>
                 <div className={styles.formGroup}>
                   <input name="email" value={customer.email} disabled />
                 </div>
                 <div className={styles.formGroup}>
-                  <input name="phone" placeholder="Số điện thoại" onChange={handleInput} />
+                  <input
+                    name="phone"
+                    placeholder="Số điện thoại"
+                    value={customer.phone}
+                    onChange={handleInput}
+                  />
                 </div>
               </div>
               <div className={styles.formGroup}>
-                <input name="address" placeholder="Địa chỉ" onChange={handleInput} />
+                <input
+                  name="address"
+                  placeholder="Địa chỉ"
+                  value={customer.address}
+                  onChange={handleInput}
+                />
               </div>
             </div>
           </section>
@@ -177,7 +221,9 @@ export default function Checkout() {
                   checked={customer.shippingMethod === "25000"}
                   onChange={handleInput}
                 />
-                <span className={styles.methodName}>Giao hàng nội thành Đà Nẵng (25.000đ)</span>
+                <span className={styles.methodName}>
+                  Giao hàng nội thành Đà Nẵng (25.000đ)
+                </span>
               </label>
             </div>
           </section>
@@ -194,8 +240,12 @@ export default function Checkout() {
                   onChange={handleInput}
                 />
                 <span className={styles.customRadio}></span>
-                <span className={styles.methodName}>Thanh toán khi giao hàng (COD)</span>
-                <span className={styles.methodIcon}><Banknote /></span>
+                <span className={styles.methodName}>
+                  Thanh toán khi giao hàng (COD)
+                </span>
+                <span className={styles.methodIcon}>
+                  <Banknote />
+                </span>
               </label>
               <label className={styles.paymentOption}>
                 <input
@@ -206,15 +256,24 @@ export default function Checkout() {
                   onChange={handleInput}
                 />
                 <span className={styles.customRadio}></span>
-                <span className={styles.methodName}>Thanh toán bằng thẻ quốc tế</span>
-                <span className={styles.methodIcon}><Landmark /></span>
+                <span className={styles.methodName}>
+                  Thanh toán bằng thẻ quốc tế
+                </span>
+                <span className={styles.methodIcon}>
+                  <Landmark />
+                </span>
               </label>
             </div>
           </section>
 
           <footer className={styles.formFooter}>
-            <Link to="/cart" className={styles.returnCart}>Quay lại giỏ hàng</Link>
-            <button className={styles.submitOrderBtn} onClick={handleCompleteOrder}>
+            <Link to="/cart" className={styles.returnCart}>
+              Quay lại giỏ hàng
+            </Link>
+            <button
+              className={styles.submitOrderBtn}
+              onClick={handleCompleteOrder}
+            >
               HOÀN TẤT ĐƠN HÀNG
             </button>
           </footer>
@@ -247,7 +306,9 @@ export default function Checkout() {
               </div>
               <div className={styles.row}>
                 <span>Phí vận chuyển</span>
-                <span>{shippingFee > 0 ? `${shippingFee.toLocaleString()}đ` : "—"}</span>
+                <span>
+                  {shippingFee > 0 ? `${shippingFee.toLocaleString()}đ` : "—"}
+                </span>
               </div>
               {deliveryTime && (
                 <div className={styles.row}>
@@ -270,7 +331,12 @@ export default function Checkout() {
       {showModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <button className={styles.closeBtn} onClick={() => setShowModal(false)}><X /></button>
+            <button
+              className={styles.closeBtn}
+              onClick={() => setShowModal(false)}
+            >
+              <X />
+            </button>
             <div className={styles.modalHeader}>
               <ClipboardCheck size={32} color="#f36f40" />
               <h3>Xác nhận thông tin đơn hàng</h3>
@@ -302,7 +368,9 @@ export default function Checkout() {
 
               {deliveryTime && (
                 <div className={styles.modalSummary}>
-                  <p>Thời gian giao: <span>{deliveryTime}</span></p>
+                  <p>
+                    Thời gian giao: <span>{deliveryTime}</span>
+                  </p>
                 </div>
               )}
 
@@ -318,22 +386,45 @@ export default function Checkout() {
                     <span>{item.name}</span>
                     <span>{item.unit}</span>
                     <span>{item.quantity}</span>
-                    <span>{(item.price * item.quantity).toLocaleString()}đ</span>
+                    <span>
+                      {(item.price * item.quantity).toLocaleString()}đ
+                    </span>
                   </div>
                 ))}
               </div>
 
               <div className={styles.modalSummary}>
-                <p>Phí ship: <span>{shippingFee.toLocaleString()}đ</span></p>
-                <p>Thanh toán: <span>{customer.paymentMethod === "cod" ? "Tiền mặt (COD)" : "VISA"}</span></p>
-                <h4 className={styles.modalTotal}>Tổng tiền: {totalAmount.toLocaleString()}đ</h4>
+                <p>
+                  Phí ship: <span>{shippingFee.toLocaleString()}đ</span>
+                </p>
+                <p>
+                  Thanh toán:{" "}
+                  <span>
+                    {customer.paymentMethod === "cod"
+                      ? "Tiền mặt (COD)"
+                      : "VISA"}
+                  </span>
+                </p>
+                <h4 className={styles.modalTotal}>
+                  Tổng tiền: {totalAmount.toLocaleString()}đ
+                </h4>
               </div>
             </div>
 
             <div className={styles.modalFooter}>
-              <button className={styles.cancelBtn} onClick={() => setShowModal(false)}>Hủy</button>
-              <button className={styles.confirmBtn} onClick={handleFinalConfirm}>
-                {customer.paymentMethod === "VISA" ? "THANH TOÁN NGAY" : "XÁC NHẬN ĐẶT HÀNG"}
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setShowModal(false)}
+              >
+                Hủy
+              </button>
+              <button
+                className={styles.confirmBtn}
+                onClick={handleFinalConfirm}
+              >
+                {customer.paymentMethod === "VISA"
+                  ? "THANH TOÁN NGAY"
+                  : "XÁC NHẬN ĐẶT HÀNG"}
               </button>
             </div>
           </div>

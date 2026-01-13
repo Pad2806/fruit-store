@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import styles from "./payment_visa.module.scss";
 import { ToastService } from "../../components/toast/Toast";
@@ -17,7 +17,7 @@ import {
 
 const stripePromise = loadStripe(
   import.meta.env.STRIPE_KEY ||
-    "pk_test_51SmxkjAjfmLAwcOovm27OG3LMVmkrDlxZcppPPbs50hwmlIjTTx6rP1Yyv1lLvpk67yXwCkaokDjdLtnVqUjSiJM00V4zMsIgl"
+    "pk_test_51SmXiZLfNRTA8GOHRQDo79seWVSR1YwbFXAljvU13ne2hi9VyOIzhL20pJ9TwE7ZiL8bhJ3gr7OrWer9cEJDXaUO00mkheWlbr"
 );
 
 const cardElementOptions = {
@@ -100,13 +100,26 @@ function PaymentVisaInner() {
     }
   }, [orderPayload, totalAmount]);
 
+  const createdRef = useRef(false);
+
   useEffect(() => {
+    if (createdRef.current) return;
     if (!location.state || !orderPayload || !totalAmount) {
       navigate("/checkouts", { replace: true });
       return;
     }
+
+    createdRef.current = true;
     createIntent();
-  }, [location.state, navigate, orderPayload, totalAmount, createIntent]);
+  }, []);
+
+  // useEffect(() => {
+  //   if (!location.state || !orderPayload || !totalAmount) {
+  //     navigate("/checkouts", { replace: true });
+  //     return;
+  //   }
+  //   createIntent();
+  // }, [location.state, navigate, orderPayload, totalAmount, createIntent]);
 
   const handlePay = async (e) => {
     e.preventDefault();
