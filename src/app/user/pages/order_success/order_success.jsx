@@ -44,7 +44,7 @@ export default function OrderSuccess() {
                 <h3>Phương thức thanh toán</h3>
               </div>
               <div className={styles.cardBody}>
-                <p>{customer.paymentMethod === "cod" ? "Thanh toán khi nhận hàng (COD)" : "Đã thanh toán qua VNPAY"}</p>
+                <p>{customer.paymentMethod === "cod" ? "Thanh toán khi nhận hàng (COD)" : "Đã thanh toán qua thẻ quốc tế VISA"}</p>
               </div>
             </div>
           </div>

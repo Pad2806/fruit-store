@@ -34,7 +34,6 @@ const userRoutes = [
       {path: "/cart", element: <RequireRole allowedRoles="user"><Cart /></RequireRole>},
       {path: "/checkouts", element: <RequireRole allowedRoles="user"><Checkout /></RequireRole>},
       {path: "/user", element: <RequireRole allowedRoles="user"><User /></RequireRole>},
-     
       { path: "/policy", element: <PrivacyPolicy /> },
       {path: "/guide", element: <OnlineShoppingGuide />},
       {path: "/order-success", element: <RequireRole allowedRoles="user"><OrderSuccess /></RequireRole>},
