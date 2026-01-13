@@ -199,8 +199,9 @@ export default function Cart() {
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.imgWrapper}>
                   <img
-                    src={`http://127.0.0.1:8000/images/${item.product.image}`}
+                    src={item.product?.image ? `http://127.0.0.1:8000/storage/${item.product.image}` : "https://placehold.co/100"}
                     alt={item.product_name}
+                    onError={(e) => e.target.src = "https://placehold.co/100"}
                   />
                   <button
                     className={styles.badgeRemove}

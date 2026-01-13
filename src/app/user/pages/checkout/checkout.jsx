@@ -29,7 +29,7 @@ export default function Checkout() {
       price: parseFloat(item.product_price),
       quantity: item.quantity,
       unit: item.unit,
-      image: `http://127.0.0.1:8000/images/${item.product?.image}`,
+      image: item.product?.image ? `http://127.0.0.1:8000/storage/${item.product?.image}` : "https://placehold.co/100",
     }));
 
     return {
@@ -315,7 +315,14 @@ export default function Checkout() {
                 </div>
                 {orderData.items.map((item) => (
                   <div key={item.id} className={styles.tableRow}>
-                    <span>{item.name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img
+                        src={item.image}
+                        alt=""
+                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                      />
+                      <span>{item.name}</span>
+                    </div>
                     <span>{item.unit}</span>
                     <span>{item.quantity}</span>
                     <span>{(item.price * item.quantity).toLocaleString()}đ</span>

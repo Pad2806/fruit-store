@@ -3,10 +3,17 @@ import "./ProductCard.css";
 import { useCart } from "../../context/CartContext";
 
 const toImageUrl = (img) => {
-  if (!img) return "/no-image.png";
-  if (img.startsWith("http://") || img.startsWith("https://")) return img;
-  if (img.startsWith("/storage/")) return `http://127.0.0.1:8000${img}`;
-  return `http://127.0.0.1:8000/storage/products/${img}`;
+  if (!img) return "https://placehold.co/300";
+  if (img.startsWith("http")) return img;
+
+  // Clean up if it starts with /storage/ or storage/
+  let cleanPath = img.replace(/^\/?storage\//, "");
+
+  // If cleanPath doesn't start with products/, assume it's directly under storage (though our backend returns products/xxx)
+  // But wait, our backend returns "products/xxx.png".
+  // So we just need to append it to storage/
+
+  return `http://127.0.0.1:8000/storage/${cleanPath}`;
 };
 
 function ProductCard({ product }) {

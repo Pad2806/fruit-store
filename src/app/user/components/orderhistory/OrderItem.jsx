@@ -98,7 +98,7 @@ export default function OrderItem({ order, onRefresh }) {
             <div className={styles.imgWrapper}>
               {/* Fallback image if product_image is missing */}
               <img
-                src={item.product_image || "https://placehold.co/60"}
+                src={item.product_image ? `http://127.0.0.1:8000/storage/${item.product_image}` : "https://placehold.co/60"}
                 alt={item.product_name}
                 onError={(e) => e.target.src = "https://placehold.co/60"}
               />
