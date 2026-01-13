@@ -95,7 +95,7 @@ class InitialDataSeeder extends Seeder
         (UUID(),'Dâu Tây','Dâu tươi',0,100,120000,(SELECT id FROM origins LIMIT 1),(SELECT id FROM categories LIMIT 1),'kg','strawberry.jpg','active','Dâu Tây',@now,null);
         INSERT INTO orders (
             id, user_id, recipient_name, recipient_email,
-            recipient_phone_number, recipient_address,
+            recipient_phone_number, recipient_address, recipient_city, recipient_district, recipient_ward,
             payment_method, payment_status,
             datetime_order, total_amount, shipping_fee,
             status, created_at, updated_at
@@ -105,7 +105,10 @@ class InitialDataSeeder extends Seeder
             'User Test',
             'user@test.com',
             '0909999999',
+            '123 Lê Duẩn, Hải Châu, Đà Nẵng',
             'Đà Nẵng',
+            'Hải Châu',
+            'Thanh Khê',
             'cod',
             'paid',
             @now,

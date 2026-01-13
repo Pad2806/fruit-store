@@ -15,10 +15,12 @@ class CreateOrdersTable extends Migration
             $table->string('recipient_email');
             $table->string('recipient_phone_number', 10);
             $table->string('recipient_address');
+            $table->string('recipient_city');
+            $table->string('recipient_district');
+            $table->string('recipient_ward');
             $table->enum('payment_method', ['cod', 'banking']);
             $table->enum('payment_status', ['pending', 'paid', 'failed']);
             $table->string('datetime_order')->nullable();
-            $table->string('payment_intent_id')->nullable();
             $table->decimal('total_amount', 15, 2);
             $table->decimal('shipping_fee', 15, 2)->default(0);
             $table->enum('status', ['pending', 'confirmed', 'shipping', 'completed', 'cancelled'])->default('pending');

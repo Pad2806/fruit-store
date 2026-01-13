@@ -22,7 +22,6 @@ class CreateProductsTable extends Migration
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->text('short_desc')->nullable();
             $table->timestamps();
-
             $table->foreign('origin_id')->references('id')->on('origins')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
