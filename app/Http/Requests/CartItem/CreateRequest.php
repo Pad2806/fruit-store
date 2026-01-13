@@ -17,6 +17,7 @@ class CreateRequest extends BaseRequest
     {
         return [
             'user_id' => 'required|string|max:255',
+            'quantity' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }

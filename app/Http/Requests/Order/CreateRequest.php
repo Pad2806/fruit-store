@@ -26,6 +26,7 @@ class CreateRequest extends BaseRequest
             'total_amount' => 'sometimes|numeric|min:0',
             'shipping_fee' => 'sometimes|numeric|min:0',
             'note' => 'nullable|string|max:1000',
+            'datetime_order' => 'sometimes|date',
         ];
     }
 }

@@ -13,34 +13,40 @@ use Illuminate\Support\Str;
 class CartItemController extends Controller
 {
     function store(Product $product, CreateRequest $request)
-    {
-        $data = $request->validated();
-        $cart = Cart::firstOrCreate(
-            ['user_id' => $data['user_id']],
-            ['id' => (string) Str::uuid()]
-        );
+{
+    $data = $request->validated();
 
-        $cartItem = CartItem::where('cart_id', $cart->id)
-            ->where('product_id', $product->id)
-            ->first();
+    $qty = (int) ($data['quantity'] ?? 1);
+    if ($qty < 1) $qty = 1;
 
-        if ($cartItem) {
-            return $this->updateQuantityInternal($cartItem, $cartItem->quantity + 1);
-        }
+    $cart = Cart::firstOrCreate(
+        ['user_id' => $data['user_id']],
+        ['id' => (string) Str::uuid()]
+    );
 
-        $cartItemData = [
-            'id' => (string) Str::uuid(),
-            'cart_id' => $cart->id,
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_price' => $product->price,
-            'quantity' => 1,
-            'unit' => $product->unit,
-        ];
-        $cartItem =CartItem::create($cartItemData);
+    $cartItem = CartItem::where('cart_id', $cart->id)
+        ->where('product_id', $product->id)
+        ->first();
 
-        return new CartItemResource($cartItem);
+    if ($cartItem) {
+        return $this->updateQuantityInternal($cartItem, $cartItem->quantity + $qty);
     }
+
+    $cartItemData = [
+        'id' => (string) Str::uuid(),
+        'cart_id' => $cart->id,
+        'product_id' => $product->id,
+        'product_name' => $product->name,
+        'product_price' => $product->price,
+        'quantity' => $qty,
+        'unit' => $product->unit,
+    ];
+
+    $cartItem = CartItem::create($cartItemData);
+
+    return new CartItemResource($cartItem);
+}
+
 
     function updateQuantity(CartItem $cartItem, UpdateRequest $request)
     {
