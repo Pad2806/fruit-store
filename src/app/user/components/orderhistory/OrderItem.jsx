@@ -57,7 +57,7 @@ export default function OrderItem({ order, onRefresh }) {
       pending: "Chờ xác nhận",
       confirmed: "Đã xác nhận",
       shipping: "Đang giao",
-      delivered: "Đã giao",
+      completed: "Đã giao",
       cancelled: "Đã huỷ"
     };
     return map[status] || status;

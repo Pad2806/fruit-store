@@ -4,10 +4,12 @@ import { Landmark, Banknote, X, ClipboardCheck } from "lucide-react";
 import styles from "./checkout.module.scss";
 import { createOrder } from "../../../../api/orders";
 import { ToastService } from "../../components/toast/Toast";
+import { useCart } from "../../context/CartContext";
 
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { refreshCartCount } = useCart();
 
   const [showModal, setShowModal] = useState(false);
   const [orderId] = useState(`FS${Date.now().toString().slice(-6)}`);
@@ -96,6 +98,8 @@ export default function Checkout() {
 
       if (orderPayload.payment_method === "cod") {
         const res = await createOrder(orderPayload);
+        // Reset cart count sau khi đặt hàng thành công
+        await refreshCartCount();
 
         navigate("/order-success", {
           state: {

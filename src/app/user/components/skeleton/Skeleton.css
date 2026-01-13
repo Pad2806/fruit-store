@@ -1,0 +1,385 @@
+/* ===== Base Skeleton Animation ===== */
+.skeleton {
+    background-color: #e0e0e0;
+    background: linear-gradient(90deg,
+            #e0e0e0 25%,
+            #d0d0d0 50%,
+            #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ===== Product Card Skeleton ===== */
+.skeleton-product-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    min-width: 220px;
+    max-width: 280px;
+    flex: 1 1 220px;
+}
+
+.skeleton-product-card .skeleton-image {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.skeleton-product-card .skeleton-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skeleton-product-card .skeleton-title {
+    margin-top: 8px;
+}
+
+.skeleton-product-card .skeleton-button {
+    margin-top: 8px;
+}
+
+/* ===== Product List Skeleton ===== */
+.skeleton-product-list {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px 0;
+    width: 100%;
+}
+
+/* ===== Product Detail Skeleton ===== */
+.skeleton-product-detail {
+    display: flex;
+    gap: 40px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.skeleton-detail-left {
+    flex: 1;
+    max-width: 500px;
+}
+
+.skeleton-detail-left .skeleton-main-image {
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 16px;
+}
+
+.skeleton-thumb-list {
+    display: flex;
+    gap: 12px;
+}
+
+.skeleton-detail-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 20px;
+}
+
+.skeleton-detail-right .skeleton-title {
+    margin-bottom: 8px;
+}
+
+.skeleton-detail-right .skeleton-meta {
+    margin-bottom: 8px;
+}
+
+.skeleton-detail-right .skeleton-price {
+    margin-bottom: 16px;
+}
+
+.skeleton-quantity-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.skeleton-detail-right .skeleton-btn {
+    margin-bottom: 20px;
+}
+
+.skeleton-desc-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 12px;
+}
+
+/* ===== Cart Page Skeleton ===== */
+.skeleton-cart-page {
+    display: flex;
+    gap: 40px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.skeleton-cart-left {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.skeleton-cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.skeleton-cart-item {
+    display: flex;
+    gap: 20px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.skeleton-cart-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-cart-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.skeleton-cart-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    height: fit-content;
+}
+
+/* ===== Home Section Skeleton ===== */
+.skeleton-home-section {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.skeleton-section-title {
+    margin-bottom: 16px;
+}
+
+.skeleton-link {
+    margin-top: 20px;
+}
+
+/* ===== Banner Skeleton ===== */
+.skeleton-banner {
+    width: 100%;
+    overflow: hidden;
+}
+
+.skeleton-banner .skeleton {
+    width: 100%;
+}
+
+/* ===== Text Skeleton ===== */
+.skeleton-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-line {
+    margin-bottom: 4px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .skeleton-product-detail {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .skeleton-detail-left {
+        max-width: 100%;
+    }
+
+    .skeleton-cart-page {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .skeleton-product-list {
+        gap: 12px;
+    }
+
+    .skeleton-product-card {
+        min-width: 160px;
+        max-width: 180px;
+        padding: 12px;
+    }
+
+    .skeleton-user-page {
+        flex-direction: column;
+    }
+
+    .skeleton-sidebar {
+        width: 100%;
+    }
+}
+
+/* ===== User Profile Skeleton ===== */
+.skeleton-user-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+}
+
+.skeleton-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.skeleton-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 400px;
+}
+
+/* ===== User Page Skeleton ===== */
+.skeleton-user-page {
+    display: flex;
+    gap: 40px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.skeleton-sidebar {
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.skeleton-user-brief {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f9f9f9;
+    border-radius: 12px;
+}
+
+.skeleton-user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.skeleton-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-main {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== Order History Skeleton ===== */
+.skeleton-order-history {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.skeleton-order-history .skeleton-title {
+    margin-bottom: 12px;
+}
+
+.skeleton-order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.skeleton-order-item {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.skeleton-order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.skeleton-order-content {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.skeleton-order-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.skeleton-order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}

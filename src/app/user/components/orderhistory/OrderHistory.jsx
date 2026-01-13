@@ -3,6 +3,7 @@ import styles from "./OrderHistory.module.scss";
 import OrderItem from "./OrderItem";
 import api from "../../../../services/axios";
 import { message } from "antd";
+import { OrderHistorySkeleton } from "../skeleton/Skeleton";
 
 export default function OrderHistory() {
   const [orders, setOrders] = useState([]);
@@ -25,7 +26,7 @@ export default function OrderHistory() {
     fetchOrders();
   }, []);
 
-  if (loading) return <p>Đang tải đơn hàng...</p>;
+  if (loading) return <OrderHistorySkeleton />;
 
   return (
     <div className={styles.historyWrapper}>

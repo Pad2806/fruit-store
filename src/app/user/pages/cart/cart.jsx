@@ -5,8 +5,10 @@ import { FaClock } from "react-icons/fa";
 import { getCartDetails } from "../../../../api/cart";
 import { createCart } from "../../../../api/cart";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import { updateItemQuantity, removeCartItem } from "../../../../api/cart_items";
 import { ToastService } from "../../components/toast/Toast";
+import { CartPageSkeleton } from "../../components/skeleton/Skeleton";
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ export default function Cart() {
   const [loading, setLoading] = useState(true);
 
   const { user } = useAuth();
+  const { refreshCartCount } = useCart();
 
   const fetchCartData = async () => {
     if (!user) {
@@ -60,6 +63,8 @@ export default function Cart() {
           item.id === cartItemId ? { ...item, quantity: newQty } : item
         )
       );
+      // Cập nhật cart count trên header
+      await refreshCartCount();
     } catch (error) {
       ToastService.error("Cập nhật số lượng thất bại");
     }
@@ -72,7 +77,8 @@ export default function Cart() {
         try {
           await removeCartItem(cartItemId);
           setCartItems(prev => prev.filter(item => item.id !== cartItemId));
-          
+          // Cập nhật cart count trên header
+          await refreshCartCount();
           ToastService.success("Đã xóa sản phẩm thành công");
         } catch (error) {
           console.log(error);
@@ -83,10 +89,10 @@ export default function Cart() {
   };
   const userId = user?.id || null;
   const handleCheckout = () => {
-  if (cartItems.length === 0) {
-    ToastService.error("Giỏ hàng trống");
-    return;
-  }
+    if (cartItems.length === 0) {
+      ToastService.error("Giỏ hàng trống");
+      return;
+    }
 
     navigate("/checkouts", {
       state: {
@@ -96,7 +102,7 @@ export default function Cart() {
         userId
       }
     });
-};
+  };
 
 
   const totalPrice = cartItems.reduce((sum, item) => {
@@ -173,7 +179,11 @@ export default function Cart() {
     setIsConfirmed(true);
   };
 
-  if (loading) return <div className={styles.container}>Đang tải dữ liệu...</div>;
+  if (loading) return (
+    <div className={styles.container}>
+      <CartPageSkeleton />
+    </div>
+  );
 
   return (
     <div className={styles.container}>
@@ -305,7 +315,7 @@ export default function Cart() {
             </div>
 
             <button className={styles.checkoutBtn} onClick={handleCheckout}>
-                    THANH TOÁN
+              THANH TOÁN
             </button>
           </div>
         </div>

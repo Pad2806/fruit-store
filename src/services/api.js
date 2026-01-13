@@ -7,7 +7,7 @@ async function request(endpoint, options = {}) {
   const token = localStorage.getItem("access_token");
 
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export const categoryApi = {
     if (params.page) queryParams.append('page', params.page);
     if (params.per_page) queryParams.append('per_page', params.per_page);
     if (params.search) queryParams.append('search', params.search);
-    
+
     const queryString = queryParams.toString();
     return request(`/seller/categories${queryString ? `?${queryString}` : ''}`);
   },
@@ -60,7 +60,7 @@ export const originApi = {
     if (params.page) queryParams.append('page', params.page);
     if (params.per_page) queryParams.append('per_page', params.per_page);
     if (params.search) queryParams.append('search', params.search);
-    
+
     const queryString = queryParams.toString();
     return request(`/seller/origins${queryString ? `?${queryString}` : ''}`);
   },
@@ -84,23 +84,38 @@ export const productApi = {
     if (params.page) queryParams.append('page', params.page);
     if (params.per_page) queryParams.append('per_page', params.per_page);
     if (params.search) queryParams.append('search', params.search);
-    
+
     const queryString = queryParams.toString();
     return request(`/seller/products${queryString ? `?${queryString}` : ''}`);
   },
   getByCategory: (categoryId) => request(`/seller/products/category/${categoryId}`),
-  create: (formData) => fetch(`${API_BASE_URL}/seller/products`, {
-    method: 'POST',
-    body: formData,
-  }).then((res) => res.json()),
-  update: (id, formData) => fetch(`${API_BASE_URL}/seller/products/${id}`, {
-    method: 'POST',
-    body: formData,
-  }).then((res) => res.json()),
+  create: (formData) => {
+    const token = localStorage.getItem("access_token");
+    return fetch(`${API_BASE_URL}/seller/products`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    }).then((res) => res.json());
+  },
+  update: (id, formData) => {
+    const token = localStorage.getItem("access_token");
+    return fetch(`${API_BASE_URL}/seller/products/${id}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    }).then((res) => res.json());
+  },
   delete: (id) => request(`/seller/products/${id}`, {
     method: 'DELETE',
   }),
 };
+
 
 // Order APIs
 export const orderApi = {
@@ -109,7 +124,7 @@ export const orderApi = {
     if (params.page) queryParams.append('page', params.page);
     if (params.per_page) queryParams.append('per_page', params.per_page);
     if (params.search) queryParams.append('search', params.search);
-    
+
     const queryString = queryParams.toString();
     return request(`/seller/orders${queryString ? `?${queryString}` : ''}`);
   },

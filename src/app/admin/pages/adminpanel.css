@@ -139,7 +139,7 @@ body {
   overflow-x: auto;
 }
 
-.users-table > table {
+.users-table>table {
   width: 100%;
   border-collapse: collapse;
   background: white;
@@ -372,6 +372,7 @@ tbody td {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -398,6 +399,7 @@ tbody td {
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -530,6 +532,18 @@ tbody td {
   box-shadow: 0 6px 16px rgba(244, 124, 75, 0.45);
 }
 
+.btn-save:disabled,
+.btn-cancel:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-save:disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 12px rgba(244, 124, 75, 0.35);
+}
+
 .delete-modal {
   max-width: 420px;
 }
@@ -554,10 +568,37 @@ tbody td {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-delete-confirm:hover {
   background: #e96f3f;
+}
+
+.btn-delete-confirm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-delete-confirm:disabled:hover {
+  background: #f47c4b;
+}
+
+/* Button Spinner Animation */
+.btn-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes btn-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
@@ -597,6 +638,7 @@ tbody td {
   background-color: #f47c4b !important;
   color: #fff !important;
 }
+
 .password-field {
   position: relative;
   display: flex;
@@ -639,15 +681,19 @@ tbody td {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -674,12 +720,10 @@ tbody td {
 }
 
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e8e8e8 37%,
-    #f0f0f0 63%
-  );
+  background: linear-gradient(90deg,
+      #f0f0f0 25%,
+      #e8e8e8 37%,
+      #f0f0f0 63%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 6px;
@@ -778,6 +822,7 @@ tbody td {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

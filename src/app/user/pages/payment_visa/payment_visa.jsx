@@ -4,6 +4,7 @@ import styles from "./payment_visa.module.scss";
 import { ToastService } from "../../components/toast/Toast";
 import { confirmOrderStripe } from "../../../../api/orders";
 import apiClient from "../../../../api/api";
+import { useCart } from "../../context/CartContext";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -34,6 +35,7 @@ function PaymentVisaInner() {
   const location = useLocation();
   const stripe = useStripe();
   const elements = useElements();
+  const { refreshCartCount } = useCart();
 
   const state = location.state || {};
   const { orderId, totalAmount, customer, items = [], deliveryTime, orderPayload } = state;
@@ -125,6 +127,8 @@ function PaymentVisaInner() {
           const confirmRes = await confirmOrderStripe(result.paymentIntent.id);
 
           if (confirmRes?.status === "completed" || confirmRes?.status === "confirmed") {
+            // Reset cart count sau khi thanh toán thành công
+            await refreshCartCount();
             navigate("/order-success", {
               state: {
                 orderId,

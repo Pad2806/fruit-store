@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import BannerSlider from "../../components/banner/BannerSlider";
 import ProductList from "../../components/product_list/ProductList";
+import { ProductListSkeleton } from "../../components/skeleton/Skeleton";
 import styles from "./products.module.scss";
 
 import banner1 from "../../assets/banner3.png";
@@ -29,7 +30,8 @@ const normalizeProducts = (payload) => {
     id: p?.id ?? p?._id ?? idx,
     name: p?.name ?? p?.title ?? "",
     price: formatPrice(p?.price ?? p?.unit_price ?? p?.sale_price),
-    image: p?.image ?? p?.image_url ?? p?.thumbnail ?? p?.cover ?? "",
+    // Use 'images' (plural) to match ProductCard component
+    images: p?.images ?? (p?.image ? [p.image] : []),
   }));
 };
 
@@ -52,6 +54,8 @@ function Products() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const startTime = Date.now();
+    const MIN_LOADING_TIME = 3000; // Minimum 3000ms để skeleton hiển thị rõ
 
     (async () => {
       try {
@@ -62,10 +66,17 @@ function Products() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
-        setAllProducts(normalizeProducts(data));
+        const normalized = normalizeProducts(data);
+
+        setAllProducts(normalized);
       } catch (e) {
         if (e?.name !== "AbortError") setError(e?.message || "Fetch failed");
       } finally {
+        // Đảm bảo skeleton hiển thị ít nhất MIN_LOADING_TIME bất kể thành công hay lỗi
+        const elapsed = Date.now() - startTime;
+        if (elapsed < MIN_LOADING_TIME) {
+          await new Promise(resolve => setTimeout(resolve, MIN_LOADING_TIME - elapsed));
+        }
         setLoading(false);
       }
     })();
@@ -120,8 +131,8 @@ function Products() {
           </select>
         </div>
 
-        {loading && <div>Đang tải sản phẩm...</div>}
-        {!loading && error && <div>{error}</div>}
+        {loading && <ProductListSkeleton count={5} />}
+        {!loading && error && <div className={styles.error}>{error}</div>}
         {!loading && !error && <ProductList products={visibleProducts} />}
 
         {!loading && !error && visibleCount < sortedProducts.length && (

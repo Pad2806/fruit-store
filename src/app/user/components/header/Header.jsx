@@ -1,7 +1,6 @@
-import { useState, useRef, useLayoutEffect, useEffect } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPhoneAlt, FaUser, FaShoppingCart, FaHome, FaEnvelope } from "react-icons/fa";
-import { getCartDetails } from "../../../../api/cart";
 
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
@@ -19,28 +18,8 @@ function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const cartId = "327c4288-8b80-45ac-9027-392acf36b7fd";
-  const [cartCount, setCartCount] = useState(0);
-
-  useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        const data = await getCartDetails(cartId);
-
-        const count =
-          data?.cart_items_count ??
-          data?.data?.cart_items_count ??
-          data?.cart_items?.length ??
-          0;
-
-        setCartCount(Number(count) || 0);
-      } catch (e) {
-        setCartCount(0);
-      }
-    };
-
-    fetchCount();
-  }, []);
+  // Sử dụng cartCount từ CartContext thay vì local state
+  const { cartCount } = useCart();
   useLayoutEffect(() => {
     if (openMenu && headerRef.current) {
       const rect = headerRef.current.getBoundingClientRect();

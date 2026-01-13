@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { UserPlus, Edit2, Trash2, Search, X, Save, LogOut, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react';
+import { UserPlus, Edit2, Trash2, Search, X, Save, LogOut, Eye, EyeOff, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import './adminpanel.css';
 import { getUsers, createUser, updateUser, deleteUser } from '../services/userService';
 
@@ -88,6 +88,10 @@ const AdminPanel = () => {
   const [generalError, setGeneralError] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
+
+  // Loading states for buttons
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const isView = modalMode === 'view';
 
@@ -195,7 +199,8 @@ const AdminPanel = () => {
   };
 
   const confirmDelete = async () => {
-    if (!userToDelete) return;
+    if (!userToDelete || deleting) return;
+    setDeleting(true);
     try {
       await deleteUser(userToDelete.id);
       await fetchUsers(pagination.current_page);
@@ -204,6 +209,8 @@ const AdminPanel = () => {
     } catch (error) {
       console.error("Failed to delete user", error);
       alert("Xoá thất bại! Có thể do lỗi kết nối hoặc quyền truy cập.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -286,6 +293,8 @@ const AdminPanel = () => {
       return;
     }
 
+    if (saving) return;
+    setSaving(true);
     setFieldErrors({});
     setGeneralError('');
 
@@ -330,6 +339,8 @@ const AdminPanel = () => {
       } else {
         setGeneralError('Có lỗi xảy ra, vui lòng thử lại.');
       }
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -696,14 +707,23 @@ const AdminPanel = () => {
             </div>
 
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={handleCloseModal}>
+              <button className="btn-cancel" onClick={handleCloseModal} disabled={saving}>
                 {isView ? 'Đóng' : 'Hủy'}
               </button>
 
               {!isView && (
-                <button className="btn-save" onClick={handleSave}>
-                  <Save size={20} />
-                  Lưu
+                <button className="btn-save" onClick={handleSave} disabled={saving}>
+                  {saving ? (
+                    <>
+                      <Loader2 size={20} className="btn-spinner" />
+                      Đang lưu...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={20} />
+                      Lưu
+                    </>
+                  )}
                 </button>
               )}
             </div>
@@ -731,11 +751,18 @@ const AdminPanel = () => {
             </div>
 
             <div className="modal-footer">
-              <button className="btn-cancel" onClick={cancelDelete}>
+              <button className="btn-cancel" onClick={cancelDelete} disabled={deleting}>
                 Huỷ
               </button>
-              <button className="btn-delete-confirm" onClick={confirmDelete}>
-                Xoá
+              <button className="btn-delete-confirm" onClick={confirmDelete} disabled={deleting}>
+                {deleting ? (
+                  <>
+                    <Loader2 size={18} className="btn-spinner" />
+                    Đang xoá...
+                  </>
+                ) : (
+                  'Xoá'
+                )}
               </button>
             </div>
           </div>

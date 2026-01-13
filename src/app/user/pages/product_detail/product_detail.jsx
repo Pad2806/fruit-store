@@ -2,6 +2,7 @@ import { useParams, Link, Navigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import ProductCard from "../../components/product_card/ProductCard";
 import { useCart } from "../../context/CartContext";
+import { ProductDetailSkeleton } from "../../components/skeleton/Skeleton";
 import { FaCheckCircle, FaTruck, FaPhoneAlt } from "react-icons/fa";
 import styles from "./product_detail.module.scss";
 
@@ -43,6 +44,8 @@ function ProductDetail() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const startTime = Date.now();
+    const MIN_LOADING_TIME = 3000; // Minimum 3000ms để skeleton hiển thị rõ
 
     (async () => {
       try {
@@ -81,6 +84,11 @@ function ProductDetail() {
       } catch (e) {
         if (e?.name !== "AbortError") setNotFound(true);
       } finally {
+        // Đảm bảo skeleton hiển thị ít nhất MIN_LOADING_TIME bất kể thành công hay lỗi
+        const elapsed = Date.now() - startTime;
+        if (elapsed < MIN_LOADING_TIME) {
+          await new Promise(resolve => setTimeout(resolve, MIN_LOADING_TIME - elapsed));
+        }
         setLoading(false);
       }
     })();
@@ -100,7 +108,7 @@ function ProductDetail() {
 
   return (
     <>
-      {loading && <div style={{ padding: 24 }}>Đang tải sản phẩm...</div>}
+      {loading && <ProductDetailSkeleton />}
 
       {!loading && product && (
         <>

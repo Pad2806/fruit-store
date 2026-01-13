@@ -5,6 +5,7 @@ import Profile from "../../components/profile/Profile";
 import OrderHistory from "../../components/orderhistory/OrderHistory";
 import { useAuth } from "../../context/AuthContext";
 import { BiUser, BiShoppingBag } from "react-icons/bi";
+import { UserPageSkeleton } from "../../components/skeleton/Skeleton";
 
 export default function User() {
   const [currentTab, setCurrentTab] = useState("profile");
@@ -17,7 +18,11 @@ export default function User() {
     }
   }, [user, loading, navigate]);
 
-  if (loading) return <div style={{ textAlign: "center", marginTop: "50px" }}>Đang tải...</div>;
+  if (loading) return (
+    <div className={styles.container}>
+      <UserPageSkeleton />
+    </div>
+  );
   if (!user) return null;
 
   return (
