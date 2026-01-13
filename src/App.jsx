@@ -7,6 +7,7 @@ import ScrollButton from "./layout/components/scroll-to-top/ScrollToTopButton";
 import { Toaster } from "react-hot-toast";
 import ChatBox from "./app/user/components/chatbox/ChatBox";
 import { AuthProvider } from "./app/user/context/AuthContext";
+import RequireRole from "./app/shared/components/RequireRole";
 function AppRoutes() {
   return useRoutes(appRoutes);
 }
@@ -20,7 +21,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <PageTitle />
-          <ChatBox />
+            <ChatBox />
           <AppRoutes />
         </CartProvider>
       </AuthProvider>
