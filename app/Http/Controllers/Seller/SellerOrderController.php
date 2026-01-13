@@ -12,19 +12,37 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SellerOrderController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $orders = Order::withCount('details as total_products')
-            ->withSum('details as total_quantity', 'quantity')
-            ->orderBy('datetime_order', 'desc')
-            ->get();
+        $perPage = (int) $request->input('per_page', 5);
+        $search = $request->input('search', '');
 
-        return OrderResource::collection($orders)->additional([
+        $query = Order::withCount('details as total_products')
+            ->withSum('details as total_quantity', 'quantity');
+
+        // Search by customer name only
+        if (!empty($search)) {
+            $query->where('recipient_name', 'like', "%{$search}%");
+        }
+
+        $orders = $query->orderBy('datetime_order', 'desc')
+            ->paginate($perPage);
+
+        return response()->json([
             'success' => true,
             'message' => 'Orders retrieved successfully',
+            'data' => OrderResource::collection($orders),
+            'pagination' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+                'from' => $orders->firstItem(),
+                'to' => $orders->lastItem(),
+            ]
         ]);
     }
-
+    
     public function show(string $id): JsonResponse
     {
         $order = Order::with('details')->find($id);

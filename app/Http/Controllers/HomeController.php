@@ -32,7 +32,7 @@ class HomeController extends Controller
                 $query->orderBy('created_at', 'desc');
         }
 
-        $limit  = (int) $request->get('limit', 5);
+        $limit  = (int) $request->get('limit', max(10, 100));
         $offset = (int) $request->get('offset', 0);
 
         $products = $query
@@ -41,13 +41,20 @@ class HomeController extends Controller
             ->get();
 
         $data = $products->map(function ($product) {
+            // Parse images from JSON string
+            $images = [];
+            if ($product->image) {
+                $decoded = json_decode($product->image, true);
+                if (is_array($decoded)) {
+                    $images = array_map(fn($img) => asset('storage/' . $img), $decoded);
+                }
+            }
+            
             return [
                 'id'     => $product->id,
                 'name'   => $product->name,
                 'price'  => number_format($product->price, 0, ',', '.') . 'đ',
-                'images' => [
-                    asset('storage/products/' . $product->image)
-                ],
+                'images' => $images,
             ];
         });
 
@@ -75,7 +82,7 @@ class HomeController extends Controller
             }
 
             $images = array_slice($images, 0, 5);
-            $images = array_map(fn($img) => asset('storage/products/' . trim($img)), $images);
+            $images = array_map(fn($img) => asset('storage/' . trim($img)), $images);
         }
 
         $mainImage = $images[0] ?? null;
@@ -108,10 +115,19 @@ class HomeController extends Controller
             ->limit(6)
             ->get()
             ->map(function ($p) {
+                // Get first image from JSON array
+                $firstImage = null;
+                if ($p->image) {
+                    $decoded = json_decode($p->image, true);
+                    if (is_array($decoded) && count($decoded) > 0) {
+                        $firstImage = asset('storage/' . $decoded[0]);
+                    }
+                }
+                
                 return [
                     'id' => $p->id,
                     'name' => $p->name,
-                    'image' => asset('storage/products/' . $p->image),
+                    'image' => $firstImage,
                 ];
             });
     }
