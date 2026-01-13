@@ -92,7 +92,7 @@ class ProductController extends Controller
             'category_id' => $validated['category_id'],
             'unit' => $validated['unit'] ?? null,
             'status' => $validated['status'] ?? 'active',
-            'image' => json_encode($imagePaths), // Store as JSON
+            'image' => $imagePaths, // Store as array (model casts to JSON)
         ]);
 
         // Load relationships for response
@@ -119,7 +119,17 @@ class ProductController extends Controller
         $validated = $request->validated();
 
         // Handle image management
-        $currentImages = $product->image ? json_decode($product->image, true) : [];
+        $currentImages = $product->image;
+
+        // Handle double-encoded or string data from legacy issues
+        if (is_string($currentImages)) {
+            $currentImages = json_decode($currentImages, true);
+        }
+
+        // Ensure $currentImages is always an array
+        if (!is_array($currentImages)) {
+            $currentImages = [];
+        }
         
         // Delete specific images if requested
         $deleteImages = $request->input('delete_images', []);
@@ -149,7 +159,7 @@ class ProductController extends Controller
 
         // Build update data
         $updateData = [
-            'image' => json_encode($currentImages),
+            'image' => $currentImages,
         ];
 
         // Only update fields that are provided

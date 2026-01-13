@@ -14,16 +14,26 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        // Parse images from JSON string to array
-        $images = $this->image ? json_decode($this->image, true) : [];
+        // Parse images. Supports array (casted), JSON string, or double-encoded JSON string.
+        $images = $this->image;
+
+        if (is_string($images)) {
+            $decoded = json_decode($images, true);
+            // If decoding a string returns a string, it was double-encoded
+            if (is_string($decoded)) {
+                $decoded = json_decode($decoded, true);
+            }
+            $images = $decoded;
+        }
         
         // Ensure $images is always an array
         if (!is_array($images)) {
             $images = [];
         }
         
-        // Convert relative paths to full URLs
+        // Convert relative paths to full URLs, ensuring forward slashes
         $imageUrls = array_map(function ($path) {
+            $path = str_replace('\\', '/', $path);
             return asset('storage/' . $path);
         }, $images);
 

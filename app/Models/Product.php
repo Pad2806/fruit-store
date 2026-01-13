@@ -32,20 +32,20 @@ class Product extends Model
     ];
 
     // Accessor to get the first image from the array
-    public function getImageAttribute($value)
-    {
-        if (is_null($value)) {
-            return null;
-        }
+    // public function getImageAttribute($value)
+    // {
+    //     if (is_null($value)) {
+    //         return null;
+    //     }
         
-        $decoded = json_decode($value, true);
+    //     $decoded = json_decode($value, true);
         
-        if (is_array($decoded) && count($decoded) > 0) {
-            return $decoded[0];
-        }
+    //     if (is_array($decoded) && count($decoded) > 0) {
+    //         return $decoded[0];
+    //     }
         
-        return $value;
-    }
+    //     return $value;
+    // }
 
     public function cartItems()
     {
