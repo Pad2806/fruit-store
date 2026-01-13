@@ -83,7 +83,7 @@ class OrderController extends Controller
                         'recipient_ward' => $metadata->recipient_ward,
                         'recipient_district' => $metadata->recipient_district,
                         'note' => $metadata->note,
-                        'datetime_order' => now()->toString(),
+                        'datetime_order' => $metadata->datetime_order ?? now()->toString(),
                         'status' => 'confirmed',
             ]);
 

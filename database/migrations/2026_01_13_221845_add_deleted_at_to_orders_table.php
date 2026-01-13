@@ -14,7 +14,9 @@ class AddDeletedAtToOrdersTable extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->softDeletes();
+            if (!Schema::hasColumn('orders', 'deleted_at')) {
+                $table->softDeletes();
+            }
         });
     }
 
@@ -26,7 +28,9 @@ class AddDeletedAtToOrdersTable extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropSoftDeletes();
+            if (Schema::hasColumn('orders', 'deleted_at')) {
+                $table->dropSoftDeletes();
+            }
         });
     }
 }

@@ -52,6 +52,7 @@ class PaymentController extends Controller
                     'recipient_district' => $request->recipient_district,
                     'shipping_fee' => (string)$request->shipping_fee ?? 0,
                     'note' => $request->note ?? '',
+                    'datetime_order' => $request->datetime_order,
                 ],
         ]);
 
