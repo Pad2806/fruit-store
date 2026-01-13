@@ -29,7 +29,6 @@ export default function Cart() {
       setLoading(true);
       let cartId = localStorage.getItem("cart_id");
       if (!cartId) {
-        // create cart for user if not exists
         const cartResp = await createCart(user.id);
         cartId = cartResp.id || cartResp.data?.id;
         if (cartId) localStorage.setItem("cart_id", cartId);
@@ -58,12 +57,9 @@ export default function Cart() {
     if (newQty < 1) return;
     try {
       await updateItemQuantity(cartItemId, newQty);
-      setCartItems(prev =>
-        prev.map(item =>
-          item.id === cartItemId ? { ...item, quantity: newQty } : item
-        )
+      setCartItems((prev) =>
+        prev.map((item) => (item.id === cartItemId ? { ...item, quantity: newQty } : item))
       );
-      // Cập nhật cart count trên header
       await refreshCartCount();
     } catch (error) {
       ToastService.error("Cập nhật số lượng thất bại");
@@ -71,39 +67,20 @@ export default function Cart() {
   };
 
   const handleRemoveItem = (cartItemId) => {
-    ToastService.confirmDelete(
-      "Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?",
-      async () => {
-        try {
-          await removeCartItem(cartItemId);
-          setCartItems(prev => prev.filter(item => item.id !== cartItemId));
-          // Cập nhật cart count trên header
-          await refreshCartCount();
-          ToastService.success("Đã xóa sản phẩm thành công");
-        } catch (error) {
-          console.log(error);
-          ToastService.error("Lỗi khi xóa sản phẩm");
-        }
-      }
-    );
-  };
-  const userId = user?.id || null;
-  const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      ToastService.error("Giỏ hàng trống");
-      return;
-    }
-
-    navigate("/checkouts", {
-      state: {
-        cartItems,
-        totalPrice,
-        deliveryTime: isConfirmed ? confirmedTime : null,
-        userId
+    ToastService.confirmDelete("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?", async () => {
+      try {
+        await removeCartItem(cartItemId);
+        setCartItems((prev) => prev.filter((item) => item.id !== cartItemId));
+        await refreshCartCount();
+        ToastService.success("Đã xóa sản phẩm thành công");
+      } catch (error) {
+        console.log(error);
+        ToastService.error("Lỗi khi xóa sản phẩm");
       }
     });
   };
 
+  const userId = user?.id || null;
 
   const totalPrice = cartItems.reduce((sum, item) => {
     return sum + parseFloat(item.product_price) * item.quantity;
@@ -125,7 +102,7 @@ export default function Cart() {
   const dateOptions = [
     { label: "Hôm nay", value: formatDate(today) },
     { label: `Ngày mai (${formatDate(tomorrow)})`, value: formatDate(tomorrow) },
-    { label: `Ngày kia (${formatDate(dayAfter)})`, value: formatDate(dayAfter) }
+    { label: `Ngày kia (${formatDate(dayAfter)})`, value: formatDate(dayAfter) },
   ];
 
   const timeOptions = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
@@ -133,21 +110,22 @@ export default function Cart() {
   const [deliveryOption, setDeliveryOption] = useState("available");
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [confirmedTime, setConfirmedTime] = useState("");
-  const [tempDate, setTempDate] = useState(dateOptions[0].label);
+  const [tempDateValue, setTempDateValue] = useState(dateOptions[0].value);
   const [tempTime, setTempTime] = useState(timeOptions[0]);
+  const [datetimeOrder, setDatetimeOrder] = useState(null);
 
   const parseTimeToMinutes = (t) => {
     const [h, m] = t.split(":").map(Number);
     return h * 60 + m;
   };
 
-  const isToday = tempDate === "Hôm nay";
+  const isToday = tempDateValue === formatDate(today);
 
   const getValidTimes = () => {
     if (!isToday) return timeOptions;
     const now = new Date();
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
-    return timeOptions.filter(t => parseTimeToMinutes(t) > nowMinutes);
+    return timeOptions.filter((t) => parseTimeToMinutes(t) > nowMinutes);
   };
 
   const validTimes = getValidTimes();
@@ -160,11 +138,24 @@ export default function Cart() {
     if (!isToday && !tempTime) {
       setTempTime(timeOptions[0]);
     }
-  }, [tempDate, deliveryOption]);
+  }, [tempDateValue, deliveryOption]);
+
+  const toMysqlDatetime = (ddmmyyyy, hhmm) => {
+    const [d, m, y] = ddmmyyyy.split("/").map(Number);
+    const [hh, mm] = hhmm.split(":").map(Number);
+    const dt = new Date(y, m - 1, d, hh, mm, 0);
+
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(
+      dt.getHours()
+    )}:${pad(dt.getMinutes())}:00`;
+  };
 
   const handleConfirmTime = () => {
     if (deliveryOption !== "select") {
       setIsConfirmed(false);
+      setConfirmedTime("");
+      setDatetimeOrder(null);
       return;
     }
     if (isToday && validTimes.length === 0) {
@@ -175,15 +166,35 @@ export default function Cart() {
       ToastService.error("Vui lòng chọn giờ giao hàng hợp lệ");
       return;
     }
-    setConfirmedTime(`${tempDate} | ${tempTime}`);
+
+    setConfirmedTime(`${tempDateValue} | ${tempTime}`);
+    setDatetimeOrder(toMysqlDatetime(tempDateValue, tempTime));
     setIsConfirmed(true);
   };
 
-  if (loading) return (
-    <div className={styles.container}>
-      <CartPageSkeleton />
-    </div>
-  );
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      ToastService.error("Giỏ hàng trống");
+      return;
+    }
+
+    navigate("/checkouts", {
+      state: {
+        cartItems,
+        totalPrice,
+        deliveryTime: isConfirmed ? confirmedTime : null,
+        datetime_order: isConfirmed ? datetimeOrder : null,
+        userId,
+      },
+    });
+  };
+
+  if (loading)
+    return (
+      <div className={styles.container}>
+        <CartPageSkeleton />
+      </div>
+    );
 
   return (
     <div className={styles.container}>
@@ -195,7 +206,7 @@ export default function Cart() {
           </p>
 
           <div className={styles.itemList}>
-            {cartItems.map(item => (
+            {cartItems.map((item) => (
               <div key={item.id} className={styles.itemCard}>
                 <div className={styles.imgWrapper}>
                   <img
@@ -203,10 +214,7 @@ export default function Cart() {
                     alt={item.product_name}
                     onError={(e) => e.target.src = "https://placehold.co/100"}
                   />
-                  <button
-                    className={styles.badgeRemove}
-                    onClick={() => handleRemoveItem(item.id)}
-                  >
+                  <button className={styles.badgeRemove} onClick={() => handleRemoveItem(item.id)}>
                     Xóa
                   </button>
                 </div>
@@ -234,7 +242,8 @@ export default function Cart() {
           <div className={styles.noteSection}>
             <h3>Ghi chú đơn hàng</h3>
             <p className={styles.readableNote}>
-              <strong>Lưu ý:</strong> Khách hàng đặt quà tặng trái cây, vui lòng ghi rõ thông tin của người được tặng và người đặt để shop thuận tiện liên hệ.
+              <strong>Lưu ý:</strong> Khách hàng đặt quà tặng trái cây, vui lòng ghi rõ thông tin của người
+              được tặng và người đặt để shop thuận tiện liên hệ.
             </p>
             <textarea placeholder="Nhập ghi chú của bạn..."></textarea>
           </div>
@@ -256,6 +265,8 @@ export default function Cart() {
                     onChange={() => {
                       setDeliveryOption("available");
                       setIsConfirmed(false);
+                      setConfirmedTime("");
+                      setDatetimeOrder(null);
                     }}
                   />
                   Giao khi có hàng
@@ -273,7 +284,9 @@ export default function Cart() {
 
               {isConfirmed && deliveryOption === "select" && (
                 <div className={styles.confirmedDisplay}>
-                  <span className={styles.clockIcon}><FaClock /></span>
+                  <span className={styles.clockIcon}>
+                    <FaClock />
+                  </span>
                   <strong>{confirmedTime}</strong>
                 </div>
               )}
@@ -281,22 +294,25 @@ export default function Cart() {
               {!isConfirmed && deliveryOption === "select" && (
                 <div className={styles.selectWrapper}>
                   <div className={styles.selectGroup}>
-                    <select value={tempDate} onChange={e => setTempDate(e.target.value)}>
-                      {dateOptions.map(opt => (
-                        <option key={opt.value} value={opt.label}>{opt.label}</option>
+                    <select value={tempDateValue} onChange={(e) => setTempDateValue(e.target.value)}>
+                      {dateOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
                       ))}
                     </select>
 
                     <select
                       value={tempTime}
-                      onChange={e => setTempTime(e.target.value)}
+                      onChange={(e) => setTempTime(e.target.value)}
                       disabled={isToday && validTimes.length === 0}
                     >
-                      {timeOptions.map(time => {
+                      {timeOptions.map((time) => {
                         const disabled = isToday && !validTimes.includes(time);
                         return (
                           <option key={time} value={time} disabled={disabled}>
-                            {time}{disabled ? " (đã qua)" : ""}
+                            {time}
+                            {disabled ? " (đã qua)" : ""}
                           </option>
                         );
                       })}

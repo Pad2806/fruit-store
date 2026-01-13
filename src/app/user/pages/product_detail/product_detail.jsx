@@ -45,7 +45,7 @@ function ProductDetail() {
   useEffect(() => {
     const controller = new AbortController();
     const startTime = Date.now();
-    const MIN_LOADING_TIME = 3000; // Minimum 3000ms để skeleton hiển thị rõ
+    const MIN_LOADING_TIME = 3000; 
 
     (async () => {
       try {
@@ -84,7 +84,6 @@ function ProductDetail() {
       } catch (e) {
         if (e?.name !== "AbortError") setNotFound(true);
       } finally {
-        // Đảm bảo skeleton hiển thị ít nhất MIN_LOADING_TIME bất kể thành công hay lỗi
         const elapsed = Date.now() - startTime;
         if (elapsed < MIN_LOADING_TIME) {
           await new Promise(resolve => setTimeout(resolve, MIN_LOADING_TIME - elapsed));

@@ -10,7 +10,6 @@ export function CartProvider({ children }) {
   const [cartCount, setCartCount] = useState(0);
   const { user } = useAuth();
 
-  // Function to refresh cart count from server
   const refreshCartCount = useCallback(async () => {
     const token = localStorage.getItem("access_token");
     if (!token || !user?.id) {
@@ -20,22 +19,26 @@ export function CartProvider({ children }) {
 
     try {
       const data = await getCartDetails();
-      const items = data.cart_items || [];
-      // Calculate total quantity from all cart items
-      const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      setCartCount(totalQuantity);
+      const items = data?.cart_items || [];
+
+      const uniqueCount = new Set(
+        items
+          .map((item) => item.product_id ?? item.product?.id ?? item.productId)
+          .filter(Boolean)
+      ).size;
+
+      setCartCount(uniqueCount);
     } catch (error) {
       console.error("Error fetching cart count:", error);
       setCartCount(0);
     }
   }, [user?.id]);
 
-  // Fetch cart count when user changes (login/logout)
   useEffect(() => {
     refreshCartCount();
   }, [refreshCartCount]);
 
-  const addToCart = async (product) => {
+  const addToCart = async (product, qty = 1) => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
@@ -48,8 +51,9 @@ export function CartProvider({ children }) {
         return;
       }
 
-      await addProductToCart(product.id, user.id, 1);
-      // Refresh cart count from server to get accurate count
+      const quantity = Math.max(1, Number(qty) || 1);
+
+      await addProductToCart(product.id, user.id, quantity);
       await refreshCartCount();
       ToastService.success("Đã thêm sản phẩm vào giỏ hàng");
     } catch (error) {
@@ -67,4 +71,3 @@ export function CartProvider({ children }) {
 export function useCart() {
   return useContext(CartContext);
 }
-
