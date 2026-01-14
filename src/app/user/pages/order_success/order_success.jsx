@@ -4,12 +4,16 @@ import styles from "./order_success.module.scss";
 
 export default function OrderSuccess() {
   const location = useLocation();
-  const { orderId, customer, items, totalAmount } = location.state || {
-    orderId: "N/A",
-    customer: {},
-    items: [],
-    totalAmount: 0
-  };
+  const { orderId, customer, items, totalAmount, order_server_id } =
+    location.state || {
+      orderId: "N/A",
+      customer: {},
+      items: [],
+      totalAmount: 0,
+      order_server_id,
+    };
+    console.log("Order id:", orderId);
+    console.log("Order server id:", order_server_id);
 
   return (
     <div className={styles.container}>
@@ -17,9 +21,12 @@ export default function OrderSuccess() {
         <div className={styles.successHeader}>
           <CheckCircle size={80} color="#27ae60" />
           <h1>ĐẶT HÀNG THÀNH CÔNG!</h1>
-          <p>Cảm ơn <strong>{customer.fullName}</strong> đã tin tưởng Fruit Store.</p>
+          <p>
+            Cảm ơn <strong>{customer.fullName}</strong> đã tin tưởng Fruit
+            Store.
+          </p>
           <div className={styles.orderCode}>
-            Mã đơn hàng: <span>{orderId}</span>
+            Mã đơn hàng: <span>{orderId === null ? order_server_id : orderId}</span>
           </div>
         </div>
 
@@ -31,10 +38,18 @@ export default function OrderSuccess() {
                 <h3>Thông tin giao hàng</h3>
               </div>
               <div className={styles.cardBody}>
-                <p><strong>Người nhận:</strong> {customer.fullName}</p>
-                <p><strong>Số điện thoại:</strong> {customer.phone}</p>
-                <p><strong>Email:</strong> {customer.email}</p>
-                <p><strong>Địa chỉ:</strong> {customer.address}</p>
+                <p>
+                  <strong>Người nhận:</strong> {customer.fullName}
+                </p>
+                <p>
+                  <strong>Số điện thoại:</strong> {customer.phone}
+                </p>
+                <p>
+                  <strong>Email:</strong> {customer.email}
+                </p>
+                <p>
+                  <strong>Địa chỉ:</strong> {customer.address}
+                </p>
               </div>
             </div>
 
@@ -44,7 +59,11 @@ export default function OrderSuccess() {
                 <h3>Phương thức thanh toán</h3>
               </div>
               <div className={styles.cardBody}>
-                <p>{customer.paymentMethod === "cod" ? "Thanh toán khi nhận hàng (COD)" : "Đã thanh toán qua thẻ quốc tế VISA"}</p>
+                <p>
+                  {customer.paymentMethod === "cod"
+                    ? "Thanh toán khi nhận hàng (COD)"
+                    : "Đã thanh toán qua thẻ quốc tế VISA"}
+                </p>
               </div>
             </div>
           </div>
@@ -60,7 +79,9 @@ export default function OrderSuccess() {
                   <div key={index} className={styles.item}>
                     <div className={styles.itemMain}>
                       <span className={styles.itemName}>{item.name}</span>
-                      <span className={styles.itemSub}>{item.unit} x {item.quantity}</span>
+                      <span className={styles.itemSub}>
+                        {item.unit} x {item.quantity}
+                      </span>
                     </div>
                     <span className={styles.itemPrice}>
                       {(item.price * item.quantity).toLocaleString()}đ
@@ -71,7 +92,9 @@ export default function OrderSuccess() {
               <div className={styles.totalSection}>
                 <div className={styles.totalRow}>
                   <span>Phí vận chuyển:</span>
-                  <span>{parseInt(customer.shippingMethod || 0).toLocaleString()}đ</span>
+                  <span>
+                    {parseInt(customer.shippingMethod || 0).toLocaleString()}đ
+                  </span>
                 </div>
                 <div className={styles.grandTotal}>
                   <span>Tổng thanh toán:</span>
@@ -87,7 +110,6 @@ export default function OrderSuccess() {
             <Home size={18} />
             Tiếp tục mua sắm
           </Link>
-
         </div>
       </div>
     </div>

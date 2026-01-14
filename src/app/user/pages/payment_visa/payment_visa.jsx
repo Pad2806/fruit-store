@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import styles from "./payment_visa.module.scss";
 import { ToastService } from "../../components/toast/Toast";
@@ -40,7 +40,14 @@ function PaymentVisaInner() {
   const { refreshCartCount } = useCart();
 
   const state = location.state || {};
-  const { orderId, totalAmount, customer, items = [], deliveryTime, orderPayload } = state;
+  const {
+    orderId,
+    totalAmount,
+    customer,
+    items = [],
+    deliveryTime,
+    orderPayload,
+  } = state;
 
   const [creatingIntent, setCreatingIntent] = useState(true);
   const [paying, setPaying] = useState(false);
@@ -49,7 +56,10 @@ function PaymentVisaInner() {
 
   const summary = useMemo(() => {
     const subtotal =
-      items.reduce((sum, it) => sum + (Number(it.price) || 0) * (Number(it.quantity) || 0), 0) || 0;
+      items.reduce(
+        (sum, it) => sum + (Number(it.price) || 0) * (Number(it.quantity) || 0),
+        0
+      ) || 0;
     const ship = Number(orderPayload?.shipping_fee || 0);
     const total = Number(totalAmount || 0);
     return { subtotal, ship, total };
@@ -83,19 +93,25 @@ function PaymentVisaInner() {
       setClientSecret(res.data.client_secret);
     } catch (err) {
       setInitError("Không thể khởi tạo thanh toán Stripe");
+      console.log(err);
     } finally {
       setCreatingIntent(false);
     }
   }, [orderPayload, totalAmount]);
 
+  const createdRef = useRef(false);
+
   useEffect(() => {
+    if (createdRef.current) return;
     if (!location.state || !orderPayload || !totalAmount) {
       navigate("/checkouts", { replace: true });
       return;
     }
-    createIntent();
-  }, [location.state, navigate, orderPayload, totalAmount, createIntent]);
 
+    createdRef.current = true;
+    createIntent();
+  }, []);
+  
   const handlePay = async (e) => {
     e.preventDefault();
     if (!stripe || !elements || !clientSecret) return;
@@ -131,7 +147,7 @@ function PaymentVisaInner() {
             await refreshCartCount();
             navigate("/order-success", {
               state: {
-                orderId,
+                orderId : null,
                 customer,
                 items,
                 totalAmount,
@@ -142,10 +158,14 @@ function PaymentVisaInner() {
             return;
           }
 
-          ToastService.error(confirmRes?.message || "Xác nhận đơn hàng thất bại");
+          ToastService.error(
+            confirmRes?.message || "Xác nhận đơn hàng thất bại"
+          );
           return;
         } catch (e) {
-          ToastService.error("Thanh toán thành công nhưng lưu đơn hàng thất bại");
+          ToastService.error(
+            "Thanh toán thành công nhưng lưu đơn hàng thất bại"
+          );
           return;
         }
       }
@@ -163,7 +183,8 @@ function PaymentVisaInner() {
           <div className={styles.brand}>
             <div className={styles.brandTitle}>Cổng thanh toán trực tuyến</div>
             <div className={styles.brandSub}>
-              <span className={styles.icon}>🔒</span> Kết nối được bảo mật bằng mã hóa SSL 256-bit
+              <span className={styles.icon}>🔒</span> Kết nối được bảo mật bằng
+              mã hóa SSL 256-bit
             </div>
           </div>
           <Link className={styles.backBtn} to="/checkouts">
@@ -204,7 +225,9 @@ function PaymentVisaInner() {
             ) : (
               <form onSubmit={handlePay} className={styles.form}>
                 <div className={styles.field}>
-                  <label className={styles.label}>Số thẻ ghi trên mặt trước</label>
+                  <label className={styles.label}>
+                    Số thẻ ghi trên mặt trước
+                  </label>
                   <div className={styles.inputShell}>
                     <CardNumberElement options={cardElementOptions} />
                   </div>
@@ -225,11 +248,20 @@ function PaymentVisaInner() {
                   </div>
                 </div>
 
-                <button className={styles.payBtn} type="submit" disabled={!stripe || paying || !clientSecret}>
-                  {paying ? "Đang xử lý giao dịch..." : `Thanh toán an toàn ${summary.total.toLocaleString()}đ`}
+                <button
+                  className={styles.payBtn}
+                  type="submit"
+                  disabled={!stripe || paying || !clientSecret}
+                >
+                  {paying
+                    ? "Đang xử lý giao dịch..."
+                    : `Thanh toán an toàn ${summary.total.toLocaleString()}đ`}
                 </button>
 
-                <div className={styles.pciNote}>Giao dịch của bạn tuân thủ tiêu chuẩn bảo mật PCI-DSS toàn cầu.</div>
+                <div className={styles.pciNote}>
+                  Giao dịch của bạn tuân thủ tiêu chuẩn bảo mật PCI-DSS toàn
+                  cầu.
+                </div>
               </form>
             )}
           </section>
@@ -242,7 +274,9 @@ function PaymentVisaInner() {
                   <span>
                     {it.name} x{it.quantity}
                   </span>
-                  <strong>{(Number(it.price) * Number(it.quantity)).toLocaleString()}đ</strong>
+                  <strong>
+                    {(Number(it.price) * Number(it.quantity)).toLocaleString()}đ
+                  </strong>
                 </div>
               ))}
             </div>

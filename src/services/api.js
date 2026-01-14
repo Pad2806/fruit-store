@@ -133,7 +133,7 @@ export const orderApi = {
     method: 'PATCH',
     body: JSON.stringify({ status }),
   }),
-  delete: (id) => request(`/orders/${id}`, {
+  delete: (id) => request(`/seller/orders/${id}`, {
     method: 'DELETE',
   }),
 };

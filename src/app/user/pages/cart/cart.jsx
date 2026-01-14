@@ -58,7 +58,9 @@ export default function Cart() {
     try {
       await updateItemQuantity(cartItemId, newQty);
       setCartItems((prev) =>
-        prev.map((item) => (item.id === cartItemId ? { ...item, quantity: newQty } : item))
+        prev.map((item) =>
+          item.id === cartItemId ? { ...item, quantity: newQty } : item
+        )
       );
       await refreshCartCount();
     } catch (error) {
@@ -67,19 +69,22 @@ export default function Cart() {
   };
 
   const handleRemoveItem = (cartItemId) => {
-    ToastService.confirmDelete("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?", async () => {
-      try {
-        await removeCartItem(cartItemId);
-        setCartItems((prev) => prev.filter((item) => item.id !== cartItemId));
-        await refreshCartCount();
-        ToastService.success("Đã xóa sản phẩm thành công");
-      } catch (error) {
-        console.log(error);
-        ToastService.error("Lỗi khi xóa sản phẩm");
+    ToastService.confirmDelete(
+      "Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?",
+      async () => {
+        try {
+          await removeCartItem(cartItemId);
+          setCartItems((prev) => prev.filter((item) => item.id !== cartItemId));
+          // Cập nhật cart count trên header
+          await refreshCartCount();
+          ToastService.success("Đã xóa sản phẩm thành công");
+        } catch (error) {
+          console.log(error);
+          ToastService.error("Lỗi khi xóa sản phẩm");
+        }
       }
-    });
+    );
   };
-
   const userId = user?.id || null;
 
   const totalPrice = cartItems.reduce((sum, item) => {
@@ -101,18 +106,32 @@ export default function Cart() {
 
   const dateOptions = [
     { label: "Hôm nay", value: formatDate(today) },
-    { label: `Ngày mai (${formatDate(tomorrow)})`, value: formatDate(tomorrow) },
-    { label: `Ngày kia (${formatDate(dayAfter)})`, value: formatDate(dayAfter) },
+    {
+      label: `Ngày mai (${formatDate(tomorrow)})`,
+      value: formatDate(tomorrow),
+    },
+    {
+      label: `Ngày kia (${formatDate(dayAfter)})`,
+      value: formatDate(dayAfter),
+    },
   ];
 
-  const timeOptions = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
+  const timeOptions = [
+    "09:00",
+    "10:00",
+    "11:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+  ];
 
   const [deliveryOption, setDeliveryOption] = useState("available");
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [confirmedTime, setConfirmedTime] = useState("");
   const [tempDateValue, setTempDateValue] = useState(dateOptions[0].value);
   const [tempTime, setTempTime] = useState(timeOptions[0]);
-  const [datetimeOrder, setDatetimeOrder] = useState(null);
+  const [datetimeOrder, setDatetimeOrder] = useState("");
 
   const parseTimeToMinutes = (t) => {
     const [h, m] = t.split(":").map(Number);
@@ -155,7 +174,7 @@ export default function Cart() {
     if (deliveryOption !== "select") {
       setIsConfirmed(false);
       setConfirmedTime("");
-      setDatetimeOrder(null);
+      setDatetimeOrder("");
       return;
     }
     if (isToday && validTimes.length === 0) {
@@ -183,7 +202,7 @@ export default function Cart() {
         cartItems,
         totalPrice,
         deliveryTime: isConfirmed ? confirmedTime : null,
-        datetime_order: isConfirmed ? datetimeOrder : null,
+        datetime_order: isConfirmed ? datetimeOrder : "",
         userId,
       },
     });
@@ -202,7 +221,8 @@ export default function Cart() {
         <div className={styles.leftCol}>
           <h2 className={styles.title}>Giỏ hàng của bạn</h2>
           <p className={styles.subTitle}>
-            Bạn đang có <strong>{cartItems.length} sản phẩm</strong> trong giỏ hàng
+            Bạn đang có <strong>{cartItems.length} sản phẩm</strong> trong giỏ
+            hàng
           </p>
 
           <div className={styles.itemList}>
@@ -220,19 +240,37 @@ export default function Cart() {
                 </div>
                 <div className={styles.itemDetails}>
                   <h3>{item.product_name}</h3>
-                  <p className={styles.readableText}>{item.product.short_desc}</p>
+                  <p className={styles.readableText}>
+                    {item?.product?.short_desc}
+                  </p>
                   <span className={styles.price}>
-                    {parseFloat(item.product_price).toLocaleString()}đ / {item.unit}
+                    {parseFloat(item.product_price).toLocaleString()}đ /{" "}
+                    {item.unit}
                   </span>
                 </div>
                 <div className={styles.rightInfo}>
                   <span className={styles.itemTotal}>
-                    {(item.quantity * parseFloat(item.product_price)).toLocaleString()}đ
+                    {(
+                      item.quantity * parseFloat(item.product_price)
+                    ).toLocaleString()}
+                    đ
                   </span>
                   <div className={styles.quantityGroup}>
-                    <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}>-</button>
+                    <button
+                      onClick={() =>
+                        handleUpdateQuantity(item.id, item.quantity - 1)
+                      }
+                    >
+                      -
+                    </button>
                     <input type="text" value={item.quantity} readOnly />
-                    <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}>+</button>
+                    <button
+                      onClick={() =>
+                        handleUpdateQuantity(item.id, item.quantity + 1)
+                      }
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
               </div>
@@ -266,7 +304,7 @@ export default function Cart() {
                       setDeliveryOption("available");
                       setIsConfirmed(false);
                       setConfirmedTime("");
-                      setDatetimeOrder(null);
+                      setDatetimeOrder("");
                     }}
                   />
                   Giao khi có hàng
@@ -294,7 +332,10 @@ export default function Cart() {
               {!isConfirmed && deliveryOption === "select" && (
                 <div className={styles.selectWrapper}>
                   <div className={styles.selectGroup}>
-                    <select value={tempDateValue} onChange={(e) => setTempDateValue(e.target.value)}>
+                    <select
+                      value={tempDateValue}
+                      onChange={(e) => setTempDateValue(e.target.value)}
+                    >
                       {dateOptions.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -319,7 +360,10 @@ export default function Cart() {
                     </select>
                   </div>
 
-                  <button className={styles.confirmTimeBtn} onClick={handleConfirmTime}>
+                  <button
+                    className={styles.confirmTimeBtn}
+                    onClick={handleConfirmTime}
+                  >
                     XÁC NHẬN THỜI GIAN
                   </button>
                 </div>
@@ -328,7 +372,9 @@ export default function Cart() {
 
             <div className={styles.totalRow}>
               <span>Tổng tiền:</span>
-              <span className={styles.finalPrice}>{totalPrice.toLocaleString()}đ</span>
+              <span className={styles.finalPrice}>
+                {totalPrice.toLocaleString()}đ
+              </span>
             </div>
 
             <button className={styles.checkoutBtn} onClick={handleCheckout}>
