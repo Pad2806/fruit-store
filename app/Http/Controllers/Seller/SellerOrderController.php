@@ -20,12 +20,13 @@ class SellerOrderController extends Controller
         $query = Order::withCount('details as total_products')
             ->withSum('details as total_quantity', 'quantity');
 
-        // Search by customer name only
         if (!empty($search)) {
             $query->where('recipient_name', 'like', "%{$search}%");
         }
 
-        $orders = $query->orderBy('datetime_order', 'desc')
+        $orders = $query
+            ->orderBy('created_at', 'desc')
+            ->orderBy('datetime_order', 'desc')
             ->paginate($perPage);
 
         return response()->json([
@@ -42,7 +43,6 @@ class SellerOrderController extends Controller
             ]
         ]);
     }
-    
     public function show(string $id): JsonResponse
     {
         $order = Order::with('details')->find($id);

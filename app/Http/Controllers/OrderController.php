@@ -85,7 +85,8 @@ class OrderController extends Controller
                         'recipient_district' => $metadata->recipient_district,
                         'note' => $metadata->note,
                         'datetime_order' => $metadata->datetime_order ?? now()->toString(),
-                        'status' => 'confirmed',
+                        // 'status' => 'confirmed',
+                        'status' => 'pending',
             ]);
 
             $this->createOrderDetailsFromCart($order, $cart);
