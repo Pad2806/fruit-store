@@ -4,7 +4,7 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Seller\ProductController;
-use App\Http\Controllers\Seller\CategoryController; 
+use App\Http\Controllers\Seller\CategoryController;
 use App\Http\Controllers\Seller\OriginController;
 use App\Http\Controllers\Seller\SellerOrderController;
 
@@ -89,6 +89,7 @@ Route::group(['prefix' => 'seller', 'middleware' => ['auth:sanctum', 'role:selle
 Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']], function () {
     // Define user routes here
     // Example: Route::get('/profile', [UserController::class, 'profile']);
+    Route::get('/profile', [App\Http\Controllers\User\UserController::class, 'show']);
     Route::get('orders', [App\Http\Controllers\User\OrderController::class, 'index']);
     Route::get('orders/{id}', [App\Http\Controllers\User\OrderController::class, 'show']);
     Route::post('orders/{id}/cancel', [App\Http\Controllers\User\OrderController::class, 'cancel']);
@@ -111,11 +112,11 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum', 'role:user']]
         Route::get('{order}', [OrderController::class, 'show']);
         Route::post('{order}/cancel', [OrderController::class, 'cancel']);
     });
-
     Route::post('/checkout/stripe', [PaymentController::class, 'stripeCheckout']);
     Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
-
 });
+
+
 
 
 
